@@ -1,0 +1,61 @@
+name: Harness
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    branches: [main, master, dev]
+
+jobs:
+  harness-smoke:
+    name: Harness Smoke Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate declarations
+        run: |
+          python -m src.cli validate
+
+      - name: Run harness (smoke, mock LLM)
+        run: |
+          mkdir -p reports
+          python -m src.cli harness tag --tag smoke \
+            --mock-llm --mock-mcp \
+            --junit reports/harness-smoke.xml \
+            --json-out reports/harness-smoke.json
+
+      - name: Run harness (all categories, mock LLM)
+        if: always()
+        run: |
+          python -m src.cli harness all \
+            --mock-llm --mock-mcp \
+            --junit reports/harness-all.xml \
+            --json-out reports/harness-all.json
+        continue-on-error: true
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: harness-reports
+          path: reports/
+
+      - name: Publish Test Report
+        if: always()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: 'reports/*.xml'
+          fail_on_failure: true
