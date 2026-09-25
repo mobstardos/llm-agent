@@ -1,0 +1,32 @@
+id: frontend
+schema_version: "1.5.0"
+title: Frontend MCP
+description: Bundle analysis, CSS, a11y, Lighthouse
+
+command: python
+args: ["-m", "src.mcp_servers.frontend.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: fe_detect, danger: read}
+  - {name: fe_build, danger: destructive}
+  - {name: fe_bundle_size, danger: read}
+  - {name: fe_dependencies_audit, danger: read}
+  - {name: css_analyze, danger: read}
+  - {name: css_lint, danger: read}
+  - {name: tailwind_config_info, danger: read}
+  - {name: a11y_check_url, danger: external}
+  - {name: lighthouse, danger: external}
+  - {name: fe_scripts, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,42 @@
+id: db_extended
+schema_version: "1.5.0"
+title: Database Extended MCP
+description: Redis, MongoDB, MSSQL, ElasticSearch
+
+command: python
+args: ["-m", "src.mcp_servers.db_extended.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: db_available, danger: read}
+  - {name: redis_get, danger: read}
+  - {name: redis_set, danger: write}
+  - {name: redis_delete, danger: destructive}
+  - {name: redis_keys, danger: read}
+  - {name: redis_info, danger: read}
+  - {name: redis_publish, danger: external}
+  - {name: mongo_find, danger: read}
+  - {name: mongo_insert, danger: write}
+  - {name: mongo_update, danger: write}
+  - {name: mongo_delete, danger: destructive}
+  - {name: mongo_collections, danger: read}
+  - {name: mongo_aggregate, danger: read}
+  - {name: mssql_query, danger: read}
+  - {name: mssql_tables, danger: read}
+  - {name: mssql_describe, danger: read}
+  - {name: es_search, danger: read}
+  - {name: es_indices, danger: read}
+  - {name: es_mapping, danger: read}
+  - {name: es_count, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

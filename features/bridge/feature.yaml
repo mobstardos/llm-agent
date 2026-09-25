@@ -1,0 +1,26 @@
+id: bridge
+version: "1.0.0"
+title: Мост (браузер)
+description: >
+  Мост «расширение браузера ↔ агенты». Расширение (Chromium/Firefox)
+  регистрирует открытые вкладки, забирает задачи long-poll'ом
+  (прочитать вкладку через chrome.scripting), отправляет захваты
+  страниц/выделений. Агенты видят вкладки через MCP «bridge»,
+  захваты ищут как память о прочитанном. Хранилище — файлы
+  data/bridge/ (tabs.json, jobs.json, captures.jsonl) — общие для
+  uvicorn и MCP-процесса, без внешней БД.
+enabled: true
+
+requires:
+  python_packages: []
+
+api_router: api.py:create_router
+
+ui_tab:
+  file: ui.js
+  title: Мост
+  icon: "🌐"
+
+ws_events:
+  - bridge.capture
+  - bridge.job

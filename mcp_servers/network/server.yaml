@@ -1,0 +1,32 @@
+id: network
+schema_version: "1.5.0"
+title: Network MCP
+description: ping, traceroute, DNS, SSL, порты
+
+command: python
+args: ["-m", "src.mcp_servers.network.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: external
+
+tools:
+  - {name: net_ping, danger: external}
+  - {name: net_traceroute, danger: external}
+  - {name: net_dns_lookup, danger: external}
+  - {name: net_reverse_dns, danger: external}
+  - {name: net_port_check, danger: external}
+  - {name: net_port_scan, danger: external}
+  - {name: net_ssl_check, danger: external}
+  - {name: net_http_headers, danger: external}
+  - {name: net_whois, danger: external}
+  - {name: net_local_ip, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

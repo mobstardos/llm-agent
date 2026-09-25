@@ -1,0 +1,25 @@
+id: onec_designer_info
+title: 1C Designer — проверка доступности
+category: 1c
+tags: [smoke, 1c]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь, доступен ли 1cv8.exe"
+
+options:
+  agent_id: onec_designer
+  mcp_servers: [onec_designer]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

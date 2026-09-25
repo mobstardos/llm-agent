@@ -1,0 +1,23 @@
+id: kubernetes_namespaces
+title: K8s — список namespaces
+category: dev
+tags: [smoke, dev, k8s]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Покажи список namespaces в кластере"
+
+options:
+  agent_id: kubernetes
+  mcp_servers: [kubernetes]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

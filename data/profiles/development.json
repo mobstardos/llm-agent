@@ -1,0 +1,20 @@
+{
+  "id": "development",
+  "title": "Разработка",
+  "description": "Все агенты включены, максимальные лимиты",
+  "overrides": {
+    "disabled_agents": [],
+    "disabled_mcp_servers": [],
+    "agent_params": {
+      "file": {
+        "max_steps": 25
+      },
+      "deepseek": {
+        "model": "deepseek-reasoner"
+      }
+    }
+  },
+  "is_builtin": true,
+  "created_at": 1790270986.5899656,
+  "updated_at": 1790270986.5899658
+}

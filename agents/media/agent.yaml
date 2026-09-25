@@ -1,0 +1,38 @@
+id: media
+schema_version: "1.5.0"
+title: Media агент
+version: "1.0.0"
+description: Аудио и видео — транскрипция, кадры, метаданные
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: whisper, ops: [transcribe], level: soft,
+       message: "Whisper не установлен — транскрипция недоступна"}
+    - {id: media, ops: [metadata], level: soft,
+       message: "ffmpeg не установлен — работа с медиа ограничена"}
+
+mcp_servers: [media, filesystem]
+depends_on:
+  hard: [file]
+  soft: [image]
+
+priority: 15
+routing_hints:
+  keywords: [аудио, видео, транскрипт, транскрибируй, mp3, mp4, кадр, whisper]
+  negative_keywords: [база, sql, 1с]
+  description_for_router: |
+    Работа с медиа: транскрипция аудио/видео (Whisper),
+    извлечение аудио и кадров, обрезка, конвертация, метаданные.
+
+mode: write
+dangerous_tools: [extract_audio, extract_frames, clip, convert, merge_audio_video]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 40000, timeout_seconds: 1800}
+ui: {icon: "🎬", color: "#a855f7", category: file}

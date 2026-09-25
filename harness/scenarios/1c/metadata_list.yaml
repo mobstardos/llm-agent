@@ -1,0 +1,25 @@
+id: onec_metadata_list
+title: 1C Metadata — список объектов
+category: 1c
+tags: [smoke, 1c, metadata]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Покажи список справочников конфигурации"
+
+options:
+  agent_id: onec_metadata
+  mcp_servers: [onec_metadata]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

@@ -1,0 +1,32 @@
+id: frontend
+schema_version: "1.5.0"
+title: Frontend агент
+version: "1.0.0"
+description: Bundle, CSS, a11y, Lighthouse
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [frontend, filesystem, browser]
+depends_on:
+  hard: [file]
+  soft: [browser]
+
+priority: 13
+routing_hints:
+  keywords: [frontend, react, vue, svelte, npm run, bundle, css, tailwind, lighthouse]
+  negative_keywords: [1с, sql]
+  description_for_router: |
+    Frontend: сборка, bundle-анализ, CSS, Tailwind, a11y, Lighthouse.
+
+mode: destructive
+dangerous_tools: [fe_build, lighthouse]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 900}
+ui: {icon: "🎨", color: "#ec4899", category: dev}

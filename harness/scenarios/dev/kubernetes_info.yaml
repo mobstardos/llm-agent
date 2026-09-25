@@ -1,0 +1,23 @@
+id: kubernetes_info
+title: K8s — проверка кластера
+category: dev
+tags: [smoke, dev, k8s]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь доступность kubectl и покажи текущий контекст"
+
+options:
+  agent_id: kubernetes
+  mcp_servers: [kubernetes]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

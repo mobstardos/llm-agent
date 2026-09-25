@@ -1,0 +1,32 @@
+id: mysql
+schema_version: "1.5.0"
+title: MySQL / SQLite агент
+version: "1.0.0"
+description: Работа с MySQL и SQLite
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: pymysql, level: soft}
+  env_vars:
+    - {name: MYSQL_HOST, level: soft}
+    - {name: SQLITE_PATH, level: soft}
+
+mcp_servers: [mysql]
+depends_on: {hard: [], soft: []}
+
+priority: 20
+routing_hints:
+  keywords: [mysql, sqlite, база, таблица, sql, select, insert]
+  negative_keywords: [postgres, 1с]
+  description_for_router: |
+    Работа с MySQL и SQLite: список таблиц, схемы, SELECT-запросы, миграции.
+
+mode: write
+dangerous_tools: [execute_write_query, execute_migration]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🗄", color: "#8b5cf6", category: db}

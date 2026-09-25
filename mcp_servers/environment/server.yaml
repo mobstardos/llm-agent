@@ -1,0 +1,36 @@
+id: environment
+schema_version: "1.5.0"
+title: Environment MCP
+description: venv, nvm, pyenv, версии инструментов
+
+command: python
+args: ["-m", "src.mcp_servers.environment.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: env_info, danger: read}
+  - {name: versions_all, danger: read}
+  - {name: python_venv_list, danger: read}
+  - {name: python_venv_create, danger: write}
+  - {name: python_venv_info, danger: read}
+  - {name: pyenv_versions, danger: read}
+  - {name: pyenv_install, danger: write}
+  - {name: pyenv_local, danger: write}
+  - {name: nvm_list, danger: read}
+  - {name: nvm_install, danger: write}
+  - {name: nvm_use, danger: write}
+  - {name: node_versions, danger: read}
+  - {name: go_versions, danger: read}
+  - {name: rust_versions, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,35 @@
+id: onec_designer
+schema_version: "1.5.0"
+title: 1C Designer MCP
+description: Управление 1С через 1cv8.exe DESIGNER
+
+command: python
+args: ["-m", "src.mcp_servers.onec_designer.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: designer_info, danger: read}
+  - {name: find_binary, danger: read}
+  - {name: load_config, danger: destructive}
+  - {name: unload_config, danger: write}
+  - {name: update_db, danger: destructive}
+  - {name: create_ib, danger: destructive}
+  - {name: dump_ib, danger: write}
+  - {name: restore_ib, danger: destructive}
+  - {name: check_config, danger: read}
+  - {name: build_cf, danger: write}
+  - {name: build_cfe, danger: write}
+  - {name: build_epf, danger: write}
+  - {name: parse_log, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

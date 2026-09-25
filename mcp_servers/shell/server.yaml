@@ -1,0 +1,24 @@
+id: shell
+schema_version: "1.5.0"
+title: Shell MCP
+description: Выполнение команд с allowlist
+
+command: python
+args: ["-m", "src.mcp_servers.shell.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: run, danger: destructive}
+  - {name: which, danger: read}
+
+process:
+  startup_timeout_seconds: 15
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,32 @@
+id: migration
+schema_version: "1.5.0"
+title: Migration MCP
+description: БД миграции (Alembic, Django, custom SQL)
+
+command: python
+args: ["-m", "src.mcp_servers.migration.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: migration_info, danger: read}
+  - {name: migration_list, danger: read}
+  - {name: migration_current, danger: read}
+  - {name: migration_history, danger: read}
+  - {name: migration_create, danger: write}
+  - {name: migration_up, danger: destructive}
+  - {name: migration_down, danger: destructive}
+  - {name: migration_stamp, danger: destructive}
+  - {name: schema_dump, danger: read}
+  - {name: schema_diff, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

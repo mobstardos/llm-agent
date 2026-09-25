@@ -1,0 +1,267 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Модели LLM и их параметры (Task 24-d: расширение списка провайдеров)
+# ═══════════════════════════════════════════════════════════════════════
+#
+# КАК ДОБАВИТЬ СВОЕГО ПРОВАЙДЕРА (docs/providers.md — подробнее):
+#   любой OpenAI-совместимый endpoint — это 3 строки в providers + ключ
+#   в .env. Код менять не нужно: /api/models сам опросит /v1/models,
+#   а UI покажет модели в группе провайдера.
+#
+# Поля провайдера:
+#   base_url    — поддерживает ${VAR:default} (подстановка из .env)
+#   api_key_env — имя переменной окружения с ключом (пусто → заглушка)
+#   local: true — работает без интернета (бейдж «локально» в UI)
+#   docs_url    — где взять ключ (подсказка в UI)
+#
+# Формат модели в чате: «provider/model» (пример openrouter/deepseek-chat)
+# или просто «model», если имя уникально в models ниже.
+
+default: qwen3.8-max
+
+# ─── Провайдеры ─────────────────────────────────────────────────────────
+providers:
+  qwen:
+    name: Qwen (qwenproxy)
+    base_url: ${QWENPROXY_URL:http://127.0.0.1:7936/v1}
+    api_key_env: ""
+
+  deepseek:
+    name: DeepSeek API
+    base_url: https://api.deepseek.com/v1
+    api_key_env: DEEPSEEK_API_KEY
+    docs_url: https://platform.deepseek.com/api_keys
+
+  ollama_local:
+    name: Локальная (Ollama)
+    base_url: ${OLLAMA_URL:http://127.0.0.1:11434}/v1
+    api_key_env: ""
+    local: true
+
+  lmstudio:
+    name: LM Studio (локально)
+    base_url: ${LMSTUDIO_URL:http://127.0.0.1:1234}/v1
+    api_key_env: ""
+    local: true
+    docs_url: https://lmstudio.ai/
+
+  openrouter:
+    name: OpenRouter (сотни моделей)
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    docs_url: https://openrouter.ai/keys
+
+  siliconflow:
+    name: SiliconFlow (free Qwen/DeepSeek)
+    base_url: https://api.siliconflow.cn/v1
+    api_key_env: SILICONFLOW_API_KEY
+    docs_url: https://cloud.siliconflow.cn/account/ak
+
+  vsegpt:
+    name: VseGPT (оплата картами РФ)
+    base_url: https://api.vsegpt.ru/v1
+    api_key_env: VSEGPT_API_KEY
+    docs_url: https://vsegpt.ru/Docs/API
+
+  proxyapi:
+    name: ProxyAPI (оплата картами РФ)
+    base_url: https://api.proxyapi.ru/openai/v1
+    api_key_env: PROXYAPI_API_KEY
+    docs_url: https://proxyapi.ru/
+
+  anthropic:
+    name: Anthropic Claude (OpenAI-compat)
+    base_url: https://api.anthropic.com/v1/
+    api_key_env: ANTHROPIC_API_KEY
+    docs_url: https://console.anthropic.com/settings/keys
+
+  gemini:
+    name: Google Gemini (OpenAI-compat)
+    base_url: ${GEMINI_URL:https://generativelanguage.googleapis.com}/v1beta/openai
+    api_key_env: GEMINI_API_KEY
+    docs_url: https://aistudio.google.com/apikey
+
+  groq:
+    name: Groq (быстрый inference)
+    base_url: https://api.groq.com/openai/v1
+    api_key_env: GROQ_API_KEY
+    docs_url: https://console.groq.com/keys
+
+  mistral:
+    name: Mistral AI
+    base_url: https://api.mistral.ai/v1
+    api_key_env: MISTRAL_API_KEY
+    docs_url: https://console.mistral.ai/api-keys/
+
+  openai:
+    name: OpenAI
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+    docs_url: https://platform.openai.com/api-keys
+
+# ─── Модели ──────────────────────────────────────────────────────────────
+# Записи ниже — минимум для старта БЕЗ живого probe (провайдер недоступен,
+# нет ключа и т.п.). Когда провайдер отвечает на /v1/models, UI показывает
+# его живой каталог (кв. id: provider/<имя из каталога>).
+models:
+  qwen3.8-max:
+    provider: qwen
+    context_window: 128000
+    supports_tools: true
+    supports_vision: false
+    temperature: 0.1
+    cost_hint: free
+
+  qwen3-thinking:
+    provider: qwen
+    context_window: 128000
+    supports_tools: true
+    supports_vision: false
+    temperature: 0.1
+    cost_hint: free
+
+  qwen3-fast:
+    provider: qwen
+    context_window: 32000
+    supports_tools: true
+    supports_vision: false
+    temperature: 0.1
+    cost_hint: free
+
+  qwen-vl-max:
+    provider: qwen
+    context_window: 32000
+    supports_tools: true
+    supports_vision: true
+    cost_hint: free
+
+  deepseek-reasoner:
+    provider: deepseek
+    context_window: 64000
+    supports_tools: true
+    supports_vision: false
+    reasoning: true
+    cost_hint: paid
+
+  deepseek-chat:
+    provider: deepseek
+    context_window: 64000
+    supports_tools: true
+    supports_vision: false
+    cost_hint: paid
+
+  "qwen2.5:1.5b-instruct":
+    provider: ollama_local
+    context_window: 4096
+    supports_tools: false
+    supports_vision: false
+    temperature: 0.2
+    cost_hint: local
+
+  # ── OpenRouter: free-модели (проверяйте актуальные на openrouter.ai) ──
+  "openrouter/deepseek/deepseek-chat-v3-0324:free":
+    provider: openrouter
+    context_window: 64000
+    supports_tools: true
+    cost_hint: free
+
+  "openrouter/deepseek/deepseek-r1:free":
+    provider: openrouter
+    context_window: 64000
+    supports_tools: false
+    reasoning: true
+    cost_hint: free
+
+  "openrouter/qwen/qwen3-235b-a22b:free":
+    provider: openrouter
+    context_window: 32000
+    supports_tools: true
+    cost_hint: free
+
+  # ── SiliconFlow: free-модели ──
+  "siliconflow/Qwen/Qwen3-8B":
+    provider: siliconflow
+    context_window: 32000
+    supports_tools: true
+    cost_hint: free
+
+  "siliconflow/deepseek-ai/DeepSeek-V3":
+    provider: siliconflow
+    context_window: 64000
+    supports_tools: true
+    cost_hint: paid
+
+  # ── VseGPT / ProxyAPI: имена уточняйте в каталоге провайдера ──
+  "vsegpt/gpt-4o-mini":
+    provider: vsegpt
+    context_window: 128000
+    supports_tools: true
+    cost_hint: paid
+
+  "vsegpt/deepseek-chat":
+    provider: vsegpt
+    context_window: 64000
+    supports_tools: true
+    cost_hint: paid
+
+  "proxyapi/gpt-4o-mini":
+    provider: proxyapi
+    context_window: 128000
+    supports_tools: true
+    cost_hint: paid
+
+  # ── Anthropic (OpenAI-совместимый endpoint) ──
+  "anthropic/claude-sonnet-4-5":
+    provider: anthropic
+    context_window: 200000
+    supports_tools: true
+    cost_hint: paid
+
+  "anthropic/claude-haiku-4-5":
+    provider: anthropic
+    context_window: 200000
+    supports_tools: true
+    cost_hint: paid
+
+  # ── Gemini (OpenAI-совместимый endpoint; из РФ — только через прокси) ──
+  "gemini/gemini-2.5-flash":
+    provider: gemini
+    context_window: 1000000
+    supports_tools: true
+    cost_hint: free
+
+  "gemini/gemini-2.5-pro":
+    provider: gemini
+    context_window: 1000000
+    supports_tools: true
+    cost_hint: paid
+
+  # ── Groq / Mistral (из РФ — через прокси) ──
+  "groq/llama-3.3-70b-versatile":
+    provider: groq
+    context_window: 128000
+    supports_tools: true
+    cost_hint: free
+
+  "mistral/mistral-large-latest":
+    provider: mistral
+    context_window: 128000
+    supports_tools: true
+    cost_hint: paid
+
+# ─── Правила выбора модели ──────────────────────────────────────────────
+selection:
+  default: qwen3.8-max
+  # Fallback-цепочка (Task 24-d): если выбранная модель недоступна
+  # (нет связи/ключ испорчен/модель удалена) — авто-переход по списку.
+  # Локальная Ollama-модель — последний рубеж (работает без интернета).
+  fallbacks:
+    - qwen3.8-max
+    - "ollama_local/qwen2.5:1.5b-instruct"
+  per_agent:
+    deepseek: deepseek-reasoner
+    image: qwen-vl-max
+  per_task:
+    - match: "проанализируй|подумай|разберись"
+      prefer: qwen3-thinking
+    - match: "быстро|просто"
+      prefer: qwen3-fast

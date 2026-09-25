@@ -1,0 +1,23 @@
+id: journal
+version: "2.0.0"
+title: Журнал действий
+description: >
+  Чёрный ящик: события tool-calls, тени файлов, diff, граф зависимостей,
+  провенанс, откат (rollback), replay, ретенция, отчёты. Этап 5: единое
+  SQLite-поколение (stdlib, без PostgreSQL), API и вкладка — из реестра фич.
+enabled: true
+
+requires:
+  python_packages: []
+  # Этап 5: журнал работает на sqlite3/hashlib/zipfile (stdlib) —
+  # никаких внешних пакетов не требуется; PostgreSQL-бэкенд v1.0 — attic/.
+
+api_router: api.py:create_router
+
+ui_tab:
+  file: ui.js
+  title: Журнал
+  icon: "📓"
+
+ws_events:
+  - journal.event

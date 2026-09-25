@@ -1,0 +1,23 @@
+id: db_extended_available
+title: DB Extended — проверка
+category: dev
+tags: [smoke, dev, db_extended]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь, какие БД настроены"
+
+options:
+  agent_id: db_extended
+  mcp_servers: [db_extended]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

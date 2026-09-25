@@ -1,0 +1,32 @@
+id: cicd
+schema_version: "1.5.0"
+title: CI/CD агент
+version: "1.0.0"
+description: GitLab CI, Jenkins
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [cicd, filesystem]
+depends_on: {hard: [], soft: [git, github]}
+
+priority: 13
+routing_hints:
+  keywords: [gitlab, jenkins, pipeline, ci, cd, build job]
+  negative_keywords: [1с]
+  description_for_router: |
+    CI/CD: GitLab pipelines (jobs, logs, retry), Jenkins (jobs, builds).
+
+mode: external
+dangerous_tools: [gitlab_retry, gitlab_cancel, gitlab_trigger,
+                  jenkins_build, jenkins_abort]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 40000, timeout_seconds: 300}
+ui: {icon: "⚙️", color: "#f97316", category: dev}

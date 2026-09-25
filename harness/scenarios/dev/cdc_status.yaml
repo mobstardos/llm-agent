@@ -1,0 +1,23 @@
+id: cdc_status
+title: CDC — проверка статуса
+category: dev
+tags: [smoke, dev, cdc]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь статус CDC worker"
+
+options:
+  agent_id: file
+  mcp_servers: [filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

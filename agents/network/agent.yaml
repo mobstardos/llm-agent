@@ -1,0 +1,31 @@
+id: network
+schema_version: "1.5.0"
+title: Network агент
+version: "1.0.0"
+description: ping, traceroute, DNS, SSL, порты
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [network, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 17
+routing_hints:
+  keywords: [ping, traceroute, dns, ssl, сертификат, порт, сеть, connection]
+  negative_keywords: [1с]
+  description_for_router: |
+    Сетевые утилиты: ping, traceroute, DNS, reverse DNS,
+    проверка портов, SSL-сертификатов, whois.
+
+mode: external
+dangerous_tools: [net_port_scan]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 20000, timeout_seconds: 300}
+ui: {icon: "🌍", color: "#0ea5e9", category: dev}

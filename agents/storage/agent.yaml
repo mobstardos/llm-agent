@@ -1,0 +1,35 @@
+id: storage
+schema_version: "1.5.0"
+title: Storage агент
+version: "1.0.0"
+description: Cloud storage — S3, MinIO, локальная FS
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: storage, ops: [upload], level: soft}
+
+mcp_servers: [storage, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 15
+routing_hints:
+  keywords: [s3, minio, хранилище, cloud, загрузи в облако, скачай из облака]
+  negative_keywords: [1с, база]
+  description_for_router: |
+    Работа с cloud storage: upload/download, sync, presigned URL.
+    S3, MinIO или локальная директория.
+
+mode: write
+dangerous_tools: [upload, download, delete_object, sync_up, sync_down]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "☁️", color: "#0ea5e9", category: dev}

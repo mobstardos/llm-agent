@@ -1,0 +1,53 @@
+id: code_analysis
+schema_version: "1.5.0"
+title: Code Analysis MCP
+description: Анализ кода — символы, ссылки, рефакторинг, метрики
+
+command: python
+args: ["-m", "src.mcp_servers.code_analysis.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: tree_sitter, level: soft}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  # ─── Символы ────────────────────────────────
+  - {name: find_symbol, danger: read}
+  - {name: find_references, danger: read}
+  - {name: list_symbols_in_file, danger: read}
+  - {name: search_symbols, danger: read}
+  - {name: get_symbol_info, danger: read}
+  - {name: call_hierarchy, danger: read}
+  - {name: class_hierarchy, danger: read}
+
+  # ─── Рефакторинг ────────────────────────────
+  - {name: rename_symbol, danger: write}
+  - {name: extract_function, danger: write}
+  - {name: extract_variable, danger: write}
+  - {name: inline_variable, danger: write}
+  - {name: organize_imports, danger: write}
+  - {name: remove_unused_imports, danger: write}
+  - {name: add_docstring, danger: write}
+
+  # ─── Анализ ─────────────────────────────────
+  - {name: find_unused, danger: read}
+  - {name: find_dead_code, danger: read}
+  - {name: complexity_report, danger: read}
+  - {name: dependency_graph, danger: read}
+  - {name: find_duplicates, danger: read}
+  - {name: find_todos, danger: read}
+
+  # ─── Навигация ──────────────────────────────
+  - {name: locate_import, danger: read}
+  - {name: resolve_import, danger: read}
+  - {name: file_outline, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

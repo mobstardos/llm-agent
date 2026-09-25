@@ -1,0 +1,39 @@
+# ═══════════════════════════════════════════════════════════════════════
+# LiteLLM-шлюз (опционально, Task 24-d): универсальный адаптер для
+# провайдеров с нативным НЕ-OpenAI API (Bedrock, Vertex AI, GigaChat…).
+#
+# Запуск:
+#   pip install 'litellm[proxy]'
+#   export ANTHROPIC_API_KEY=...        # ключи провайдеров
+#   litellm --config config/litellm.example.yaml --port 4000
+#
+# Затем в config/models.yaml:
+#   providers:
+#     litellm:
+#       name: LiteLLM шлюз
+#       base_url: http://127.0.0.1:4000/v1
+#       api_key_env: LITELLM_KEY        # master_key из этого конфига
+# ═══════════════════════════════════════════════════════════════════════
+
+model_list:
+  # Claude через нативный Anthropic SDK
+  - model_name: claude-sonnet-4-5
+    litellm_params:
+      model: anthropic/claude-sonnet-4-5
+
+  # Gemini через нативный google AI Studio SDK
+  - model_name: gemini-2.5-flash
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+
+  # Пример: любой провайдер LiteLLM добавляется одной записью
+  # - model_name: gigachat-max
+  #   litellm_params:
+  #     model: gigachat/giga-chat-max
+
+litellm_settings:
+  drop_params: true          # молча игнорировать несовместимые параметры
+  num_retries: 1
+
+general_settings:
+  master_key: sk-litagente-local-1234   # → LITELLM_KEY в .env

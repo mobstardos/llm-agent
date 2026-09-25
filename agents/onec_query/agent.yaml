@@ -1,0 +1,30 @@
+id: onec_query
+schema_version: "1.5.0"
+title: 1С Query агент
+version: "1.0.0"
+description: Язык запросов 1С — парсинг, валидация, оптимизация
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mcp_servers: [onec_query]
+depends_on: {hard: [], soft: []}
+
+priority: 14
+routing_hints:
+  keywords: [запрос 1с, язык запросов, выбери, группировка, ВЫБРАТЬ]
+  negative_keywords: [sql, postgres, mysql]
+  description_for_router: |
+    Язык запросов 1С: разбор, валидация, извлечение метаданных,
+    конвертация SQL ↔ 1С, оптимизация.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 120}
+ui: {icon: "🔍", color: "#dc2626", category: 1c}

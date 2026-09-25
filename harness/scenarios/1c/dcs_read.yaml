@@ -1,0 +1,25 @@
+id: onec_dcs_read
+title: 1C DCS — чтение схемы
+category: 1c
+tags: [smoke, 1c, dcs]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Найди и проанализируй схему компоновки данных отчёта"
+
+options:
+  agent_id: onec_dcs
+  mcp_servers: [onec_dcs]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

@@ -1,0 +1,26 @@
+id: browser_page_open
+title: Browser — открыть страницу
+category: browser
+tags: [smoke, browser]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "index.html": |
+        <html><body><h1 id="t">Hello</h1></body></html>
+
+prompt: "Открой http://localhost:8000 и проверь заголовок"
+
+options:
+  agent_id: browser
+  mcp_servers: [browser, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 10}
+
+loop: agent.reasoning

@@ -1,0 +1,23 @@
+id: network_local_ip
+title: Network — локальный IP
+category: dev
+tags: [smoke, dev, network]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Покажи локальный IP и hostname"
+
+options:
+  agent_id: network
+  mcp_servers: [network, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

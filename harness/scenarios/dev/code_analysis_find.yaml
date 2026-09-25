@@ -1,0 +1,30 @@
+id: code_analysis_find_symbol
+title: Code Analysis — поиск символа
+category: dev
+tags: [smoke, dev, code_analysis]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.py": |
+        def hello():
+            print("hi")
+
+        def world():
+            hello()
+
+prompt: "Найди все определения hello"
+
+options:
+  agent_id: code_analysis
+  mcp_servers: [code_analysis, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

@@ -1,0 +1,32 @@
+id: git
+schema_version: "1.5.0"
+title: Git агент
+version: "1.0.0"
+description: Git-операции в проекте
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [git, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 12
+routing_hints:
+  keywords: [git, коммит, ветка, branch, commit, diff, merge]
+  negative_keywords: [1с, база]
+  description_for_router: |
+    Git-операции: статус, diff, коммиты, ветки, откаты.
+
+mode: write
+dangerous_tools: [commit, reset, checkout, branch_create]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 20000, timeout_seconds: 300}
+ui: {icon: "🔀", color: "#f97316", category: dev}

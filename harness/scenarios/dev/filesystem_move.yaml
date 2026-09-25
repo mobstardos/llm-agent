@@ -1,0 +1,25 @@
+id: filesystem_move_file
+title: Filesystem — перемещение файла
+category: dev
+tags: [smoke, dev, filesystem]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "src/old.py": |
+        def foo():
+            pass
+
+prompt: "Перемести src/old.py в src/new.py"
+
+options:
+  agent_id: file
+  mcp_servers: [filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

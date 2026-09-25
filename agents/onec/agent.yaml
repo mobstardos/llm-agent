@@ -1,0 +1,32 @@
+id: onec
+schema_version: "1.5.0"
+title: 1С агент
+version: "1.0.0"
+description: Чтение данных 1С через OData
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+  env_vars:
+    - {name: ONEC_BASE_URL, level: hard}
+
+mcp_servers: [onec]
+depends_on: {hard: [], soft: []}
+
+priority: 15
+routing_hints:
+  keywords: [1с, onec, справочник, документ, регистр, контрагент]
+  negative_keywords: [mysql, postgres]
+  description_for_router: |
+    Чтение данных из 1С:Предприятие через OData.
+    Справочники, документы, регистры.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🏢", color: "#dc2626", category: 1c}

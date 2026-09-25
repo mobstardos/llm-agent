@@ -1,0 +1,38 @@
+id: image
+schema_version: "1.5.0"
+title: Image MCP
+description: Работа с изображениями — описание, OCR, обработка
+
+command: python
+args: ["-m", "src.mcp_servers.image.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: PIL, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: vision, ops: [describe], level: soft}
+    - {id: ocr, ops: [ocr], level: soft}
+
+mode: write
+
+tools:
+  - {name: describe, danger: read}
+  - {name: ocr, danger: read}
+  - {name: classify, danger: read}
+  - {name: compare, danger: read}
+  - {name: metadata, danger: read}
+  - {name: resize, danger: write}
+  - {name: crop, danger: write}
+  - {name: convert, danger: write}
+  - {name: optimize, danger: write}
+  - {name: generate_favicon_set, danger: write}
+  - {name: diff_visual, danger: read}
+  - {name: vision_info, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

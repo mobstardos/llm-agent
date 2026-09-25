@@ -1,0 +1,26 @@
+{
+  "id": "1c_development",
+  "title": "1С-разработка",
+  "description": "1С + файлы + deepseek",
+  "overrides": {
+    "disabled_agents": [
+      "mysql",
+      "postgres"
+    ],
+    "agent_params": {
+      "file": {
+        "priority": 20
+      },
+      "onec": {
+        "priority": 15,
+        "max_steps": 20
+      },
+      "deepseek": {
+        "priority": 10
+      }
+    }
+  },
+  "is_builtin": true,
+  "created_at": 1790270986.5902147,
+  "updated_at": 1790270986.590215
+}

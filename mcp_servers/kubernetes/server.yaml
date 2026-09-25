@@ -1,0 +1,75 @@
+id: kubernetes
+schema_version: "1.5.0"
+title: Kubernetes MCP
+description: Управление K8s-кластером через kubectl
+
+command: python
+args: ["-m", "src.mcp_servers.kubernetes.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+
+mode: destructive
+
+tools:
+  # ─── Context / Cluster ──────────────────────
+  - {name: k8s_info, danger: read}
+  - {name: k8s_list_contexts, danger: read}
+  - {name: k8s_current_context, danger: read}
+  - {name: k8s_use_context, danger: write}
+  - {name: k8s_cluster_info, danger: read}
+  - {name: k8s_list_namespaces, danger: read}
+
+  # ─── Pods ───────────────────────────────────
+  - {name: k8s_list_pods, danger: read}
+  - {name: k8s_get_pod, danger: read}
+  - {name: k8s_describe_pod, danger: read}
+  - {name: k8s_pod_logs, danger: read}
+  - {name: k8s_exec_pod, danger: destructive}
+  - {name: k8s_delete_pod, danger: destructive}
+
+  # ─── Deployments ────────────────────────────
+  - {name: k8s_list_deployments, danger: read}
+  - {name: k8s_get_deployment, danger: read}
+  - {name: k8s_scale_deployment, danger: destructive}
+  - {name: k8s_restart_deployment, danger: destructive}
+  - {name: k8s_rollout_status, danger: read}
+  - {name: k8s_rollout_history, danger: read}
+  - {name: k8s_rollout_undo, danger: destructive}
+
+  # ─── Services / Ingress ─────────────────────
+  - {name: k8s_list_services, danger: read}
+  - {name: k8s_get_service, danger: read}
+  - {name: k8s_list_ingresses, danger: read}
+
+  # ─── ConfigMaps / Secrets ───────────────────
+  - {name: k8s_list_configmaps, danger: read}
+  - {name: k8s_get_configmap, danger: read}
+  - {name: k8s_list_secrets, danger: read}
+
+  # ─── Nodes ──────────────────────────────────
+  - {name: k8s_list_nodes, danger: read}
+  - {name: k8s_describe_node, danger: read}
+  - {name: k8s_top_nodes, danger: read}
+  - {name: k8s_top_pods, danger: read}
+
+  # ─── Events ─────────────────────────────────
+  - {name: k8s_events, danger: read}
+
+  # ─── Apply / Delete ─────────────────────────
+  - {name: k8s_apply_manifest, danger: destructive}
+  - {name: k8s_delete_manifest, danger: destructive}
+  - {name: k8s_apply_file, danger: destructive}
+
+  # ─── Helm ───────────────────────────────────
+  - {name: k8s_helm_list, danger: read}
+  - {name: k8s_helm_status, danger: read}
+  - {name: k8s_helm_history, danger: read}
+  - {name: k8s_helm_rollback, danger: destructive}
+  - {name: k8s_helm_values, danger: read}
+
+process:
+  startup_timeout_seconds: 15
+  restart_policy: on_failure
+  max_restarts: 3

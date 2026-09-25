@@ -1,0 +1,23 @@
+id: search_synonyms
+title: Search — расширение синонимами
+category: dev
+tags: [smoke, dev, search]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь /api/synonyms"
+
+options:
+  agent_id: file
+  mcp_servers: [filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

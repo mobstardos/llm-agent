@@ -1,0 +1,81 @@
+Секций с файлами: 578
+Сообщений MSG: 21
+
+  .env.example: MSG 93 добавлено 4 ключей
+  .env.example: MSG 95 добавлено 2 ключей
+  .env.example: MSG 95 добавлено 5 ключей
+  .env.example: MSG 97 добавлено 1 ключей
+  .env.example: MSG 99 добавлено 3 ключей
+  .env.example: MSG 101 добавлено 11 ключей
+  .env.example: MSG 105 добавлено 4 ключей
+  .env.example: MSG 107 добавлено 2 ключей
+  .env.example: MSG 109 добавлено 18 ключей
+  .env.example: MSG 111 добавлено 3 ключей
+  settings.yaml: секция mcp_servers заменена из MSG 97
+  settings.yaml: require_confirmation_for +32 из MSG 97
+  settings.yaml: require_confirmation_for +55 из MSG 99
+  settings.yaml: require_confirmation_for +72 из MSG 101
+  settings.yaml: require_confirmation_for +28 из MSG 105
+  settings.yaml: require_confirmation_for +34 из MSG 107
+  settings.yaml: require_confirmation_for +31 из MSG 109
+  settings.yaml: require_confirmation_for +14 из MSG 111
+[ПУСТО] harness/tests/__init__.py (MSG 91) — нет код-блока
+  requirements.txt: MSG 67 добавлено 1 строк
+  requirements.txt: MSG 91 добавлено 1 строк
+  requirements.txt: MSG 91 добавлено 17 строк
+  requirements.txt: MSG 93 добавлено 9 строк
+  requirements.txt: MSG 93 добавлено 4 строк
+  requirements.txt: MSG 93 добавлено 1 строк
+  requirements.txt: MSG 95 добавлено 1 строк
+  requirements.txt: MSG 97 добавлено 1 строк
+  requirements.txt: MSG 101 добавлено 1 строк
+  requirements.txt: MSG 101 добавлено 2 строк
+  requirements.txt: MSG 105 добавлено 1 строк
+  requirements.txt: MSG 105 добавлено 2 строк
+  requirements.txt: MSG 107 добавлено 10 строк
+  requirements.txt: MSG 109 добавлено 14 строк
+  requirements.txt: MSG 111 добавлено 2 строк
+[ПУСТО] src/extraction/extractors/__init__.py (MSG 91) — нет код-блока
+[ПУСТО] src/mcp_servers/browser/__init__.py (MSG 95) — нет код-блока
+[ПУСТО] src/mcp_servers/build/__init__.py (MSG 107) — нет код-блока
+[ПУСТО] src/mcp_servers/cicd/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/code_analysis/__init__.py (MSG 105) — нет код-блока
+[ПУСТО] src/mcp_servers/data/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/db_extended/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/debug/__init__.py (MSG 107) — нет код-блока
+[ПУСТО] src/mcp_servers/deepseek/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/document/__init__.py (MSG 91) — нет код-блока
+[ПУСТО] src/mcp_servers/documentation/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/environment/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/filesystem/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/frontend/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/git/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/github/__init__.py (MSG 107) — нет код-блока
+[ПУСТО] src/mcp_servers/http/__init__.py (MSG 107) — нет код-блока
+[ПУСТО] src/mcp_servers/image/__init__.py (MSG 93) — нет код-блока
+[ПУСТО] src/mcp_servers/kubernetes/__init__.py (MSG 111) — нет код-блока
+[ПУСТО] src/mcp_servers/lsp/__init__.py (MSG 105) — нет код-блока
+[ПУСТО] src/mcp_servers/media/__init__.py (MSG 101) — нет код-блока
+[ПУСТО] src/mcp_servers/memory/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/migration/__init__.py (MSG 107) — нет код-блока
+[ПУСТО] src/mcp_servers/monitoring/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/mysql/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/network/__init__.py (MSG 109) — нет код-блока
+[ПУСТО] src/mcp_servers/onec/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/onec_dcs/__init__.py (MSG 99) — нет код-блока
+[ПУСТО] src/mcp_servers/onec_designer/__init__.py (MSG 95) — нет код-блока
+[ПУСТО] src/mcp_servers/onec_forms/__init__.py (MSG 99) — нет код-блока
+[ПУСТО] src/mcp_servers/onec_metadata/__init__.py (MSG 97) — нет код-блока
+[ПУСТО] src/mcp_servers/onec_query/__init__.py (MSG 97) — нет код-блока
+[ПУСТО] src/mcp_servers/onec_tests/__init__.py (MSG 99) — нет код-блока
+[ПУСТО] src/mcp_servers/postgres/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/security/__init__.py (MSG 107) — нет код-блока
+[ПУСТО] src/mcp_servers/shell/__init__.py (MSG 83) — нет код-блока
+[ПУСТО] src/mcp_servers/storage/__init__.py (MSG 101) — нет код-блока
+[ПУСТО] src/mcp_servers/testing/__init__.py (MSG 107) — нет код-блока
+[ПУСТО] src/web/__init__.py (MSG 87) — нет код-блока
+
+Полных файлов сохранено: 416
+Патчей слито автоматически: 33
+Патчей сохранено в patches/: 8
+Записей в манифесте неслитых: 6

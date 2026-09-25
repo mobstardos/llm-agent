@@ -1,0 +1,23 @@
+id: deepseek_web
+schema_version: "1.5.0"
+title: DeepSeek Web MCP
+description: DeepSeek через веб-cookies
+
+command: python
+args: ["-m", "src.mcp_servers.deepseek.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+
+mode: read
+
+tools:
+  - {name: deepseek_chat, danger: read}
+  - {name: deepseek_reasoner, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

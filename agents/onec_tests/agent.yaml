@@ -1,0 +1,33 @@
+id: onec_tests
+schema_version: "1.5.0"
+title: 1С Tests агент
+version: "1.0.0"
+description: Автотесты 1С — YAxUnit и Vanessa Automation
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [onec_tests, onec_designer, filesystem]
+depends_on:
+  hard: [file]
+  soft: [onec_designer]
+
+priority: 14
+routing_hints:
+  keywords: [тесты 1с, yaxunit, vanessa, feature, автотесты]
+  negative_keywords: [web, sql]
+  description_for_router: |
+    Автотесты 1С: YAxUnit (unit-тесты BSL) и Vanessa Automation
+    (BDD feature-файлы). Запуск, анализ результатов.
+
+mode: destructive
+dangerous_tools: [run_yaxunit, run_vanessa]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 1800}
+ui: {icon: "🧪", color: "#dc2626", category: 1c}

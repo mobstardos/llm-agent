@@ -1,0 +1,30 @@
+id: postgres
+schema_version: "1.5.0"
+title: PostgreSQL MCP
+description: Работа с PostgreSQL
+
+command: python
+args: ["-m", "src.mcp_servers.postgres.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: psycopg, level: soft, message: "psycopg не установлен"}
+  env_vars:
+    - {name: PG_HOST, level: soft}
+
+mode: write
+
+tools:
+  - {name: list_schemas, danger: read}
+  - {name: list_tables, danger: read}
+  - {name: describe_table, danger: read}
+  - {name: run_query, danger: read}
+  - {name: execute_write_query, danger: write}
+  - {name: execute_migration, danger: destructive}
+  - {name: driver_info, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

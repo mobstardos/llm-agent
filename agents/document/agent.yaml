@@ -1,0 +1,37 @@
+id: document
+schema_version: "1.5.0"
+title: Document агент
+version: "1.0.0"
+description: Работа с документами — PDF, DOCX, XLSX, изображения
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: pdfplumber, level: soft, message: "pdfplumber не установлен — PDF не читается"}
+    - {name: docx, level: soft, message: "python-docx не установлен — DOCX не читается"}
+    - {name: openpyxl, level: soft, message: "openpyxl не установлен — XLSX не читается"}
+    - {name: PIL, level: soft, message: "Pillow не установлен — изображения не читаются"}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [document, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 15
+routing_hints:
+  keywords: [pdf, docx, xlsx, документ, таблица, извлеки, прочитай файл]
+  negative_keywords: [база, 1с, git]
+  description_for_router: |
+    Извлечение текста и таблиц из PDF, DOCX, XLSX, изображений.
+    Используй для работы с документацией, ТЗ, выгрузками.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 40000, timeout_seconds: 300}
+ui: {icon: "📄", color: "#f59e0b", category: dev}

@@ -1,0 +1,36 @@
+id: cicd
+schema_version: "1.5.0"
+title: CI/CD MCP
+description: GitLab CI, Jenkins
+
+command: python
+args: ["-m", "src.mcp_servers.cicd.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: external
+
+tools:
+  - {name: cicd_info, danger: read}
+  - {name: gitlab_pipelines, danger: read}
+  - {name: gitlab_pipeline, danger: read}
+  - {name: gitlab_jobs, danger: read}
+  - {name: gitlab_job_log, danger: read}
+  - {name: gitlab_retry, danger: external}
+  - {name: gitlab_cancel, danger: external}
+  - {name: gitlab_trigger, danger: external}
+  - {name: jenkins_jobs, danger: read}
+  - {name: jenkins_job_info, danger: read}
+  - {name: jenkins_build, danger: external}
+  - {name: jenkins_console, danger: read}
+  - {name: jenkins_abort, danger: external}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

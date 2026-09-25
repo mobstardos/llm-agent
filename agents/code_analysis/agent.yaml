@@ -1,0 +1,41 @@
+id: code_analysis
+schema_version: "1.5.0"
+title: Code Analysis агент
+version: "1.0.0"
+description: Анализ кода, символы, рефакторинг
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: tree_sitter, level: soft}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [code_analysis, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 8
+routing_hints:
+  keywords: [найди функцию, где используется, переименуй, рефакторинг, структура, символы]
+  negative_keywords: [1с, база]
+  description_for_router: |
+    Анализ кода: поиск символов и ссылок, рефакторинг (rename, extract),
+    структура файла, мёртвый код, сложность, дубликаты, TODO.
+
+mode: write
+dangerous_tools:
+  - rename_symbol
+  - extract_function
+  - extract_variable
+  - inline_variable
+  - organize_imports
+  - remove_unused_imports
+  - add_docstring
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 40000, timeout_seconds: 300}
+ui: {icon: "🔎", color: "#6366f1", category: dev}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>LLM Agent — интерактивный курс</title>
+  <link rel="stylesheet" href="/static/guide.css" />
+</head>
+<body>
+  <div class="g-app">
+    <header>
+      <a class="g-home" href="/" title="Вернуться в чат">← 🤖 LLM Agent</a>
+      <h1>🎓 Интерактивный курс</h1>
+      <div class="g-progress-pill">
+        Пройдено: <b id="g-progress-num">0</b>/<span id="g-progress-total">10</span>
+        <button id="g-reset" type="button" title="Сбросить прогресс">↺</button>
+      </div>
+    </header>
+
+    <div class="g-layout">
+      <aside id="g-sidebar" class="g-sidebar"><!-- уроки рендерит guide.js --></aside>
+      <main id="g-main" class="g-main"><!-- контент урока --></main>
+    </div>
+
+    <footer class="g-footer">
+      <button id="g-prev" type="button" class="secondary">← Назад</button>
+      <span id="g-step-label" class="g-step-label"></span>
+      <button id="g-next" type="button" class="primary">Далее →</button>
+    </footer>
+  </div>
+
+  <script src="/static/guide.js"></script>
+</body>
+</html>

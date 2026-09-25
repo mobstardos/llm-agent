@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>LLM Agent</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>🤖 LLM Agent</h1>
+      <div class="controls">
+        <!-- Индикатор системы -->
+        <span id="sys-status" class="sys-status" title="Состояние системы">
+          <span class="sys-dot" id="sys-dot"></span>
+          <span id="sys-text">—</span>
+        </span>
+
+        <!-- Кнопка проекта -->
+        <button id="project-btn" class="project-btn" type="button">
+          📁 <span id="project-label">проект…</span>
+        </button>
+
+        <!-- Метрики кэша -->
+        <span id="cache-stats" class="cache-stats" title="Кэш">—</span>
+
+        <!-- Модель (Task 24-d: комбо-бокс с поиском по всем провайдерам) -->
+        <div id="model-box" class="model-box">
+          <button id="model-btn" type="button"
+                  title="Модель (сохраняется автоматически)">
+            <span id="model-current">—</span><span class="caret">▾</span>
+          </button>
+          <div id="model-panel" class="model-panel hidden">
+            <input id="model-search" class="model-search" type="text"
+                   placeholder="Поиск модели…" autocomplete="off" />
+            <div id="model-list" class="model-list"></div>
+            <div class="model-panel-foot">
+              <button id="model-refresh" type="button"
+                      title="Перечитать список провайдеров">🔄 Обновить</button>
+              <span id="model-count" class="model-count"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Последние чаты (Task 24-c) -->
+        <select id="session" title="Последние чаты"></select>
+
+        <!-- Task 27: импорт чатов с сайта -->
+        <button id="import-chats" class="icon-btn" type="button" title="Импорт чатов с сайта (JSON-экспорт DeepSeek/Qwen)">⬆️</button>
+
+        <!-- Статус WS -->
+        <div id="status" class="status">Отключено</div>
+
+        <!-- Кнопка Analytics -->
+        <a href="/analytics" class="icon-btn" title="Analytics" target="_blank">📊</a>
+
+        <!-- Кнопка интерактивного курса (Task 26) -->
+        <a href="/guide" class="icon-btn" title="Интерактивный курс по системе" target="_blank">🎓</a>
+
+        <!-- Кнопка настроек -->
+        <button id="settings-btn" class="icon-btn" type="button" title="Настройки">⚙️</button>
+      </div>
+    </header>
+
+    <main id="chat"></main>
+
+    <!-- Task 27: баннер режима правки сообщения -->
+    <div id="edit-banner" class="edit-banner hidden">
+      <span class="edit-note">Правка сообщения</span>
+      <button id="edit-cancel" type="button" title="Отменить правку">✕</button>
+    </div>
+
+    <form id="form">
+      <textarea id="input" placeholder="Опишите задачу… (Ctrl+Enter — отправить)" rows="3"></textarea>
+      <button type="submit">Отправить</button>
+    </form>
+  </div>
+
+  <!-- Task 27: импорт чатов с сайта (JSON-экспорт провайдера) -->
+  <input id="import-file" type="file" accept=".json,application/json" hidden />
+
+  <!-- ══════════════════════════════════════════════════════
+       Project modal
+       ══════════════════════════════════════════════════════ -->
+  <div id="project-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>📁 Папка проекта</h3>
+      <div class="modal-label">Текущий путь:</div>
+      <div id="project-current-path" class="stats">—</div>
+
+      <div class="modal-label" style="margin-top:12px">Новый путь:</div>
+      <input id="project-path-input" class="input" type="text"
+             placeholder="D:\path\to\project" />
+
+      <div class="settings-actions" style="margin-top:12px">
+        <button id="project-browse-btn" class="secondary" type="button">📂 Обзор...</button>
+        <button id="project-save-btn" class="primary" type="button">💾 Сохранить</button>
+      </div>
+
+      <div id="project-feedback" class="stats" style="display:none;margin-top:12px"></div>
+      <div id="project-servers" class="stats" style="margin-top:12px">—</div>
+
+      <div class="modal-actions">
+        <button id="project-close" class="primary" type="button">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Approval modal
+       ══════════════════════════════════════════════════════ -->
+  <div id="approval-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>⚠️ Требуется подтверждение</h3>
+      <div class="modal-row">
+        <span class="modal-label">Инструмент:</span>
+        <code id="approval-tool"></code>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Причина:</span>
+        <span id="approval-reason"></span>
+      </div>
+      <div class="modal-label">Аргументы:</div>
+      <pre id="approval-args"></pre>
+      <div class="modal-row">
+        <span class="modal-label">Запомнить:</span>
+        <select id="approval-remember">
+          <option value="once">Только сейчас</option>
+          <option value="tool">Всегда для инструмента</option>
+          <option value="path" class="path-only">Всегда для файла</option>
+          <option value="folder" class="path-only">Всегда для папки</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button id="approval-reject" class="danger">Отклонить</button>
+        <button id="approval-approve" class="primary">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Import preview modal
+       ══════════════════════════════════════════════════════ -->
+  <div id="import-preview-modal" class="modal hidden">
+    <div class="modal-content import-preview-content">
+      <h3>⬆️ Импорт политик — предпросмотр</h3>
+      <div id="import-preview-summary" class="settings-stats">—</div>
+
+      <div class="import-sections">
+        <details id="import-new-section" class="import-section">
+          <summary><span id="import-new-count">0</span> новых</summary>
+          <div id="import-new-list" class="import-list"></div>
+        </details>
+        <details id="import-conflicts-section" class="import-section">
+          <summary><span id="import-conflicts-count">0</span> конфликтов</summary>
+          <div id="import-conflicts-list" class="import-list"></div>
+        </details>
+        <details id="import-invalid-section" class="import-section">
+          <summary><span id="import-invalid-count">0</span> невалидных</summary>
+          <div id="import-invalid-list" class="import-list"></div>
+        </details>
+      </div>
+
+      <div class="modal-actions">
+        <button id="import-preview-cancel" class="danger" type="button">Отмена</button>
+        <button id="import-preview-apply" class="primary" type="button">Применить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Settings modal
+       ══════════════════════════════════════════════════════ -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content settings-content">
+      <div class="settings-header">
+        <h3>⚙️ Настройки</h3>
+        <div class="settings-tabs">
+          <button class="tab-btn active" data-tab="system">Система</button>
+          <button class="tab-btn" data-tab="agents">Агенты</button>
+          <button class="tab-btn" data-tab="mcp">MCP</button>
+          <button class="tab-btn" data-tab="capabilities">Capabilities</button>
+          <button class="tab-btn" data-tab="policies">Политики</button>
+          <button class="tab-btn" data-tab="backup">Бэкапы</button>
+          <button class="tab-btn" data-tab="synonyms">Синонимы</button>
+          <button class="tab-btn" data-tab="age">AGE</button>
+          <button class="tab-btn" data-tab="cdc">CDC</button>
+          <button class="tab-btn" data-tab="history">История</button>
+          <button class="tab-btn" data-tab="profiles">Профили</button>
+          <button class="tab-btn" data-tab="audit">Аудит</button>
+          <button class="tab-btn" data-tab="rollback">Rollback</button>
+          <button class="tab-btn" data-tab="diagnostics">Диагностика</button>
+        </div>
+      </div>
+
+      <div class="settings-body">
+        <!-- SYSTEM -->
+        <div class="tab-panel active" data-panel="system">
+          <div class="settings-section">
+            <h4>Состояние системы</h4>
+            <div id="sys-health" class="settings-stats">—</div>
+          </div>
+          <div class="settings-section">
+            <h4>Кэш</h4>
+            <div id="settings-cache-stats" class="settings-stats">—</div>
+            <div class="settings-actions">
+              <button id="cache-clear-btn" class="secondary" type="button">Очистить кэш</button>
+              <button id="cache-reset-metrics-btn" class="secondary" type="button">Сбросить метрики</button>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h4>Обогащение событий (Ollama)</h4>
+            <div id="settings-enrichment" class="settings-stats">—</div>
+            <div class="settings-actions">
+              <button id="enrichment-trigger-btn" class="secondary" type="button">🔄 Разбудить</button>
+              <button id="enrichment-batch-btn" class="secondary" type="button">⚡ Обработать батч</button>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h4>Дайджест журнала (локальная модель)</h4>
+            <div id="settings-digest" class="settings-stats digest-text">—</div>
+            <div class="settings-actions">
+              <button id="digest-refresh-btn" class="secondary" type="button">🔄 Обновить сейчас</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGENTS -->
+        <div class="tab-panel" data-panel="agents">
+          <div class="panel-actions">
+            <button id="agents-refresh" class="secondary">🔄 Обновить</button>
+            <span id="agents-summary" class="summary">—</span>
+          </div>
+          <div id="agents-list" class="list"></div>
+        </div>
+
+        <!-- MCP -->
+        <div class="tab-panel" data-panel="mcp">
+          <div class="panel-actions">
+            <button id="mcp-refresh" class="secondary">🔄 Обновить</button>
+            <span id="mcp-summary" class="summary">—</span>
+          </div>
+          <div id="mcp-list" class="list"></div>
+        </div>
+
+        <!-- CAPABILITIES -->
+        <div class="tab-panel" data-panel="capabilities">
+          <div class="panel-actions">
+            <button id="capabilities-refresh" class="secondary">🔄 Обновить</button>
+          </div>
+          <div id="capabilities-list" class="list"></div>
+        </div>
+
+        <!-- POLICIES -->
+        <div class="tab-panel" data-panel="policies">
+          <div id="settings-policies-stats" class="settings-stats">—</div>
+          <div class="policies-toolbar">
+            <button id="policies-cleanup-btn" class="secondary" type="button">🧹 Очистить старые</button>
+            <button id="policies-backup-btn" class="secondary" type="button">💾 Бэкап сейчас</button>
+            <button id="policies-export-btn" class="secondary" type="button">⬇️ Экспорт</button>
+            <button id="policies-import-btn" class="secondary" type="button">⬆️ Импорт</button>
+            <input id="policies-import-file" type="file"
+                   accept="application/json,.json" style="display:none" />
+            <select id="policies-import-mode">
+              <option value="merge">Слить с текущими</option>
+              <option value="replace">Заменить все</option>
+            </select>
+          </div>
+          <div id="policies-list" class="policies-list">
+            <div class="empty">Нет сохранённых политик</div>
+          </div>
+          <div class="settings-actions">
+            <button id="policies-clear-btn" class="secondary danger-text" type="button">
+              Удалить все
+            </button>
+          </div>
+          <div class="settings-section" style="margin-top:16px">
+            <h4>Метрики политик</h4>
+            <div id="settings-metrics" class="settings-stats">—</div>
+          </div>
+        </div>
+
+        <!-- BACKUP -->
+        <div class="tab-panel" data-panel="backup">
+          <div class="panel-actions">
+            <button id="backup-refresh" class="secondary">🔄 Обновить</button>
+            <button id="backup-create-btn" class="primary">💾 Создать бэкап</button>
+          </div>
+          <div id="backup-info" class="settings-stats">—</div>
+          <div id="backup-list" class="list"></div>
+        </div>
+
+        <!-- SYNONYMS -->
+        <div class="tab-panel" data-panel="synonyms">
+          <div class="panel-actions">
+            <button id="synonyms-refresh" class="secondary">🔄 Обновить</button>
+            <span id="synonyms-summary" class="summary">—</span>
+          </div>
+          <div class="settings-section">
+            <h4>Добавить синоним</h4>
+            <div class="form-row">
+              <label>Термин</label>
+              <input id="syn-term" type="text" placeholder="например: файл" />
+            </div>
+            <div class="form-row">
+              <label>Синонимы (через запятую)</label>
+              <input id="syn-syns" type="text" placeholder="file, документ, модуль" />
+            </div>
+            <div class="form-row">
+              <label>Категория</label>
+              <input id="syn-category" type="text" placeholder="file" />
+            </div>
+            <div class="settings-actions">
+              <button id="syn-add-btn" class="primary" type="button">➕ Добавить</button>
+            </div>
+          </div>
+          <div id="synonyms-list" class="list"></div>
+        </div>
+
+        <!-- AGE -->
+        <div class="tab-panel" data-panel="age">
+          <div class="panel-actions">
+            <button id="age-refresh" class="secondary">🔄 Обновить</button>
+            <button id="age-sync-btn" class="primary">🔁 Синхронизировать граф</button>
+          </div>
+          <div id="age-stats" class="settings-stats">—</div>
+          <div class="settings-section">
+            <h4>Cypher-запрос</h4>
+            <div class="form-row">
+              <label>Запрос</label>
+              <textarea id="age-query" rows="3"
+                placeholder="MATCH (f:File) RETURN f.path AS path LIMIT 10"></textarea>
+            </div>
+            <div class="form-row">
+              <label>Колонки (через запятую)</label>
+              <input id="age-columns" type="text" value="path" />
+            </div>
+            <div class="settings-actions">
+              <button id="age-run-btn" class="primary" type="button">▶ Выполнить</button>
+            </div>
+            <pre id="age-result" class="stats hidden"></pre>
+          </div>
+        </div>
+
+        <!-- CDC -->
+        <div class="tab-panel" data-panel="cdc">
+          <div class="panel-actions">
+            <button id="cdc-refresh" class="secondary">🔄 Обновить</button>
+          </div>
+          <div id="cdc-stats" class="settings-stats">—</div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="tab-panel" data-panel="history">
+          <div class="panel-actions">
+            <button id="history-refresh" class="secondary">🔄 Обновить</button>
+          </div>
+          <div id="history-list" class="list"></div>
+          <pre id="history-diff" class="stats hidden"></pre>
+        </div>
+
+        <!-- PROFILES -->
+        <div class="tab-panel" data-panel="profiles">
+          <div class="panel-actions">
+            <button id="profiles-refresh" class="secondary">🔄 Обновить</button>
+            <input id="profile-new-id" class="input" placeholder="id нового профиля" style="max-width:200px">
+            <button id="profile-save-current" class="secondary">💾 Сохранить текущие</button>
+            <input type="file" id="profile-import-file" accept=".json" class="hidden">
+            <button id="profile-import-btn" class="secondary">📥 Импорт</button>
+            <button id="profile-export-current" class="secondary">📤 Экспорт</button>
+          </div>
+          <div id="profiles-list" class="list"></div>
+        </div>
+
+        <!-- AUDIT -->
+        <div class="tab-panel" data-panel="audit">
+          <div class="panel-actions">
+            <button id="audit-refresh" class="secondary">🔄 Обновить</button>
+          </div>
+          <div id="audit-list" class="list"></div>
+        </div>
+
+        <!-- ROLLBACK -->
+        <div class="tab-panel" data-panel="rollback">
+          <div class="panel-actions">
+            <button id="rollback-refresh" class="secondary">🔄 Обновить</button>
+          </div>
+          <div id="rollback-list" class="list"></div>
+        </div>
+
+        <!-- DIAGNOSTICS -->
+        <div class="tab-panel" data-panel="diagnostics">
+          <h4>Snapshot</h4>
+          <div id="diag-snapshot" class="stats">—</div>
+          <h4>Промпт оркестратора</h4>
+          <button id="show-prompt" class="secondary" type="button">👁 Показать</button>
+          <pre id="diag-prompt" class="stats hidden"></pre>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="settings-close" class="primary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

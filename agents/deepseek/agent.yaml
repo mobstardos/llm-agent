@@ -1,0 +1,30 @@
+id: deepseek
+schema_version: "1.5.0"
+title: DeepSeek агент
+version: "1.0.0"
+description: Вспомогательные задачи через DeepSeek
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+
+mcp_servers: [deepseek_web]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [deepseek, суммаризируй, классифицируй, преобразуй, json]
+  negative_keywords: [файл, база, 1с]
+  description_for_router: |
+    Вспомогательные задачи: классификация, суммаризация, JSON-преобразование,
+    быстрое рассуждение о фрагментах.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 5, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "🧩", color: "#a855f7", category: ai}

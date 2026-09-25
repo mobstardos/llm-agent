@@ -1,0 +1,34 @@
+id: onec_forms
+schema_version: "1.5.0"
+title: 1С Forms агент
+version: "1.0.0"
+description: Управляемые формы 1С
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: lxml, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [onec_forms, onec_metadata, filesystem]
+depends_on:
+  hard: [file]
+  soft: [onec_metadata]
+
+priority: 14
+routing_hints:
+  keywords: [форма, управляемая форма, элементы формы, команда формы, обработчик]
+  negative_keywords: [web, sql, скд]
+  description_for_router: |
+    Управляемые формы 1С: чтение, создание, элементы, команды,
+    обработчики, модуль формы.
+
+mode: write
+dangerous_tools: [create_form, write_form_bsl]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "🖼", color: "#dc2626", category: 1c}

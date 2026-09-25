@@ -1,0 +1,32 @@
+id: monitoring
+schema_version: "1.5.0"
+title: Monitoring агент
+version: "1.0.0"
+description: Логи, Prometheus, Jaeger
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [monitoring, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 16
+routing_hints:
+  keywords: [логи, log, prometheus, метрики, jaeger, трейс, мониторинг]
+  negative_keywords: [1с, git]
+  description_for_router: |
+    Мониторинг: логи (tail/grep/stats/JSON),
+    Prometheus (PromQL), Jaeger (traces).
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "📊", color: "#10b981", category: dev}

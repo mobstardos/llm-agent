@@ -1,0 +1,25 @@
+id: onec_forms_list
+title: 1C Forms — список форм объекта
+category: 1c
+tags: [smoke, 1c, forms]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Покажи список форм документа"
+
+options:
+  agent_id: onec_forms
+  mcp_servers: [onec_forms]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

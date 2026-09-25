@@ -1,0 +1,26 @@
+id: media
+schema_version: "1.5.0"
+title: Media
+description: Работа с аудио и видео
+
+operations:
+  - id: extract_audio
+  - id: extract_frames
+  - id: metadata
+  - id: convert
+  - id: clip
+
+providers:
+  - id: ffmpeg_local
+    display_name: "ffmpeg (локально)"
+    type: local
+    priority: 10
+    binary: ffmpeg
+    supports: [extract_audio, extract_frames, metadata, convert, clip]
+    cost_hint: free
+    health:
+      method: which
+      binary: ffmpeg
+
+strategy: fallback
+tie_breaker: [health, alphabetical]

@@ -1,0 +1,40 @@
+id: kubernetes
+schema_version: "1.5.0"
+title: Kubernetes агент
+version: "1.0.0"
+description: K8s — pods, deployments, services, helm
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [kubernetes, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 14
+routing_hints:
+  keywords: [k8s, kubernetes, kubectl, pod, deployment, namespace, helm, кластер]
+  negative_keywords: [1с, mysql, postgres]
+  description_for_router: |
+    Kubernetes: pods, deployments, services, ingresses, configmaps,
+    events, logs, exec, rollout, scale, helm releases.
+
+mode: destructive
+dangerous_tools:
+  - k8s_exec_pod
+  - k8s_delete_pod
+  - k8s_scale_deployment
+  - k8s_restart_deployment
+  - k8s_rollout_undo
+  - k8s_apply_manifest
+  - k8s_delete_manifest
+  - k8s_apply_file
+  - k8s_helm_rollback
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 40000, timeout_seconds: 600}
+ui: {icon: "☸️", color: "#326ce5", category: dev}

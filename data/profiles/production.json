@@ -1,0 +1,16 @@
+{
+  "id": "production",
+  "title": "Продакшен",
+  "description": "Только чтение, опасные операции отключены",
+  "overrides": {
+    "disabled_agents": [
+      "shell",
+      "git"
+    ],
+    "disabled_mcp_servers": [],
+    "agent_params": {}
+  },
+  "is_builtin": true,
+  "created_at": 1790270986.590124,
+  "updated_at": 1790270986.5901241
+}

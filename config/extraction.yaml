@@ -1,0 +1,33 @@
+enabled: true
+cache_path: data/extraction.sqlite
+cache_ttl_days: 30
+
+limits:
+  max_file_size_bytes: 104857600
+  max_chars: 100000
+  min_chars: 100
+  timeout_seconds: 60
+  max_parallel: 4
+
+fallback:
+  # Цепочки fallback'ов
+  pdf:
+    - pdf_text
+    - pdf_ocr
+  image:
+    - image_vision
+    - image_ocr
+    - image_metadata
+  audio:
+    - audio_whisper
+    - audio_metadata
+
+ocr:
+  lang: "rus+eng"
+  dpi: 200
+  max_pages: 50
+
+whisper:
+  model: base
+  device: cpu
+  compute_type: int8

@@ -1,0 +1,22 @@
+id: notes
+version: "1.0.0"
+title: Заметки
+description: >
+  Демонстрация Feature SDK (Этап 4): подсистема = директория с манифестом.
+  API-роутер монтируется из api.py, вкладка «Заметки» — из ui.js,
+  изменения приходят в чат как WS-событие notes.changed. Ноль правок
+  main.py / index.html.
+enabled: true
+
+requires:
+  python_packages: []   # только stdlib
+
+api_router: api.py:create_router
+
+ui_tab:
+  file: ui.js
+  title: Заметки
+  icon: "🗒️"
+
+ws_events:
+  - notes.changed

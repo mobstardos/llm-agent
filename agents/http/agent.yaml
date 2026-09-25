@@ -1,0 +1,30 @@
+id: http
+schema_version: "1.5.0"
+title: HTTP Client агент
+version: "1.0.0"
+description: HTTP, GraphQL, WebSocket, load test
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+
+mcp_servers: [http, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [http, rest, api, get, post, graphql, webhook, запрос, curl]
+  negative_keywords: [1с, sql]
+  description_for_router: |
+    HTTP-клиент: REST, GraphQL, WebSocket, SSE, load test.
+    Для тестирования API и вебхуков.
+
+mode: external
+dangerous_tools: [http_request, http_post, http_put, http_patch, http_delete, load_test]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🌐", color: "#0ea5e9", category: dev}

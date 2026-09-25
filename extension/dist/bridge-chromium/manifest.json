@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "LLM Agent Bridge",
+  "version": "1.2.0",
+  "description": "Мост к локальному LLM Agent: захват страниц и выделений, вкладки для агентов, чат в side panel, куки веб-чатов (DeepSeek/Qwen). Требует запущенный сервер llm-agent на 127.0.0.1.",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "tabs",
+    "scripting",
+    "alarms",
+    "notifications",
+    "sidePanel",
+    "cookies"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "LLM Agent Bridge",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "panel/panel.html"
+  },
+  "omnibox": {
+    "keyword": "ag"
+  },
+  "commands": {
+    "wake-agent": {
+      "suggested_key": {
+        "default": "Alt+Shift+B"
+      },
+      "description": "Разбудить агента: открыть панель чата и подхватить выделенное"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

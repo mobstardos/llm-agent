@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Agent</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header id="hdr">
+    <span id="dot" class="dot off" title="нет связи"></span>
+    <span id="title">LLM Agent</span>
+    <span id="session-tag" class="tag" title="id сессии"></span>
+    <button id="btn-new" class="mini" title="Новая сессия (сброс истории)">⭯</button>
+    <button id="btn-settings" class="mini" title="Настройки сервера">⚙</button>
+  </header>
+
+  <div id="cfg" class="hidden">
+    <label>Адрес сервера
+      <input id="cfg-url" type="text" spellcheck="false"
+             placeholder="http://127.0.0.1:8000">
+    </label>
+    <div class="row">
+      <button id="cfg-save" class="primary">Сохранить</button>
+      <button id="cfg-cancel">Отмена</button>
+    </div>
+    <div id="cfg-hint" class="hint">Сервер: python run.py — порт как в .env
+      (по умолчанию 8000).</div>
+  </div>
+
+  <main id="log"></main>
+
+  <div id="approval" class="hidden">
+    <div id="approval-title"></div>
+    <div id="approval-body" class="mono"></div>
+    <div class="row">
+      <button id="ap-yes" class="primary">Разрешить</button>
+      <button id="ap-no">Отклонить</button>
+    </div>
+  </div>
+
+  <footer>
+    <textarea id="input" rows="1" placeholder="Спросить агента… (Enter — отправить)"></textarea>
+    <button id="send" class="primary" title="Отправить">➤</button>
+  </footer>
+
+  <script src="panel.js"></script>
+</body>
+</html>

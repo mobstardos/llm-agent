@@ -1,0 +1,59 @@
+id: filesystem
+schema_version: "1.5.0"
+title: Filesystem MCP
+description: Доступ к файлам проекта с sandboxing — базовые операции + move/rename/copy/symlink, поиск, архивы, diff, hash
+
+command: python
+args: ["-m", "src.mcp_servers.filesystem.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  # ─── Базовые ─────────────────────────────────
+  - {name: read_file, danger: read}
+  - {name: write_file, danger: write}
+  - {name: apply_patch, danger: write}
+  - {name: list_files, danger: read}
+  - {name: search_in_files, danger: read}
+  - {name: delete_file, danger: destructive}
+  - {name: current_root, danger: read}
+  # ─── Перемещение и структура ────────────────
+  - {name: move_file, danger: write}
+  - {name: rename_file, danger: write}
+  - {name: copy_file, danger: write}
+  - {name: move_dir, danger: write}
+  - {name: create_dir, danger: write}
+  - {name: delete_dir, danger: destructive}
+  - {name: symlink, danger: write}
+  - {name: read_symlink, danger: read}
+  - {name: chmod, danger: write}
+  # ─── Поиск ───────────────────────────────────
+  - {name: find_by_glob, danger: read}
+  - {name: find_by_name, danger: read}
+  - {name: find_by_content, danger: read}
+  - {name: find_by_mtime, danger: read}
+  - {name: find_by_size, danger: read}
+  - {name: grep, danger: read}
+  # ─── Информация ──────────────────────────────
+  - {name: file_info, danger: read}
+  - {name: disk_usage, danger: read}
+  - {name: diff_files, danger: read}
+  - {name: hash_file, danger: read}
+  - {name: count_lines, danger: read}
+  - {name: dir_stats, danger: read}
+  # ─── Архивы ──────────────────────────────────
+  - {name: list_archive, danger: read}
+  - {name: create_archive, danger: write}
+  - {name: extract_archive, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]

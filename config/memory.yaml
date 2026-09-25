@@ -1,0 +1,105 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Память проекта
+# ═══════════════════════════════════════════════════════════════════════
+
+enabled: true
+
+working:
+  max_context_tokens: 32000
+  compact_threshold: 0.60
+  truncate_threshold: 0.80
+  budget:
+    system: 0.15
+    profile: 0.10
+    recent: 0.45
+    summary: 0.10
+    recall: 0.20
+
+episodic:
+  db_path: data/memory.sqlite
+  retention:
+    raw_messages_days: 90
+    events_days: 180
+    summaries_days: 730
+  auto_summary:
+    session_end: true
+    daily: true
+    daily_hour: 3
+  max_message_chars: 50000
+
+semantic:
+  profile_path: data/project_profile.yaml
+  profile_md_path: data/project_profile.md
+  auto_generate: true
+  regenerate_interval_hours: 24
+
+vector:
+  enabled: true
+  store_path: data/vector.lance
+  table_name: chunks
+  embedder:
+    model: "BAAI/bge-m3"
+    device: "cpu"
+    batch_size: 32
+    max_length: 512
+    cache_dir: data/embedder_cache
+  chunking:
+    strategy: ast
+    max_tokens: 400
+    overlap_tokens: 50
+    min_tokens: 20
+  indexing:
+    file_patterns:
+      - "**/*.py"
+      - "**/*.js"
+      - "**/*.ts"
+      - "**/*.md"
+      - "**/*.yaml"
+      - "**/*.json"
+      - "**/*.sql"
+      - "**/*.bsl"
+    ignore_patterns:
+      - "**/.git/**"
+      - "**/node_modules/**"
+      - "**/__pycache__/**"
+      - "**/.venv/**"
+      - "**/data/**"
+    max_file_size_kb: 500
+    incremental: true
+    file_watch: true
+  retrieval:
+    top_k: 10
+    min_score: 0.35
+    rerank: true
+    dedup_by_file: true
+    max_per_file: 3
+
+procedural:
+  path: data/procedures.yaml
+  enabled: true
+  min_success_count: 2
+  min_success_rate: 0.7
+  max_procedures: 500
+
+user:
+  path: data/user_profile.yaml
+  enabled: true
+  learn_from_approvals: true
+  learn_from_rejections: true
+  auto_analyze_interval_hours: 168
+
+graph:
+  enabled: true
+  db_path: data/graph.sqlite
+  parsers:
+    python: true
+    javascript: true
+    typescript: true
+    sql: false
+    bsl: false
+    xml: false
+  rebuild_interval_hours: 24
+
+mcp:
+  enabled: true
+  server_id: memory

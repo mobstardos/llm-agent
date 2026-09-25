@@ -1,0 +1,23 @@
+id: age_health
+title: Apache AGE — проверка
+category: dev
+tags: [smoke, dev, age]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь статус Apache AGE"
+
+options:
+  agent_id: file
+  mcp_servers: [filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

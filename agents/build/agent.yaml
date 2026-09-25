@@ -1,0 +1,33 @@
+id: build
+schema_version: "1.5.0"
+title: Build & Package агент
+version: "1.0.0"
+description: Сборка, зависимости, Docker
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [build, filesystem]
+depends_on:
+  hard: [file]
+  soft: [testing]
+
+priority: 9
+routing_hints:
+  keywords: [сборка, build, npm install, pip install, docker, зависимости]
+  negative_keywords: [1с]
+  description_for_router: |
+    Сборка проекта, управление зависимостями (npm/pip/cargo),
+    Docker-образы и контейнеры.
+
+mode: destructive
+dangerous_tools: [build_run, pkg_add, pkg_remove, docker_build, docker_run]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 1800}
+ui: {icon: "🔨", color: "#f59e0b", category: dev}

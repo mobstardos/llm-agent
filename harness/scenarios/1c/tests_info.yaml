@@ -1,0 +1,25 @@
+id: onec_tests_info
+title: 1C Tests — проверка доступности
+category: 1c
+tags: [smoke, 1c, tests]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь, доступны ли YAxUnit и Vanessa"
+
+options:
+  agent_id: onec_tests
+  mcp_servers: [onec_tests]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

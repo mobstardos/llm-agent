@@ -1,0 +1,36 @@
+id: journal
+schema_version: "1.5.0"
+title: Journal MCP
+description: Журнал действий агентов — поиск, история, откат, реплей
+
+command: python
+args: ["-m", "src.mcp_servers.journal.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+
+mode: write
+
+tools:
+  - {name: journal_search, danger: read}
+  - {name: journal_get, danger: read}
+  - {name: journal_recent, danger: read}
+  - {name: journal_history, danger: read}
+  - {name: journal_diff, danger: read}
+  - {name: journal_tree, danger: read}
+  - {name: journal_stats, danger: read}
+  - {name: journal_checkpoint_create, danger: write}
+  - {name: journal_checkpoint_list, danger: read}
+  - {name: journal_checkpoint_delete, danger: destructive}
+  - {name: journal_plan_rollback, danger: read}
+  - {name: journal_rollback, danger: destructive}
+  - {name: journal_replay_plan, danger: read}
+  - {name: journal_replay, danger: destructive}
+  - {name: journal_retention_stats, danger: read}
+  - {name: journal_retention_enforce, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Agent — прототип чата: Этап 1 (контекст) + Этап 2 (план)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif; background: #0f1116; color: #e6e6e6; font-size: 14px;
+  }
+  .app { max-width: 1180px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── Header ─────────────────────────────────────────── */
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 18px; border-bottom: 1px solid #23252e; gap: 10px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header h1 small { color: #9aa0a6; font-weight: 400; }
+  .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font-size: 11px; font-family: ui-monospace, monospace; padding: 4px 8px;
+    background: #171a22; border-radius: 6px; color: #9aa0a6; border: 1px solid #23252e;
+  }
+  .chip b { color: #4ade80; font-weight: 600; }
+  .chip.model b { color: #e6e6e6; }
+
+  /* ── Layout ─────────────────────────────────────────── */
+  .main { flex: 1; display: flex; min-height: 0; }
+  .chat-col { flex: 1; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid #23252e; }
+
+  /* ── Chat ───────────────────────────────────────────── */
+  #chat { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .msg { max-width: 82%; border-radius: 10px; padding: 9px 12px; line-height: 1.45; white-space: pre-wrap; }
+  .msg.user { align-self: flex-end; background: #1d2a45; border: 1px solid #2c3d5e; }
+  .msg.assistant { align-self: flex-start; background: #171a22; border: 1px solid #23252e; }
+  .msg .who { font-size: 11px; color: #9aa0a6; margin-bottom: 4px; font-family: ui-monospace, monospace; }
+  .msg .who .agent-tag { color: #4ade80; }
+  .msg.typing { color: #9aa0a6; font-style: italic; }
+
+  /* ── Badges ─────────────────────────────────────────── */
+  .badge-row { align-self: flex-start; display: flex; gap: 6px; flex-wrap: wrap; margin: -6px 0 0 0; }
+  .badge {
+    font-size: 10.5px; font-family: ui-monospace, monospace; padding: 3px 8px;
+    border-radius: 999px; border: 1px solid;
+  }
+  .badge.e1 { color: #4ade80; border-color: #14532d; background: #052012; }
+  .badge.e2 { color: #38bdf8; border-color: #0c4a6e; background: #041826; }
+  .badge.intent { color: #fbbf24; border-color: #713f12; background: #1c1503; }
+  .badge.route { color: #c4b5fd; border-color: #4c1d95; background: #17082e; }
+
+  /* ── Plan track (дорожка шагов) ─────────────────────── */
+  .plan { align-self: flex-start; width: 88%; background: #131722; border: 1px solid #23252e; border-radius: 10px; padding: 10px 12px; }
+  .plan-title { font-size: 11px; color: #9aa0a6; font-family: ui-monospace, monospace; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step { display: flex; gap: 10px; background: #171a22; border: 1px solid #23252e; border-radius: 8px; padding: 8px 10px; transition: border-color .3s; }
+  .step.running { border-color: #b45309; }
+  .step.done    { border-color: #14532d; }
+  .step.error   { border-color: #7f1d1d; }
+  .step-icon {
+    width: 30px; height: 30px; border-radius: 8px; background: #0f1116;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    border: 1px solid #23252e;
+  }
+  .step-body { flex: 1; min-width: 0; }
+  .step-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .step-head b { font-size: 13px; }
+  .step-id { font-size: 10.5px; color: #6b7280; font-family: ui-monospace, monospace; }
+  .step-status { margin-left: auto; font-size: 11px; font-family: ui-monospace, monospace; color: #9aa0a6; }
+  .step.running .step-status { color: #fbbf24; }
+  .step.done .step-status { color: #4ade80; }
+  .step.error .step-status { color: #f87171; }
+  .step-task { font-size: 12px; color: #c7cbd1; margin-top: 2px; }
+  .step-stream {
+    font-size: 12px; color: #9aa0a6; margin-top: 5px; padding: 6px 8px;
+    background: #0f1116; border-radius: 6px; font-family: ui-monospace, monospace;
+    white-space: pre-wrap; display: none; max-height: 110px; overflow-y: auto;
+  }
+  .step-meta { font-size: 10.5px; color: #6b7280; font-family: ui-monospace, monospace; margin-top: 5px; }
+  .arrow { text-align: center; color: #4b5563; font-size: 11px; margin: -3px 0; }
+
+  /* ── Approval (Этап 2 превью) ───────────────────────── */
+  .approval { align-self: flex-start; width: 88%; background: #1a1206; border: 1px solid #713f12; border-radius: 10px; padding: 10px 12px; }
+  .approval .a-title { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 4px; }
+  .approval .a-body { font-size: 12px; font-family: ui-monospace, monospace; color: #d1d5db; }
+  .approval .a-btns { margin-top: 8px; display: flex; gap: 8px; }
+
+  /* ── Input ──────────────────────────────────────────── */
+  .input-row { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #23252e; }
+  #query {
+    flex: 1; background: #171a22; color: #e6e6e6; border: 1px solid #23252e;
+    border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: inherit; outline: none;
+  }
+  #query:focus { border-color: #3b82f6; }
+  button.btn {
+    background: #1d4ed8; border: none; color: #fff; padding: 10px 16px;
+    border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  button.btn:hover { background: #2563eb; }
+  button.btn.ghost { background: #171a22; border: 1px solid #23252e; color: #9aa0a6; }
+  button.btn.ghost:hover { color: #e6e6e6; border-color: #3b4250; }
+  .approval .a-btns .btn { padding: 6px 12px; font-size: 12px; }
+  .approval .a-btns .btn.ghost { background: transparent; }
+
+  /* ── Sidebar ────────────────────────────────────────── */
+  .side { width: 300px; flex-shrink: 0; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #10131a; }
+  .panel { background: #171a22; border: 1px solid #23252e; border-radius: 10px; padding: 10px 12px; }
+  .panel h3 { margin: 0 0 8px; font-size: 12px; color: #9aa0a6; text-transform: uppercase; letter-spacing: .04em; }
+  .legend { font-size: 11.5px; color: #9aa0a6; line-height: 1.55; }
+  .legend .badge { margin-right: 4px; }
+  .scen { display: flex; flex-direction: column; gap: 6px; }
+  .scen button {
+    text-align: left; background: #0f1116; border: 1px solid #23252e; color: #c7cbd1;
+    padding: 8px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; line-height: 1.4;
+  }
+  .scen button:hover { border-color: #3b4250; color: #fff; }
+  .scen button .s-name { color: #e6e6e6; font-weight: 600; display: block; }
+  #session-state { font-size: 11px; font-family: ui-monospace, monospace; color: #9aa0a6; white-space: pre-wrap; line-height: 1.5; }
+  #session-state b { color: #4ade80; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🤖 LLM Agent — прототип чата <small>· Этап 1 (контекст) + Этап 2 (план — теперь в коде)</small></h1>
+    <div class="controls">
+      <span class="chip model">модель: <b id="chip-model">deepseek-chat</b></span>
+      <span class="chip">Intent Layer: <b>без LLM</b></span>
+      <span class="chip">память диалога: <b id="chip-mem">0 сообщ.</b></span>
+      <span class="chip">агенты прошлого шага: <b id="chip-agents">—</b></span>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="chat-col">
+      <div id="chat"></div>
+      <div class="input-row">
+        <input id="query" placeholder="Напишите сообщение… (@file — прямое обращение к агенту)" autocomplete="off">
+        <button class="btn" id="send">Отправить</button>
+        <button class="btn ghost" id="clear">Очистить</button>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="panel">
+        <h3>Как читать прототип</h3>
+        <div class="legend">
+          <span class="badge e1">Этап 1</span> — в коде: Intent Layer
+          (роутинг без LLM), память диалога, история в роутере.<br><br>
+          <span class="badge e2">Этап 2</span> — в коде (SUPERVISOR_ENABLED=1):
+          дорожка шагов плана, стрим по шагам, апрув плана, re-plan по ошибке,
+          бюджеты шагов/re-plan.<br><br>
+          <span class="badge intent">Intent:*</span> — какое сработало правило
+          (mention / keywords / continuation / smalltalk / low_confidence).<br><br>
+          <span class="badge route">Маршрут</span> — итоговый выбор агентов
+          (в Этапе 2 — результат LLM-планировщика).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Сценарии (автопрогон)</h3>
+        <div class="scen">
+          <button data-scen="1"><span class="s-name">1 · Многоагентный план + продолжение</span>«Проверь синтаксис и собери пакет» → план из 2 шагов → «а теперь прогони тесты»</button>
+          <button data-scen="2"><span class="s-name">2 · Болтовня без агентов</span>«Привет!» → прямой ответ, агенты не привлекались</button>
+          <button data-scen="3"><span class="s-name">3 · Re-plan по ошибке (Этап 2)</span>сборка падает → наблюдение → новый шаг → апрув docker_run</button>
+          <button data-scen="4"><span class="s-name">4 · Явное @упоминание</span>«@onec покажи структуру справочника» → без LLM-роутинга</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Состояние сессии</h3>
+        <div id="session-state">история: пусто</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+/* ═════════════════════ Ядро прототипа (симуляция) ═════════════════════ */
+"use strict";
+
+/* ── Карточки агентов (аналог routing_hints из agent.yaml) ── */
+const CARDS = [
+  { id: "file",    title: "File агент",       icon: "📁", kw: ["файл","файлы","директор","копир","синтаксис","конфиг","исправ"], neg: [] },
+  { id: "build",   title: "Build & Package",  icon: "🔨", kw: ["сборка","собер","build","npm","docker","пакет","зависимост"], neg: ["1с","1c"] },
+  { id: "testing", title: "Testing агент",    icon: "🧪", kw: ["тест","pytest","прогони","проверь тесты"], neg: [] },
+  { id: "shell",   title: "Shell агент",      icon: "⌨️", kw: ["команд","shell","bash","скрипт"], neg: [] },
+  { id: "onec",    title: "1С агент",         icon: "🧩", kw: ["1с","1c","справочник","метаданные","конфигурац"], neg: ["linux"] },
+];
+
+/* Словари эвристик — порт src/supervisor/intents.py */
+const CONTINUATION = ["продолжай","продолжить","дальше","ещё раз","еще раз","а теперь","и теперь","снова","повтори"];
+const SMALLTALK = ["привет","здравствуй","добрый день","доброе утро","спасибо","благодарю","отлично","супер","круто","ок","окей","пока","ага","угу"];
+
+const chat = document.getElementById("chat");
+const queryEl = document.getElementById("query");
+const state = { history: [], lastAgents: [] };
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* ── Intent Layer (упрощённый порт classify()) ── */
+function classifyIntent(query, session, cards) {
+  const q = query.trim(); const ql = q.toLowerCase();
+  const mentions = [...q.matchAll(/@([a-zA-Z0-9_а-яё-]+)/g)].map(m => m[1])
+    .filter(m => cards.some(c => c.id === m));
+  if (mentions.length)
+    return { agents: mentions, source: "mention", conf: 0.95,
+             reason: "явное @упоминание агента" };
+  if (q.length <= 40 && SMALLTALK.some(p => ql.includes(p)))
+    return { agents: [], source: "smalltalk", conf: 0.9,
+             reason: "приветствие/вежливость — агенты не нужны" };
+  if (session.lastAgents.length && CONTINUATION.some(p => ql.includes(p)))
+    return { agents: [...session.lastAgents], source: "continuation", conf: 0.8,
+             reason: "продолжение работы с агентами: " + session.lastAgents.join(", ") };
+  const hits = [];
+  for (const c of cards) {
+    if (c.neg.some(n => ql.includes(n))) continue;          // негативное = вето
+    let h = 0;
+    for (const k of c.kw) if (ql.includes(k) || k.includes(ql) && ql.length > 3) { h++; }
+    if (h > 0) hits.push({ id: c.id, h });
+  }
+  hits.sort((a, b) => b.h - a.h);
+  if (hits.length)
+    return { agents: [hits[0].id], source: "keywords", conf: Math.min(0.85, 0.55 + 0.1 * hits[0].h),
+             reason: "ключевые слова (" + hits[0].h + ") указывают на агента " + hits[0].id };
+  return { agents: [], source: "low_confidence", conf: 0,
+           reason: "явных сигналов нет — нужен LLM-роутинг" };
+}
+
+/* ── Рендер ── */
+function addMsg(role, text, opts = {}) {
+  const el = document.createElement("div");
+  el.className = "msg " + role + (opts.cls ? " " + opts.cls : "");
+  if (opts.who) el.innerHTML = '<div class="who">' + opts.who + "</div>";
+  el.appendChild(document.createTextNode(text));
+  chat.appendChild(el); chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+function addBadges(list) {
+  const row = document.createElement("div");
+  row.className = "badge-row";
+  row.innerHTML = list.map(b => '<span class="badge ' + b.cls + '">' + b.text + "</span>").join("");
+  chat.appendChild(row); chat.scrollTop = chat.scrollHeight;
+  return row;
+}
+async function typeInto(el, text, speed = 14) {
+  el.style.display = "block";
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text[i];
+    if (i % 3 === 0) { chat.scrollTop = chat.scrollHeight; await sleep(speed); }
+  }
+}
+
+/* ── Дорожка шагов (Этап 2 — превью) ── */
+function renderPlan(steps) {
+  const plan = document.createElement("div");
+  plan.className = "plan";
+  plan.innerHTML = '<div class="plan-title"><span>ПЛАН · ' + steps.length + ' шаг(а)</span>' +
+    '<span>Supervisor: Plan → Execute → Observe</span></div><div class="steps"></div>';
+  const box = plan.querySelector(".steps");
+  steps.forEach((s, i) => {
+    if (i > 0) {
+      const a = document.createElement("div"); a.className = "arrow"; a.textContent = "▼";
+      box.appendChild(a);
+    }
+    const el = document.createElement("div");
+    el.className = "step"; el.dataset.state = "pending";
+    el.innerHTML =
+      '<div class="step-icon">' + s.icon + "</div>" +
+      '<div class="step-body">' +
+        '<div class="step-head"><b>' + s.title + '</b>' +
+          '<span class="step-id">' + s.id + "</span>" +
+          '<span class="step-status">ожидание</span></div>' +
+        '<div class="step-task">' + s.task + "</div>" +
+        '<div class="step-stream"></div>' +
+        '<div class="step-meta"></div>' +
+      "</div>";
+    box.appendChild(el); s.el = el;
+  });
+  chat.appendChild(plan); chat.scrollTop = chat.scrollHeight;
+  return plan;
+}
+function setStep(s, st, statusText) {
+  s.el.dataset.state = st;
+  s.el.classList.remove("running", "done", "error");
+  if (st !== "pending") s.el.classList.add(st);
+  s.el.querySelector(".step-status").textContent = statusText;
+}
+
+/* ── Апрув (Этап 2 — превью) ── */
+function requestApproval(tool, args) {
+  return new Promise(resolve => {
+    const el = document.createElement("div");
+    el.className = "approval";
+    el.innerHTML =
+      '<div class="a-title">⚠️ Требуется подтверждение (dangerous_tools)</div>' +
+      '<div class="a-body">' + tool + "(" + JSON.stringify(args) + ")</div>" +
+      '<div class="a-btns"><button class="btn ok">Разрешить</button>' +
+      '<button class="btn ghost no">Отклонить</button></div>';
+    el.querySelector(".ok").onclick = () => { el.remove(); resolve(true); };
+    el.querySelector(".no").onclick = () => { el.remove(); resolve(false); };
+    chat.appendChild(el); chat.scrollTop = chat.scrollHeight;
+  });
+}
+
+/* ── Фейковые ответы агентов ── */
+const REPLIES = {
+  file: {
+    stream: "→ скан src/ (12 файлов)\n→ py_compile: 11 ok, 1 ошибка\n→ utils/parse.py:38 SyntaxError: missing colon\n→ автоправка применена\n→ повторная проверка: ok",
+    done: "Проверил 12 файлов в src/: найдена и исправлена 1 синтаксическая ошибка (utils/parse.py:38). Повторная компиляция — чисто.",
+    tools: 3, secs: 2.1,
+  },
+  build: {
+    stream: "→ pip install -r requirements.txt\n→ python -m build --wheel\n→ wheel собран: dist/llm_agent-1.0.0-py3-none-any.whl",
+    done: "Сборка завершена: зависимости актуальны, wheel собран (dist/llm_agent-1.0.0-py3-none-any.whl, 486 KB).",
+    tools: 2, secs: 4.8,
+  },
+  testing: {
+    stream: "→ pytest harness/tests -q\n→ 2 passed in 0.38s\n→ scripts-тесты: 24 ok",
+    done: "Тесты пройдены: 26/26 зелёные (harness 2, scripts 24). Регрессий нет.",
+    tools: 2, secs: 1.9,
+  },
+  shell: {
+    stream: "→ docker --version ✓\n→ docker build -t llm-agent .\n→ образ собран: llm-agent:latest (312 MB)",
+    done: "Fallback через shell: docker-образ llm-agent:latest собран успешно.",
+    tools: 3, secs: 6.2,
+  },
+  onec: {
+    stream: "→ подключение к базе ✓\n→ чтение метаданных справочника\n→ реквизиты: 14, табличные части: 2",
+    done: "Справочник «Номенклатура»: 14 реквизитов, 2 табличные части, стандартные формы.",
+    tools: 2, secs: 2.4,
+  },
+};
+
+/* ── Исполнение плана ── */
+async function runSteps(steps) {
+  const plan = renderPlan(steps);
+  await sleep(350);
+  for (const s of steps) {
+    setStep(s, "running", "выполняется…");
+    const stream = s.el.querySelector(".step-stream");
+    const meta = s.el.querySelector(".step-meta");
+    if (s.dangerous) {
+      const ok = await requestApproval(s.dangerous.tool, s.dangerous.args);
+      if (!ok) {
+        setStep(s, "error", "отклонено");
+        meta.textContent = "пользователь отклонил dangerous-инструмент";
+        return { success: false, plan };
+      }
+    }
+    const r = REPLIES[s.id] || REPLIES.file;
+    await typeInto(stream, r.stream, s.speed || 12);
+    const t0 = Date.now();
+    await sleep(300);
+    if (s.fail) {
+      setStep(s, "error", "ошибка");
+      meta.textContent = "npm ERR! fetch timeout (2 попытки) · " + ((Date.now() - t0) / 1000 + r.secs).toFixed(1) + "s";
+      return { success: false, failedStep: s, plan };
+    }
+    setStep(s, "done", "готово ✓");
+    meta.textContent = "🔧 " + r.tools + " tool-calls · " + r.secs + "s";
+  }
+  return { success: true, plan };
+}
+
+/* ── Обновление панели сессии ── */
+function refreshState() {
+  document.getElementById("chip-mem").textContent = state.history.length + " сообщ.";
+  document.getElementById("chip-agents").textContent =
+    state.lastAgents.length ? state.lastAgents.join(", ") : "—";
+  const h = state.history.slice(-6).map(m =>
+    (m.role === "user" ? "Пользователь: " : "Агент [" + (m.agent || "ai") + "]: ") +
+    m.content.slice(0, 60) + (m.content.length > 60 ? "…" : "")
+  ).join("\n");
+  document.getElementById("session-state").textContent =
+    h ? h + "\n\nlast_agents: " + (state.lastAgents.join(", ") || "—") : "история: пусто";
+}
+function remember(role, text, agent) {
+  state.history.push({ role, content: text, agent: agent || "" });
+  if (role === "assistant" && agent && !state.lastAgents.includes(agent))
+    state.lastAgents.push(agent);
+  refreshState();
+}
+</script>
+<script>
+/* ═════════════ Главный поток: сообщение → Intent → маршрут → план ═════════════ */
+"use strict";
+
+let busy = false;
+
+async function handleMessage(query) {
+  if (busy || !query.trim()) return;
+  busy = true; queryEl.value = "";
+
+  addMsg("user", query);
+  remember("user", query);
+
+  const intent = classifyIntent(query, state, CARDS);
+
+  addBadges([
+    { cls: "e1", text: "Этап 1 · в коде" },
+    { cls: "intent", text: "Intent: " + intent.source + " · " + intent.conf.toFixed(2) },
+  ]);
+
+  /* ── Болтовня: прямой ответ без агентов (уже в коде) ── */
+  if (intent.source === "smalltalk") {
+    const typing = addMsg("assistant", "печатает…", { cls: "typing" });
+    await sleep(700);
+    typing.remove();
+    const answer = "Привет! Я на связи. Опишите задачу — сам выберу нужных агентов и составлю план (или напишите @id агента для прямого обращения).";
+    addMsg("assistant", answer, { who: '<span class="agent-tag">Прямой чат</span> · без инструментов' });
+    remember("assistant", answer);
+    addBadges([{ cls: "e1", text: "агенты не привлекались · 0 tool-calls" }]);
+    busy = false; return;
+  }
+
+  /* ── Маршрутизация ── */
+  addMsg("assistant", intent.needs_llm_routing
+      ? "слишком неоднозначно — вызываю LLM-роутер с историей диалога…"
+      : "роутинг без LLM: сработали routing_hints из agent.yaml",
+      { cls: "typing" });
+
+  let agents = intent.agents;
+  if (intent.needs_llm_routing) {
+    await sleep(900);
+    /* В прототипе: fallback-выбор. В реальном коде — Orchestrator.route()
+       с history=session.history_for_router() (Этап 1, уже реализовано). */
+    agents = ["file"];
+    addBadges([{ cls: "route", text: "Маршрут (LLM, с историей): " + agents.join(", ") }]);
+  } else {
+    await sleep(350);
+    addBadges([{ cls: "route", text: "Маршрут (без LLM): " + agents.join(", ") }]);
+  }
+
+  /* ── Декомпозиция на шаги (Этап 2 — превью дизайна) ──
+     В Этапе 2 это Supervisor.plan(); здесь — демонстрация внешнего вида. */
+  const steps = planStepsFor(query, agents);
+
+  addBadges([{ cls: "e2", text: "Этап 2 · превью: план и дорожка шагов" }]);
+  const res = await runSteps(steps);
+
+  /* ── Observe: re-plan по ошибке (Этап 2) ── */
+  if (!res.success && res.failedStep) {
+    await sleep(500);
+    addBadges([{ cls: "e2", text: "Observe: шаг упал → re-plan (замена стратегии)" }]);
+    await sleep(800);
+    const fallback = REPLIES.shell;
+    const s2 = [{ id: "shell", title: "Shell агент (fallback)", icon: "⌨️",
+                  task: "Обойти сбой: собрать образ напрямую через docker CLI",
+                  dangerous: { tool: "shell__docker_run", args: { image: "llm-agent", build: true } } }];
+    const res2 = await runSteps(s2);
+    if (res2.success) {
+      const final2 = REPLIES.shell.done;
+      addMsg("assistant", final2, { who: "Итог после re-plan" });
+      remember("assistant", final2, "shell");
+    }
+  } else if (!res.success) {
+    addMsg("assistant", "Выполнение остановлено: пользователь отклонил операцию.", { who: "Итог" });
+  } else {
+    /* ── Синтез итога ── */
+    const parts = steps.map(s => REPLIES[s.id] ? REPLIES[s.id].done : "");
+    const finalText = parts.join("\n\n");
+    addMsg("assistant", finalText, { who: "Синтез результата · агенты: " + steps.map(s => s.id).join(", ") });
+    remember("assistant", finalText, steps[0] ? steps[0].id : "");
+    steps.slice(1).forEach(s => remember("assistant", "", s.id));
+  }
+
+  busy = false; queryEl.focus();
+}
+
+/* Простая декомпозиция для прототипа (в Этапе 2 — LLM-планировщик) */
+function planStepsFor(query, agents) {
+  const ql = query.toLowerCase();
+  const steps = [];
+  const push = (id, task, extra) => steps.push(Object.assign(
+    { id, title: CARDS.find(c => c.id === id).title, icon: CARDS.find(c => c.id === id).icon, task }, extra || {}));
+
+  if (ql.includes("сборк") && ql.includes("синтаксис") || ql.includes("синтаксис") && ql.includes("пакет")) {
+    push("file",  "Проверить синтаксис Python-файлов в src/");
+    push("build", "Собрать пакет (wheel) из проверенного кода");
+  } else if (ql.includes("зависимост") && (ql.includes("docker") || ql.includes("образ"))) {
+    push("build", "Обновить зависимости и собрать docker-образ",
+         { fail: true });   // сценарий 3: намеренный сбой → re-plan
+  } else if (ql.includes("тест")) {
+    push("testing", "Прогнать тесты и собрать сводку по регрессиям");
+  } else if (ql.includes("справочник") || ql.includes("метаданн")) {
+    push("onec", "Прочитать метаданные справочника из конфигурации 1С");
+  } else if (ql.includes("синтаксис") || ql.includes("файл")) {
+    push("file", "Проверить и при необходимости исправить файлы");
+  } else {
+    push(agents[0] || "file", "Выполнить запрос пользователя");
+  }
+  return steps;
+}
+
+/* ═════════════ Сценарии автопрогона ═════════════ */
+const SCENARIOS = {
+  1: async () => { await handleMessage("Проверь синтаксис в src/ и собери пакет");
+                   await waitIdle(); await sleep(600);
+                   await handleMessage("а теперь прогони тесты"); },
+  2: async () => { await handleMessage("Привет!"); },
+  3: async () => { await handleMessage("Обнови зависимости и собери docker-образ"); },
+  4: async () => { await handleMessage("@onec покажи структуру справочника"); },
+};
+function waitIdle() {
+  return new Promise(r => { const t = setInterval(() => { if (!busy) { clearInterval(t); r(); } }, 200); });
+}
+
+/* ═════════════ Обвязка ═════════════ */
+document.getElementById("send").onclick = () => handleMessage(queryEl.value);
+queryEl.addEventListener("keydown", e => { if (e.key === "Enter") handleMessage(queryEl.value); });
+document.getElementById("clear").onclick = () => {
+  state.history = []; state.lastAgents = []; chat.innerHTML = ""; refreshState();
+  addMsg("assistant", "Диалог очищен. Память сессии пуста — Intent Layer начинает с нуля.", { cls: "typing" });
+};
+document.querySelectorAll(".scen button").forEach(b => {
+  b.onclick = () => SCENARIOS[b.dataset.scen]();
+});
+
+/* Приветствие */
+addMsg("assistant",
+  "Это интерактивный прототип дизайна чата (docs/prototype/stage1-chat.html).\n\n" +
+  "• Зелёные метки «Этап 1» — реализовано (Session + Intent Layer + история в роутере).\n" +
+  "• Синие метки «Этап 2» — тоже реализовано: Supervisor (Plan → Execute → Observe → Re-plan)\n" +
+  "  работает в приложении под флагом SUPERVISOR_ENABLED=1 (включён по умолчанию).\n\n" +
+  "Запустите сценарий из панели справа или напишите своё сообщение — Intent Layer в прототипе работает по тем же правилам, что и в коде.",
+  { who: "Прототип" });
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "id": "default",
+  "title": "По умолчанию",
+  "description": "Стандартный профиль без изменений",
+  "overrides": {},
+  "is_builtin": true,
+  "created_at": 1790270986.5898004,
+  "updated_at": 1790270986.5898004
+}

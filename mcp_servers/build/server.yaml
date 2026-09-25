@@ -1,0 +1,38 @@
+id: build
+schema_version: "1.5.0"
+title: Build & Package MCP
+description: Сборка, пакеты, Docker
+
+command: python
+args: ["-m", "src.mcp_servers.build.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: detect_project, danger: read}
+  - {name: build_run, danger: destructive}
+  - {name: build_clean, danger: destructive}
+  - {name: pkg_list, danger: read}
+  - {name: pkg_add, danger: destructive}
+  - {name: pkg_remove, danger: destructive}
+  - {name: pkg_update, danger: destructive}
+  - {name: pkg_outdated, danger: read}
+  - {name: pkg_audit, danger: read}
+  - {name: docker_build, danger: destructive}
+  - {name: docker_run, danger: destructive}
+  - {name: docker_stop, danger: destructive}
+  - {name: docker_list, danger: read}
+  - {name: docker_logs, danger: read}
+  - {name: docker_compose_up, danger: destructive}
+  - {name: docker_compose_down, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

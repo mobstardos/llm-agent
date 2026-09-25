@@ -1,0 +1,33 @@
+id: data
+schema_version: "1.5.0"
+title: Data агент
+version: "1.0.0"
+description: CSV, Parquet, JSON, YAML, XML
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [data, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 15
+routing_hints:
+  keywords: [csv, parquet, json, yaml, xml, данные, таблица, query]
+  negative_keywords: [1с, web]
+  description_for_router: |
+    Обработка данных: CSV, Parquet, JSON, YAML, XML.
+    Query через DuckDB, конвертация, diff.
+
+mode: write
+dangerous_tools: [csv_to_json, csv_to_parquet]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 40000, timeout_seconds: 300}
+ui: {icon: "📈", color: "#10b981", category: dev}

@@ -1,0 +1,40 @@
+id: ocr
+schema_version: "1.5.0"
+title: OCR
+description: Извлечение текста с изображений
+
+operations:
+  - id: ocr
+    description: Извлечь текст
+    input: [image_path, lang]
+    output: text
+
+providers:
+  - id: tesseract
+    display_name: "Tesseract"
+    type: local
+    priority: 10
+    binary: tesseract
+    langs: [rus, eng]
+    supports: [ocr]
+    cost_hint: free
+    health:
+      method: which
+      binary: tesseract
+
+  - id: qwen_vl_ocr
+    display_name: "Qwen-VL (OCR)"
+    type: openai_compatible
+    priority: 20
+    base_url: http://127.0.0.1:7936/v1
+    api_key: any
+    model: qwen-vl-max
+    supports: [ocr]
+    cost_hint: free
+    health:
+      method: http_get
+      url: http://127.0.0.1:7936/v1/models
+      timeout: 5.0
+
+strategy: fallback
+tie_breaker: [health, latency, locality, cost]

@@ -1,0 +1,39 @@
+id: agent.reasoning
+type: reasoning
+title: Основной цикл агента
+description: |
+  Цикл LLM ↔ tools. Продолжается, пока LLM возвращает tool_calls.
+  Выход — когда LLM вернул финальный ответ без вызова инструментов.
+
+trigger:
+  kind: manual
+
+budget:
+  max_iterations: 15
+  max_tokens: 50000
+  max_duration_seconds: 600
+
+body:
+  - kind: llm_call
+    params:
+      tools: from_agent_spec
+      on_token: emit_to_ws
+
+  - kind: tool_calls
+    params:
+      for_each: msg.tool_calls
+      approval: from_policy
+      on_result: append_to_messages
+
+on_success: null
+on_failure: agent.retry
+on_timeout: agent.escalation
+
+metrics:
+  - steps
+  - tool_calls
+  - tokens_input
+  - tokens_output
+  - duration_ms
+
+trace_level: normal

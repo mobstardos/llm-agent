@@ -1,0 +1,44 @@
+id: file
+schema_version: "1.5.0"
+title: Файловый агент
+version: "1.0.0"
+description: Чтение, создание, правка и удаление файлов проекта
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  paths:
+    - name: PROJECT_ROOT
+      env: PROJECT_ROOT
+      type: dir
+      writable: false
+      level: hard
+
+mcp_servers: [filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [файл, код, прочитай, запиши, исправь, найди, создай, удали]
+  negative_keywords: [база, sql, 1с, картинка]
+  description_for_router: |
+    Работа с файлами проекта: чтение, создание, правка, удаление.
+    Используй для задач с кодом, конфигами, документацией.
+
+mode: write
+dangerous_tools: [write_file, apply_patch, delete_file]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime:
+  max_steps: 15
+  max_result_chars: 30000
+  timeout_seconds: 600
+
+ui:
+  icon: "📁"
+  color: "#3b82f6"
+  category: file

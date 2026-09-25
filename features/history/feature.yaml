@@ -1,0 +1,24 @@
+id: history
+version: "1.0.0"
+title: История
+description: >
+  Чтение долговременных зеркал PostgreSQL: ops.chat_sessions /
+  ops.chat_messages (диалоги), ops.plans (планы Supervisor),
+  journal.events_mirror (поток операций журнала). Данные наполняет
+  PgReplicator (db/ops.sql) — фича только читает. Поиск по зеркалам
+  (полнотекстовый при наличии FTS-колонок, иначе ILIKE), экспорт
+  сессии в Markdown. PG недоступен → эндпоинты отвечают 503.
+enabled: true
+
+requires:
+  python_packages:
+    - {name: psycopg, level: hard}
+
+api_router: api.py:create_router
+
+ui_tab:
+  file: ui.js
+  title: История
+  icon: "📜"
+
+ws_events: []

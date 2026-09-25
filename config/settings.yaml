@@ -1,0 +1,226 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Общие настройки
+# ═══════════════════════════════════════════════════════════════════════
+
+# Агенты — какие включены по умолчанию
+agents:
+  enabled_by_default: []
+  disabled_by_default: []
+
+# MCP-серверы
+mcp_servers:
+  filesystem:
+    command: python
+    args: ["-m", "src.mcp_servers.filesystem.server"]
+  mysql:
+    command: python
+    args: ["-m", "src.mcp_servers.mysql.server"]
+  postgres:
+    command: python
+    args: ["-m", "src.mcp_servers.postgres.server"]
+  onec:
+    command: python
+    args: ["-m", "src.mcp_servers.onec.server"]
+  deepseek_web:
+    command: python
+    args: ["-m", "src.mcp_servers.deepseek.server"]
+    env:
+      DEEPSEEK_DS_SESSION_ID: "${DEEPSEEK_DS_SESSION_ID}"
+      DEEPSEEK_SMIDV2: "${DEEPSEEK_SMIDV2}"
+      DEEPSEEK_AUTH_TOKEN: "${DEEPSEEK_AUTH_TOKEN}"
+  memory:
+    command: python
+    args: ["-m", "src.mcp_servers.memory.server"]
+  git:
+    command: python
+    args: ["-m", "src.mcp_servers.git.server"]
+  shell:
+    command: python
+    args: ["-m", "src.mcp_servers.shell.server"]
+  document:
+    command: python
+    args: ["-m", "src.mcp_servers.document.server"]
+  image:
+    command: python
+    args: ["-m", "src.mcp_servers.image.server"]
+  browser:
+    command: python
+    args: ["-m", "src.mcp_servers.browser.server"]
+  media:
+    command: python
+    args: ["-m", "src.mcp_servers.media.server"]
+  storage:
+    command: python
+    args: ["-m", "src.mcp_servers.storage.server"]
+  onec_designer:
+    command: python
+    args: ["-m", "src.mcp_servers.onec_designer.server"]
+  onec_metadata:
+    command: python
+    args: ["-m", "src.mcp_servers.onec_metadata.server"]
+  onec_query:
+    command: python
+    args: ["-m", "src.mcp_servers.onec_query.server"]
+  onec_dcs:
+    command: python
+    args: ["-m", "src.mcp_servers.onec_dcs.server"]
+  onec_forms:
+    command: python
+    args: ["-m", "src.mcp_servers.onec_forms.server"]
+  onec_tests:
+    command: python
+    args: ["-m", "src.mcp_servers.onec_tests.server"]
+  code_analysis:
+    command: python
+    args: ["-m", "src.mcp_servers.code_analysis.server"]
+  lsp:
+    command: python
+    args: ["-m", "src.mcp_servers.lsp.server"]
+  testing:
+    command: python
+    args: ["-m", "src.mcp_servers.testing.server"]
+  build:
+    command: python
+    args: ["-m", "src.mcp_servers.build.server"]
+  debug:
+    command: python
+    args: ["-m", "src.mcp_servers.debug.server"]
+  http:
+    command: python
+    args: ["-m", "src.mcp_servers.http.server"]
+  security:
+    command: python
+    args: ["-m", "src.mcp_servers.security.server"]
+  github:
+    command: python
+    args: ["-m", "src.mcp_servers.github.server"]
+  migration:
+    command: python
+    args: ["-m", "src.mcp_servers.migration.server"]
+  db_extended:
+    command: python
+    args: ["-m", "src.mcp_servers.db_extended.server"]
+  documentation:
+    command: python
+    args: ["-m", "src.mcp_servers.documentation.server"]
+  cicd:
+    command: python
+    args: ["-m", "src.mcp_servers.cicd.server"]
+  environment:
+    command: python
+    args: ["-m", "src.mcp_servers.environment.server"]
+  network:
+    command: python
+    args: ["-m", "src.mcp_servers.network.server"]
+  monitoring:
+    command: python
+    args: ["-m", "src.mcp_servers.monitoring.server"]
+  frontend:
+    command: python
+    args: ["-m", "src.mcp_servers.frontend.server"]
+  data:
+    command: python
+    args: ["-m", "src.mcp_servers.data.server"]
+  kubernetes:
+    command: python
+    args: ["-m", "src.mcp_servers.kubernetes.server"]
+  journal:
+    command: python
+    args: ["-m", "src.mcp_servers.journal.server"]
+
+# Лимиты
+limits:
+  max_agent_steps: 15
+  max_tool_result_chars: 30000
+  require_confirmation_for:
+    # Files
+    - write_file
+    - apply_patch
+    - delete_file
+    # DB
+    - execute_write_query
+    - execute_migration
+    # Git
+    - git_commit
+    - git_push
+    - shell_run
+    # Browser
+    - click
+    - fill
+    - evaluate
+    # 1C Designer
+    - load_config
+    - update_db
+    - restore_ib
+    - create_ib
+    - build_cf
+    - build_cfe
+    - build_epf
+    # 1C Metadata
+    - create_object
+    - add_attribute
+    - add_tabular_section
+    - write_module
+    - create_extension
+    - adopt_object
+    # 1C DCS
+    - create_dcs
+    - add_calculated_field
+    - add_parameter
+    # 1C Forms
+    - create_form
+    - write_form_bsl
+    # 1C Tests
+    - run_yaxunit
+    - run_vanessa
+    # Storage
+    - upload
+    - download
+    - delete_object
+    - sync_up
+    - sync_down
+    # LSP
+    - lsp_rename
+    - lsp_format
+    # Migration
+    - migration_up
+    - migration_down
+    - migration_stamp
+    # Data
+    - csv_to_json
+    - csv_to_parquet
+    # Kubernetes
+    - k8s_exec_pod
+    # Journal
+    - journal_rollback
+    - journal_replay
+    - journal_checkpoint_delete
+    - journal_retention_enforce
+
+# Логирование
+logging:
+  level: INFO
+  format: json
+  sinks:
+    console: true
+    file_app: true
+    file_error: true
+    file_audit: true
+    sqlite: true
+    websocket: true
+  retention:
+    app_log_mb: 100
+    app_log_count: 10
+    error_log_mb: 50
+    error_log_count: 5
+    audit_log_mb: 1024
+    audit_log_count: 20
+    sqlite_days: 30
+    audit_days: 365
+
+# Мониторинг
+monitoring:
+  health_check_interval_seconds: 30
+  tcp_check_timeout_seconds: 5
+  com_worker_enabled: true
+  com_worker_timeout_seconds: 30

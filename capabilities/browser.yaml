@@ -1,0 +1,36 @@
+id: browser
+schema_version: "1.5.0"
+title: Browser
+description: Автоматизация браузера (Chromium, Firefox, WebKit)
+
+operations:
+  - id: navigate
+  - id: interact
+  - id: screenshot
+  - id: inspect
+
+providers:
+  - id: playwright_chromium
+    display_name: "Playwright Chromium"
+    type: local
+    priority: 10
+    binary: playwright
+    supports: [navigate, interact, screenshot, inspect]
+    cost_hint: free
+    health:
+      method: which
+      binary: playwright
+
+  - id: playwright_firefox
+    display_name: "Playwright Firefox"
+    type: local
+    priority: 20
+    binary: playwright
+    supports: [navigate, interact, screenshot, inspect]
+    cost_hint: free
+    health:
+      method: which
+      binary: playwright
+
+strategy: fallback
+tie_breaker: [health, locality, alphabetical]

@@ -1,0 +1,38 @@
+id: db_extended
+schema_version: "1.5.0"
+title: DB Extended агент
+version: "1.0.0"
+description: Redis, MongoDB, MSSQL, ElasticSearch
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [db_extended, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 18
+routing_hints:
+  keywords: [redis, mongo, mongodb, mssql, elastic, elasticsearch, nosql]
+  negative_keywords: [1с, git, web]
+  description_for_router: |
+    Работа с Redis, MongoDB, MSSQL, ElasticSearch.
+    Кэш, документы, аналитика, поиск.
+
+mode: write
+dangerous_tools:
+  - redis_set
+  - redis_delete
+  - redis_publish
+  - mongo_insert
+  - mongo_update
+  - mongo_delete
+  - mssql_query
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🗄️", color: "#8b5cf6", category: db}

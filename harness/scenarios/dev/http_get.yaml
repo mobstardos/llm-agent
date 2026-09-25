@@ -1,0 +1,23 @@
+id: http_get_example
+title: HTTP — GET-запрос
+category: dev
+tags: [smoke, dev, http]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Сделай GET-запрос к https://httpbin.org/get"
+
+options:
+  agent_id: http
+  mcp_servers: [http]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

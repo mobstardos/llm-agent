@@ -1,0 +1,67 @@
+id: vision
+schema_version: "1.5.0"
+title: Vision
+description: Описание изображений, распознавание содержимого
+
+operations:
+  - id: describe
+    description: Описать содержимое изображения
+    input: [image_path, question]
+    output: text
+  - id: ocr
+    description: Извлечь текст с изображения
+    input: [image_path, lang]
+    output: text
+  - id: classify
+    description: Классифицировать изображение
+    input: [image_path, classes]
+    output: label
+  - id: compare
+    description: Сравнить два изображения
+    input: [image_a, image_b]
+    output: text
+
+providers:
+  # Приоритет 1: Qwen-VL через qwenproxy
+  - id: qwen_vl_proxy
+    display_name: "Qwen-VL через qwenproxy"
+    type: openai_compatible
+    priority: 10
+    base_url: http://127.0.0.1:7936/v1
+    api_key: any-string-or-empty
+    model: qwen-vl-max
+    supports: [describe, ocr, classify, compare]
+    cost_hint: free
+    health:
+      method: http_get
+      url: http://127.0.0.1:7936/v1/models
+      timeout: 5.0
+
+  # Приоритет 2: LLaVA через Ollama
+  - id: ollama_llava
+    display_name: "LLaVA через Ollama"
+    type: ollama
+    priority: 20
+    base_url: http://127.0.0.1:11434
+    model: llava:13b
+    supports: [describe]
+    cost_hint: free
+    health:
+      method: http_get
+      url: http://127.0.0.1:11434/api/tags
+      timeout: 5.0
+
+  # Приоритет 3: Tesseract OCR (только текст)
+  - id: tesseract_ocr
+    display_name: "Tesseract OCR"
+    type: local
+    priority: 50
+    binary: tesseract
+    supports: [ocr]
+    cost_hint: free
+    health:
+      method: which
+      binary: tesseract
+
+strategy: fallback
+tie_breaker: [health, latency, locality, cost, alphabetical]

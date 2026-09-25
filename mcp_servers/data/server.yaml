@@ -1,0 +1,35 @@
+id: data
+schema_version: "1.5.0"
+title: Data MCP
+description: CSV, Parquet, JSON, diff
+
+command: python
+args: ["-m", "src.mcp_servers.data.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: data_info, danger: read}
+  - {name: csv_read, danger: read}
+  - {name: csv_query, danger: read}
+  - {name: parquet_read, danger: read}
+  - {name: parquet_query, danger: read}
+  - {name: json_query, danger: read}
+  - {name: json_schema, danger: read}
+  - {name: data_diff, danger: read}
+  - {name: csv_to_json, danger: write}
+  - {name: csv_to_parquet, danger: write}
+  - {name: yaml_validate, danger: read}
+  - {name: toml_validate, danger: read}
+  - {name: xml_query, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,33 @@
+id: debug
+schema_version: "1.5.0"
+title: Debugging MCP
+description: Отладка и профилирование
+
+command: python
+args: ["-m", "src.mcp_servers.debug.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: debug_tools, danger: read}
+  - {name: profile_cpu, danger: destructive}
+  - {name: profile_memory, danger: destructive}
+  - {name: trace_calls, danger: destructive}
+  - {name: py_spy_record, danger: destructive}
+  - {name: py_spy_top, danger: destructive}
+  - {name: py_spy_dump, danger: destructive}
+  - {name: run_with_pdb, danger: destructive}
+  - {name: benchmark_run, danger: destructive}
+  - {name: timing_wrap, danger: destructive}
+  - {name: parse_profile, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

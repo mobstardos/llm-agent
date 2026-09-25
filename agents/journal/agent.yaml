@@ -1,0 +1,35 @@
+id: journal
+schema_version: "1.5.0"
+title: Journal агент
+version: "1.0.0"
+description: Журнал действий — история, откат, реплей
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [journal, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [история, откат, верни, replay, кто изменил, когда менялось, journal]
+  negative_keywords: [1с, база, картинка]
+  description_for_router: |
+    Журнал действий: история файлов, поиск действий, откат к точке,
+    воспроизведение цепочки действий, граф зависимостей, retention.
+
+mode: write
+dangerous_tools:
+  - journal_rollback
+  - journal_replay
+  - journal_checkpoint_delete
+  - journal_retention_enforce
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 40000, timeout_seconds: 600}
+ui: {icon: "📓", color: "#a855f7", category: dev}
