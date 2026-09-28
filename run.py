@@ -215,6 +215,74 @@ def check_pg_autodetect() -> None:
         info(f"статус: {status} — {rep.get('hint', '')}")
 
 
+def _looks_like_our_zombie(cmdline: str) -> bool:
+    """Похоже ли на зомби нашего стека (qwenproxy/qpx/uvicorn/run.py)."""
+    try:
+        from src.port_cleanup import DEFAULT_MATCH
+    except Exception:  # noqa: BLE001 — диагностика не должна валить старт
+        return False
+    low = (cmdline or "").lower()
+    return any(m in low for m in DEFAULT_MATCH)
+
+
+def _port_holders(port: int) -> list[tuple[int, str]]:
+    """Кто слушает порт: [(pid, cmdline)] — без собственного процесса."""
+    try:
+        from src.port_cleanup import find_listeners, process_cmdline
+    except Exception:  # noqa: BLE001
+        return []
+    try:
+        listeners = find_listeners([port])
+    except Exception:  # noqa: BLE001
+        return []
+    out: list[tuple[int, str]] = []
+    for pid in listeners.get(port, []):
+        if pid == os.getpid():
+            continue
+        out.append((pid, process_cmdline(pid)))
+    return out
+
+
+def _print_busy_instructions(port: int, holders: list[tuple[int, str]]) -> None:
+    info("Старый экземпляр НЕ подхватит свежий .env (например, куки "
+         "из мастера) — нужен перезапуск:")
+    if holders:
+        for pid, _ in holders:
+            info(f"  Windows: taskkill /PID {pid} /F   |   "
+                 f"Linux/macOS: kill {pid}")
+    else:
+        info(f"  Windows: netstat -ano | findstr :{port} → "
+             f"taskkill /PID <PID> /F")
+    info("  затем запустите заново: python run.py")
+    info(f"Альтернатива: другой порт — python run.py --port {port + 1}")
+
+
+def run_port_cleanup(s) -> None:
+    """Анти-zombie клининг (--clean-ports): убить зомби на портах стека."""
+    section("Анти-zombie клининг портов")
+    try:
+        from src.port_cleanup import cleanup_stale_ports
+    except Exception as e:  # noqa: BLE001
+        warn(f"модуль клининга недоступен: {e}")
+        return
+    ports = sorted({s.qwenproxy.port, s.web_port})
+    reports = cleanup_stale_ports(
+        ports, exclude_pids={os.getpid()}, dry_run=False,
+    )
+    for rep in reports:
+        if not rep.found_pids:
+            info(f"порт {rep.port} свободен")
+        for pid in rep.killed:
+            ok(f"порт {rep.port}: зомби PID {pid} убит")
+        for pid in rep.skipped:
+            info(f"порт {rep.port}: PID {pid} пропущен "
+                 f"(свой или не похож на наш стек)")
+        for err in rep.errors:
+            fail(f"порт {rep.port}: {err}")
+    if any(rep.killed for rep in reports):
+        time.sleep(1.0)  # сокеты освобождаются не мгновенно
+
+
 def check_qwenproxy() -> subprocess.Popen | None:
     section("QwenProxy")
     s = get_settings()
@@ -273,6 +341,10 @@ def main() -> int:
     parser.add_argument("--skip-setup", action="store_true",
                         help="не запускать мастер первого запуска")
     parser.add_argument("--port", type=int, default=None)
+    parser.add_argument("--clean-ports", action="store_true",
+                        help="перед стартом убить зомби-процессы "
+                             "(qwenproxy/qpx/старый агент), держащие "
+                             "порты qwenproxy/веб")
     args = parser.parse_args()
 
     print(_color(
@@ -281,6 +353,10 @@ def main() -> int:
         "╚══════════════════════════════════════════════════════╝",
         C.BOLD + C.MAGENTA,
     ))
+
+    s = get_settings()
+    if args.clean_ports:
+        run_port_cleanup(s)
 
     qp_proc: subprocess.Popen | None = None
     try:
@@ -297,22 +373,47 @@ def main() -> int:
             qp_proc = check_qwenproxy()
 
         import uvicorn
-        s = get_settings()
         port = args.port or s.web_port
         section("Запуск сервера")
         if is_port_open(s.web_host, port):
             # Диагностика ДО uvicorn: иначе пользователь видит сырой
             # [Errno 10048] и не понимает, что старый экземпляр держит
             # порт и НЕ видит свежий .env (куки и т.п.)
-            fail(f"Порт {port} занят — обычно это ещё работающий "
-                 f"старый экземпляр LLM Agent")
-            info("Он НЕ подхватит свежий .env (например, куки из мастера) "
-                 "— нужен перезапуск:")
-            info(f"  1) остановите старый: Ctrl+C в его окне; либо "
-                 f"netstat -ano | findstr :{port} → taskkill /PID <PID> /F")
-            info("  2) запустите заново: python run.py")
-            info(f"Альтернатива: другой порт — python run.py --port {port + 1}")
-            return 1
+            holders = _port_holders(port)
+            if holders:
+                fail(f"Порт {port} занят:")
+                for pid, cmdline in holders:
+                    info(f"  PID {pid}: "
+                         f"{cmdline or '<командная строка недоступна>'}")
+            else:
+                fail(f"Порт {port} занят — обычно это ещё работающий "
+                     f"старый экземпляр LLM Agent")
+            killable = [pid for pid, cmdline in holders
+                        if _looks_like_our_zombie(cmdline)]
+            if killable and sys.stdout.isatty():
+                answer = ask(
+                    f"  Убить зомби-процесс(ы) "
+                    f"{', '.join(map(str, killable))} и продолжить? [y/N]: ",
+                    default="n",
+                )
+                if answer in ("y", "yes", "д", "да"):
+                    from src.port_cleanup import _kill_default
+                    for pid in killable:
+                        if _kill_default(pid):
+                            ok(f"PID {pid} убит")
+                        else:
+                            fail(f"PID {pid} не удалось убить")
+                    time.sleep(1.0)
+                    if is_port_open(s.web_host, port):
+                        fail(f"Порт {port} всё ещё занят после клининга")
+                        return 1
+                    ok(f"Порт {port} освобождён — продолжаю")
+                else:
+                    _print_busy_instructions(port, holders)
+                    return 1
+            else:
+                _print_busy_instructions(port, holders)
+                return 1
         ok(f"http://{s.web_host}:{port}")
         uvicorn.run(
             "src.main:app", host=s.web_host, port=port,
