@@ -1,5 +1,9 @@
 name: Harness
 
+permissions:
+  contents: read
+  checks: write
+
 on:
   push:
     branches: [main, master, dev]
@@ -17,7 +21,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          # pgserver (0.21.0) заявляет Requires-Python >=3.8,<3.12 — на 3.12+ pip не находит дистрибутив
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Install dependencies
