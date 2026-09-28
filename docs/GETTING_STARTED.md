@@ -219,7 +219,7 @@ python first_run.py --reset            :: сбросить и пройти ма�
 
 ### 6.1. Ключевые переменные `.env`
 
-Полный список с комментариями — `.env.example` (303 строки). Самое нужное:
+Полный список с комментариями — `.env.example` (~300 строк). Самое нужное:
 
 | Группа | Переменная | По умолчанию | Описание |
 |---|---|---|---|
@@ -255,6 +255,75 @@ Ollama / OpenAI / OpenRouter / SiliconFlow / VseGPT / ProxyAPI / LM Studio /
 Anthropic / Gemini / Groq / Mistral; выбор сохраняется и переживает
 перезагрузку. Ссылка на папку проекта — кнопка 📁.
 
+### 6.3. `config/*.yaml` — карта конфигов
+
+Эти файлы читаются при старте сервера — правки вступают в силу после
+перезапуска (в отличие от «горячих» настроек веб-интерфейса из 6.2,
+которые живут в `config/runtime.yaml` и применяются на лету).
+
+| Файл | За что отвечает | Что настраивается |
+|---|---|---|
+| `models.yaml` | реестр провайдеров и моделей, модель по умолчанию, фолбэки | `default: qwen3.8-max`; блок `providers:` — как расширять, см. 6.4 |
+| `memory.yaml` | рабочая, эпизодическая и семантическая память | `working.max_context_tokens` (32000) и пороги компакции/усечения (0.60/0.80), бюджет контекста по секциям (system/profile/recent/summary/recall); ретенция эпизодов: сырые сообщения 90 дней, события 180, саммари 730; автосаммари в конце сессии и ежедневно в 03:00; профиль проекта `data/project_profile.yaml` с авто-регенерацией раз в 24 ч |
+| `settings.yaml` | общие настройки: какие агенты включены по умолчанию, команды запуска MCP-серверов | `agents.enabled_by_default` / `disabled_by_default`; `mcp_servers.<имя>.command/args/env` (например, куки DeepSeek пробрасываются в MCP через `env:`) |
+| `alerting.yaml` | правила алертов (баннер в UI, запись в аудит-лог) | `db_unavailable` (critical), `llm_slow` (warn, p95 > 30 с), `mcp_crash_loop` (warn) |
+| `extraction.yaml` | извлечение текста из документов | лимиты: файл ≤ 100 МБ, 100 000 знаков, таймаут 60 с, 4 потока; кэш `data/extraction.sqlite` (30 дней); цепочки fallback: pdf → `pdf_text` → `pdf_ocr`, image → `image_vision` → `image_ocr` → `image_metadata` |
+| `litellm.example.yaml` | готовый пример шлюза LiteLLM для провайдеров с нативным не-OpenAI API | см. 6.4 |
+
+Значения в YAML поддерживают подстановку переменных из `.env`:
+`${VAR}` или `${VAR:default}` — так, например, `base_url` провайдера
+qwen подхватывает `QWENPROXY_URL`.
+
+### 6.4. Добавление своего провайдера моделей
+
+Любой OpenAI-совместимый endpoint подключается **без изменения кода** —
+три строки в `config/models.yaml` плюс ключ в `.env`:
+
+```yaml
+providers:
+  myprovider:
+    name: Мой провайдер
+    base_url: https://api.example.com/v1   # поддерживает ${VAR:default}
+    api_key_env: MYPROVIDER_API_KEY        # имя переменной .env с ключом
+    # local: true                          # бейдж «локально» в UI
+    # docs_url: https://…                  # подсказка «где взять ключ»
+```
+
+После перезапуска `/api/models` сам опросит `…/v1/models`, и модели
+появятся в селекте чата группой провайдера. Формат выбора —
+`provider/model` (например `openrouter/deepseek-chat`) или просто
+`model`, если имя уникально. Подробно — [providers.md](providers.md).
+
+**Провайдеры с нативным не-OpenAI API** (Bedrock, Vertex AI, GigaChat…)
+подключаются через шлюз LiteLLM:
+
+```bash
+pip install 'litellm[proxy]'
+litellm --config config/litellm.example.yaml --port 4000
+```
+
+затем в `models.yaml` добавляется провайдер с
+`base_url: http://127.0.0.1:4000/v1` и `api_key_env` на master-key.
+Список готовых моделей-примеров — в самом `config/litellm.example.yaml`.
+
+### 6.5. Порты и сервисы
+
+| Порт | Сервис | Чем настраивается |
+|---|---|---|
+| 8000 | веб-интерфейс и API | `WEB_HOST` / `WEB_PORT` |
+| 7936 | qwenproxy (браузерный роутер Qwen) — необязателен | `QWENPROXY_URL` |
+| 11434 | Ollama (локальные модели) | `OLLAMA_URL` |
+| 5432 | PostgreSQL основной (pgvector) | `DATABASE_URL` / `PG_APP_*` |
+| 5433 | Apache AGE (граф, опционально) | `AGE_DSN` |
+| 9092 | Kafka (CDC, опционально) | `KAFKA_BOOTSTRAP_SERVERS` |
+| 8080 | Kafka UI | `docker-compose.yml` |
+| 6379 | Redis (кластерный режим) | `REDIS_URL` |
+| 4000 | LiteLLM-шлюз (если запущен) | флаг `--port` при старте |
+
+Занятый порт — самая частая причина «сервер не стартует»: `run.py`
+проверяет это заранее и подсказывает, как остановить старый экземпляр;
+радикальное средство — `python run.py --clean-ports`.
+
 ---
 
 ## 7. PostgreSQL (опционально, но полезно)
@@ -270,6 +339,28 @@ docker compose up -d postgres     # поднимет контейнер из doc
 python scripts/init_db.py         # идемпотентно накатит схему (init + journal + ops + аналитика)
 python scripts/init_db.py --check # проверить, что схема на месте
 ```
+
+> Контейнер из docker-compose накатывает схему сам при первом создании
+> тома (`db/*.sql` смонтированы в `docker-entrypoint-initdb.d`), так что
+> `init_db.py` здесь — идемпотентная доводка и проверка, а не ритуал.
+
+**Apache AGE и Kafka (опционально):** в том же `docker-compose.yml`
+уже описаны графовая база и CDC-шина — поднимаются отдельно:
+
+```bash
+docker compose up -d age-postgres      # Apache AGE, порт 5433
+docker compose up -d kafka kafka-ui    # Kafka 9092 + UI на http://localhost:8080
+```
+
+и включаются в `.env` (по умолчанию оба выключены):
+
+| Переменная | По умолчанию | Назначение |
+|---|---|---|
+| `AGE_ENABLED`, `AGE_DSN`, `AGE_GRAPH` | `false`, `…llmagent:secret@localhost:5433/llmagent`, `llm_graph` | property-граф: сущности и связи для долговременной памяти |
+| `KAFKA_ENABLED`, `KAFKA_BOOTSTRAP_SERVERS`, `KAFKA_TOPIC_PREFIX` | `false`, `localhost:9092`, `llmagent.cdc` | поток CDC-событий в Kafka-топики |
+
+⚠️ **AGE не работает нативно на Windows** — только Docker/WSL2
+(контейнерный путь выше работает на любой ОС).
 
 **Внешний сервер** — пропишите в `.env` либо `DATABASE_URL=postgres://user:pass@host:5432/db`,
 либо набор `PG_APP_HOST/PG_APP_PORT/PG_APP_USER/PG_APP_PASSWORD/PG_APP_DATABASE`.
@@ -307,7 +398,20 @@ Bridge в настройках, API `/api/bridge/cookies`.
 
 ## 9. Обновление, сброс, удаление
 
-**Обновить зависимости:** удалите `.venv\.installed` и запустите `install.py`.
+**Обновить проект из git:**
+
+```bash
+git pull
+del .venv\.installed        # Windows (в bash: rm .venv/.installed) — заставит установщик перепроверить зависимости
+python install.py
+python -m src.cli migrate           # сухой прогон: покажет устаревшие декларации
+python -m src.cli migrate --write   # поднять schema_version в agents/*/agent.yaml и mcp_servers/*/server.yaml
+bash run.sh                         # Windows: run.bat
+```
+
+`migrate` без `--write` ничего не меняет — только показывает, что
+обновится. После обновления проверьте схему PostgreSQL:
+`python scripts/init_db.py --check` (накат идемпотентный).
 
 **Сбросить AI-настройки:** `python first_run.py --reconfigure-ai`.
 
@@ -331,6 +435,9 @@ Bridge в настройках, API `/api/bridge/cookies`.
 | Сервер жив | <http://127.0.0.1:8000/api/db/status> → `{"ok": true}` |
 | Модели/провайдеры | кнопка модели в шапке → «🔄 Обновить»; API `/api/models` покажет причину недоступности каждого |
 | Схема PostgreSQL | `python scripts/init_db.py --check` |
+| Устаревшие декларации (после git pull) | `python -m src.cli migrate` → `--write` |
+| AGE / Kafka не подключаются | `docker compose ps`; в `.env` включены `AGE_ENABLED` / `KAFKA_ENABLED`? |
+| Занятый порт | `python run.py --clean-ports` (или смените `WEB_PORT`) |
 | Автодетект PG | `/api/db/autodetect` в веб-интерфейсе |
 | Журнал и откат | вкладки «История» / «Rollback» в настройках |
 | Смоук-тест после установки | запускается автоматически `install.py`; лог — `.install_smoke.log` |
