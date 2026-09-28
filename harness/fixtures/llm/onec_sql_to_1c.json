@@ -1,0 +1,34 @@
+{
+  "scenario_id": "onec_sql_to_1c",
+  "model": "scripted-harness",
+  "recorded_via": "synthetic (offline, без реального стека)",
+  "recorded_at": 1790613832.1591995,
+  "exchange_count": 2,
+  "exchanges": [
+    {
+      "seq": 0,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "type": "function",
+            "function": {
+              "name": "onec_query__parse_query",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1,
+      "response": {
+        "role": "assistant",
+        "content": "[harness] 1C Query — конвертация SQL: шаг выполнен детерминированно (offline-fixture).",
+        "tool_calls": null
+      }
+    }
+  ]
+}

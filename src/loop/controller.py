@@ -28,6 +28,10 @@ logger = logging.getLogger(__name__)
 class LoopController:
     """Исполняет любой loop по его спецификации."""
 
+    # Попыток на один LLM-вызов внутри итерации (1 основная + 2 ретрая):
+    # транзиентные ошибки провайдера и chaos-фолты не должны ронять loop
+    LLM_CALL_MAX_ATTEMPTS: int = 3
+
     def __init__(self, telemetry: LoopTelemetry | None = None):
         self.telemetry = telemetry
         # Регистрируем обработчики шагов
@@ -223,27 +227,39 @@ class LoopController:
             )
             state.messages.append({"role": "user", "content": user_content})
 
-        # Fault injection
-        if context.faults:
-            rule = context.faults.check_llm(state.iterations, 0)
-            if rule:
-                await context.faults.apply_llm_fault(rule)
-
-        # LLM call
-        try:
-            msg = await context.llm_client.chat(
-                state.messages,
-                tools=context.available_tools or None,
-                model=context.model,
-                on_token=context.on_token,
-                on_reasoning=getattr(context, "on_reasoning", None),
-                state_hash=context.extra.get("state_hash"),
-            )
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:
-            logger.exception("LLM call failed")
-            return True, False, {"error": str(e)}
+        # LLM call — с ретраями: injected faults и транзиентные ошибки
+        # провайдера не должны ронять весь loop (сценарий chaos
+        # llm_timeout_recovery ожидает recovered_after_retries)
+        msg = None
+        llm_error: str | None = None
+        for attempt in range(self.LLM_CALL_MAX_ATTEMPTS):
+            try:
+                if context.faults:
+                    rule = context.faults.check_llm(state.iterations, attempt)
+                    if rule:
+                        await context.faults.apply_llm_fault(rule)
+                msg = await context.llm_client.chat(
+                    state.messages,
+                    tools=context.available_tools or None,
+                    model=context.model,
+                    on_token=context.on_token,
+                    on_reasoning=getattr(context, "on_reasoning", None),
+                    state_hash=context.extra.get("state_hash"),
+                )
+                llm_error = None
+                break
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                llm_error = str(e)
+                logger.warning(
+                    "LLM call failed (attempt %d/%d): %s",
+                    attempt + 1, self.LLM_CALL_MAX_ATTEMPTS, e,
+                )
+                continue
+        if msg is None:
+            logger.exception("LLM call failed after retries")
+            return True, False, {"error": llm_error}
 
         tokens_in = 0
         tokens_out = 0  # LLMClient может не возвращать; считаем приблизительно

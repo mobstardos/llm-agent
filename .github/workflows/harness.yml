@@ -34,18 +34,17 @@ jobs:
         run: |
           python -m src.cli validate
 
-      # Жёсткий гейт: file-сценарии — единственные с записанными fixtures
+      # Жёсткий гейт: file-сценарии (быстрый отказ при регрессии рантайма)
       - name: Harness file scenarios (hard gate)
         run: |
           python -m src.cli harness run file_read_basic --mock-llm --mock-mcp
           python -m src.cli harness run file_apply_patch_basic --mock-llm --mock-mcp
 
-      # Информационно: fixtures для остальных MCP-инструментов не записаны
-      # (нужен прогон --record на реальном стеке); упадут с «нет fixtures»
-      - name: Harness smoke suite (informational)
-        continue-on-error: true
+      # Жёсткий гейт: весь smoke-набор (31 сценарий; fixtures детерминированные,
+      # генерируются scripts/record_harness_fixtures.py; для замены на записи
+      # реального стека — тот же скрипт с --real на машине со стеком)
+      - name: Harness smoke suite (hard gate)
         run: python -m src.cli harness tag --tag smoke --mock-llm --mock-mcp
 
-      - name: Harness all categories (informational)
-        continue-on-error: true
+      - name: Harness all categories (hard gate, chaos включительно)
         run: python -m src.cli harness all --mock-llm --mock-mcp

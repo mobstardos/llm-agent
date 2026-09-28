@@ -1,0 +1,34 @@
+{
+  "scenario_id": "onec_dcs_read",
+  "model": "scripted-harness",
+  "recorded_via": "synthetic (offline, без реального стека)",
+  "recorded_at": 1790613832.1461196,
+  "exchange_count": 2,
+  "exchanges": [
+    {
+      "seq": 0,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "type": "function",
+            "function": {
+              "name": "onec_dcs__read_dcs",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1,
+      "response": {
+        "role": "assistant",
+        "content": "[harness] 1C DCS — чтение схемы: шаг выполнен детерминированно (offline-fixture).",
+        "tool_calls": null
+      }
+    }
+  ]
+}

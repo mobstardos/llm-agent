@@ -1,0 +1,34 @@
+{
+  "scenario_id": "search_synonyms",
+  "model": "scripted-harness",
+  "recorded_via": "synthetic (offline, без реального стека)",
+  "recorded_at": 1790613832.1675913,
+  "exchange_count": 2,
+  "exchanges": [
+    {
+      "seq": 0,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "type": "function",
+            "function": {
+              "name": "filesystem__read_file",
+              "arguments": "{\"path\": \"test.txt\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1,
+      "response": {
+        "role": "assistant",
+        "content": "[harness] Search — расширение синонимами: шаг выполнен детерминированно (offline-fixture).",
+        "tool_calls": null
+      }
+    }
+  ]
+}

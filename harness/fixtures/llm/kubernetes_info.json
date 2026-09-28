@@ -1,0 +1,34 @@
+{
+  "scenario_id": "kubernetes_info",
+  "model": "scripted-harness",
+  "recorded_via": "synthetic (offline, без реального стека)",
+  "recorded_at": 1790613832.1223671,
+  "exchange_count": 2,
+  "exchanges": [
+    {
+      "seq": 0,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "type": "function",
+            "function": {
+              "name": "kubernetes__k8s_info",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1,
+      "response": {
+        "role": "assistant",
+        "content": "[harness] K8s — проверка кластера: шаг выполнен детерминированно (offline-fixture).",
+        "tool_calls": null
+      }
+    }
+  ]
+}
