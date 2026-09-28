@@ -246,14 +246,14 @@ def _port_holders(port: int) -> list[tuple[int, str]]:
 def _print_busy_instructions(port: int, holders: list[tuple[int, str]]) -> None:
     info("Старый экземпляр НЕ подхватит свежий .env (например, куки "
          "из мастера) — нужен перезапуск:")
+    # Общая подсказка — всегда (контракт scripts/test_run_port_busy.py)
+    info(f"  1) Windows: netstat -ano | findstr :{port} → "
+         f"taskkill /PID <PID> /F   |   Linux/macOS: kill <PID>")
     if holders:
         for pid, _ in holders:
-            info(f"  Windows: taskkill /PID {pid} /F   |   "
-                 f"Linux/macOS: kill {pid}")
-    else:
-        info(f"  Windows: netstat -ano | findstr :{port} → "
-             f"taskkill /PID <PID> /F")
-    info("  затем запустите заново: python run.py")
+            info(f"  найден держатель PID {pid}: taskkill /PID {pid} /F   |   "
+                 f"kill {pid}")
+    info("  2) запустите заново: python run.py")
     info(f"Альтернатива: другой порт — python run.py --port {port + 1}")
 
 
