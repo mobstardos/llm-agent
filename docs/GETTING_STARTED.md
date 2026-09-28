@@ -236,10 +236,10 @@ python first_run.py --reset            :: сбросить и пройти ма�
 | Микрозадачи | `LOCAL_MICRO_TASKS_ENABLED` | `1` | заголовки/теги/дайджест на локальной модели |
 | PostgreSQL | `PG_ENABLED`, `DATABASE_URL` или `PG_APP_*` | — | зеркала журнала/сессий, память агентов, аналитика |
 | | `PG_REPLICATE` | `1` | `0` — выключить репликацию (тихий режим без PG) |
-| Векторные хранилища | `PRIMARY_VECTOR_STORE` и др. | `lancedb` | `lancedb` / `postgres` / `files` |
-| Бэкапы | `BACKUP_ENABLED`, `BACKUP_INTERVAL_HOURS`, `BACKUP_KEEP_LAST` | `true`, `6`, `7` | авто-бэкапы баз |
+| Векторные хранилища | `PRIMARY_VECTOR_STORE` и др. | `postgres` | `postgres` / `lancedb` / `files` (при недоступном PG — мягкий откат на локальные) |
+| Бэкапы | `BACKUP_ENABLED`, `BACKUP_INTERVAL_HOURS`, `BACKUP_KEEP_LAST` | `true`, `24`, `7` | авто-бэкапы баз |
 | Журнал | см. `docs/JOURNAL.md` | — | ретенция, реплей |
-| Кэш | `CACHE_ENABLED`, `CACHE_TTL` | `true`, `86400` | кэш ответов LLM |
+| Кэш | `CACHE_ENABLED`, `CACHE_TTL` | `true`, `3600` | кэш ответов LLM (`data/cache.sqlite`) |
 | Петля агента | `LOOP_MAX_ITERATIONS`, `LOOP_MAX_TOKENS`, `LOOP_HARD_LIMIT` | — | бюджет итераций/токенов/времени |
 | Кластер | `CLUSTER_ENABLED`, `REDIS_URL` | `false` | мульти-инстанс через Redis-шину |
 

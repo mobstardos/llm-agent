@@ -134,8 +134,10 @@ DeepSeek (🔑 DeepSeek). Подробно: docs/providers.md, раздел «Т
 старый лог — это прошлое, новых сообщений не будет.
 
 ### Q. Как заблокировать/разблокировать AGE-граф, CDC, Kafka?
-**A.** `.env`: `AGE_ENABLED=false`, `CDC_ENABLED`/`KAFKA_ENABLED=false`.
-Всё опционально — ядро не зависит от них.
+**A.** `.env`: `AGE_ENABLED=false`, `KAFKA_ENABLED=false`. Отдельной
+переменной для CDC нет: CDC-воркер стартует автоматически, когда включён
+Kafka (`KAFKA_ENABLED=true`) и подключён PostgreSQL. Всё опционально —
+ядро не зависит от них.
 
 ## Веб-интерфейс и расширение
 

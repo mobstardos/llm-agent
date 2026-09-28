@@ -13,9 +13,10 @@ Apache AGE, Kafka (CDC), Kubernetes.
 |---|---|
 | **[docs/STRUCTURE.md](docs/STRUCTURE.md)** | 🗺️ **«что за что отвечает»** — подробнейшая карта проекта: все модули `src/`, декларации агентов/MCP/capabilities/loops/features, harness и CI, CLI-справочник, рецепты «куда что добавлять» |
 | **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** | подробная инструкция: установка, первый запуск, мастер настройки, `.env`, PostgreSQL, расширение, диагностика |
+| **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** | архитектура: слои, путь запроса, память, журнал, инструменты, расширение |
 | **[docs/CAPABILITIES.md](docs/CAPABILITIES.md)** | полное описание возможностей: чат, модели, 37 агентов, 39 MCP, память, журнал, bridge, аналитика |
 | **[docs/FAQ.md](docs/FAQ.md)** | решения типовых проблем (окно bat закрывается, кодировки, порт занят, 403 region, куки протухли…) |
-| [docs/ARCHITECTURE-V2.md](docs/ARCHITECTURE-V2.md) | архитектура системы |
+| [docs/ARCHITECTURE-V2.md](docs/ARCHITECTURE-V2.md) | дизайн Supervisor-цикла и фич-манифестов (этапы внедрения) |
 | [docs/JOURNAL.md](docs/JOURNAL.md) | журнал действий: откат и реплей |
 | [docs/DATABASE.md](docs/DATABASE.md) | базы данных, PostgreSQL-интеграция |
 | [docs/providers.md](docs/providers.md) | провайдеры LLM и как добавить своего |
