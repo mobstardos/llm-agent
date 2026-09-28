@@ -21,8 +21,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          # pgserver (0.21.0) заявляет Requires-Python >=3.8,<3.12 — на 3.12+ pip не находит дистрибутив
-          python-version: '3.11'
+          # pgserver 0.1.4 даёт колёса только до cp312 — на 3.13+ он не установится
+          python-version: '3.12'
           cache: 'pip'
 
       - name: Install dependencies

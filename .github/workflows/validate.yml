@@ -23,8 +23,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          # pgserver (0.21.0) требует <3.12 — держим CI на 3.11
-          python-version: '3.11'
+          # pgserver 0.1.4 даёт колёса только до cp312 — на 3.13+ он не установится
+          python-version: '3.12'
           cache: 'pip'
       - run: pip install -r requirements.txt
       - name: Validate all declarations

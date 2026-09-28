@@ -100,7 +100,8 @@ aiokafka>=0.11.0
 # ripgrep и fd устанавливаются как бинари, не через pip
 pathspec>=0.12.0
 # Встроенный PostgreSQL для тестов БД (scripts/test_db_pg.py, scripts/e2e_db_pg.py)
-pgserver>=0.1.6; platform_system != "Windows" and python_version < "3.12"
+# ВАЖНО: у pgserver нет релизов >=0.1.5 (актуален 0.1.4, колёса только cp39–cp312, без sdist)
+pgserver>=0.1.4; platform_system != "Windows" and python_version < "3.13"
 
 # ─── Dev tools (P1) ─────────────────────────────────────────────────────
 pip-audit>=2.7.0
