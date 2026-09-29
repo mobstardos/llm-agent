@@ -205,6 +205,7 @@ GET  /api/journal/retention         статус ретенции
 POST /api/journal/retention/sweep   запустить проход вручную
 GET  /api/journal/export            экспорт событий (json|md)
 GET  /api/journal/reports           список отчётов
+GET  /api/journal/reports/{name}    скачать файл отчёта
 ```
 
 ### 8.3. Для людей и LLM — файлы

@@ -1,7 +1,10 @@
 # 🤖 LLM Agent — мультиагентная система правки файлов и БД
 
+![CI: Validate](https://github.com/mobstardos/llm-agent/actions/workflows/validate.yml/badge.svg)
+![CI: Harness](https://github.com/mobstardos/llm-agent/actions/workflows/harness.yml/badge.svg)
+
 Локальный веб-чат с LLM, который через **MCP-серверы** управляет файлами
-проекта и базами данных. Поддерживает 38 MCP-серверов, 36 агентов, полный
+проекта и базами данных. Поддерживает 39 MCP-серверов, 37 агентов, полный
 цикл 1С-разработки, интеграцию с PostgreSQL+pgvector, Ollama (малая LLM),
 Apache AGE, Kafka (CDC), Kubernetes.
 

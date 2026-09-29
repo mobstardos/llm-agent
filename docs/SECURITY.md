@@ -36,14 +36,18 @@
 
 ## Список операций, требующих подтверждения
 
-Задаётся в `config/settings.yaml` в секции `limits.require_confirmation_for`:
+Задаётся в `config/settings.yaml` в секции `limits.require_confirmation_for`
+(фактический список; дополняйте под свои задачи):
 
-- `write_file`
-- `apply_patch`
-- `execute_write_query`
-- `execute_migration`
-- `drop_table`
-- `delete_rows`
+- файлы: `write_file`, `apply_patch`, `delete_file`
+- БД: `execute_write_query`, `execute_migration`
+- git: `git_commit`, `git_push`
+- shell: `shell_run`
+- браузер: `click`, `fill`, `evaluate`
+
+Подтверждения реализованы политиками (`src/policies.py`: режимы агентов,
+TTL-разрешения «всегда для инструмента/файла/папки») и approval-модалью
+веб-интерфейса; перехват — в единой точке `MCPManager.call_tool`.
 
 ---
 
