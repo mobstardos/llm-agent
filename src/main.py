@@ -30,6 +30,8 @@ from src.core.file_watcher import FileWatcher
 from src.core.features import FeatureLoader
 from src.core.metrics import PrometheusExporter
 from src.core.registry import Registry
+from src.core.setup import sanitize_env_updates
+from src import env_file
 from src import events   # событийная шина (Этап 4): publish/subscribe
 from src.file_state import FileState
 from src.llm_client import LLMClient
@@ -1224,6 +1226,145 @@ async def registry_mcp_enable(mcp_id: str, payload: dict = Body(...)):
     await _sync_mcp()
     await _sync_runtime()
     return {"ok": True, "enabled": enabled}
+
+
+# ═════════════════════════════════════════════════════════
+# Быстрая настройка модулей (Task «настроить и запустить»)
+# ═════════════════════════════════════════════════════════
+@app.get("/api/registry/mcp/{mcp_id}/requirements")
+async def registry_mcp_requirements(mcp_id: str):
+    """Структурный отчёт: чего не хватает MCP-серверу для запуска."""
+    reg: Registry = state.get("registry")
+    if not reg:
+        raise HTTPException(503, "Registry not ready")
+    info = reg.mcp_requirements(mcp_id)
+    if not info:
+        raise HTTPException(404, "MCP server not found")
+    return info
+
+
+@app.get("/api/registry/agents/{agent_id}/requirements")
+async def registry_agent_requirements(agent_id: str):
+    """Структурный отчёт: чего не хватает агенту."""
+    reg: Registry = state.get("registry")
+    if not reg:
+        raise HTTPException(503, "Registry not ready")
+    info = reg.agent_requirements(agent_id)
+    if not info:
+        raise HTTPException(404, "Agent not found")
+    return info
+
+
+async def _apply_env_updates(reg: Registry, kind: str, module_id: str,
+                             updates: dict) -> dict:
+    """Общая запись env в .env + os.environ + аудит + пересборка снапшота."""
+    result: dict = {}
+    if not updates:
+        return result
+    report = env_file.write_env_updates(updates)
+    env_file.apply_to_environ(updates)
+    try:
+        reg.audit.log(
+            "ui", "setup_config", f"{kind}:{module_id}",
+            {"keys": sorted(updates)}, {"keys": sorted(updates)},
+        )
+    except Exception:
+        pass
+    # env влияет на статусы агентов (проверки requires) — пересобираем
+    # синхронно, чтобы последующий /start и ответ видели свежий снапшот
+    await reg.build_snapshot(reason="config_env")
+    result["path"] = report.get("path")
+    return result
+
+
+@app.post("/api/registry/mcp/{mcp_id}/config")
+async def registry_mcp_config(mcp_id: str, payload: dict = Body(...)):
+    """Сохранить значения env-переменных MCP-сервера в .env."""
+    reg: Registry = state.get("registry")
+    if not reg:
+        raise HTTPException(503, "Registry not ready")
+    if mcp_id not in reg.mcp_servers:
+        raise HTTPException(404, "MCP server not found")
+    updates, skipped = sanitize_env_updates(payload.get("env") or {})
+    result = {"ok": True, "written": sorted(updates), "skipped": skipped}
+    result.update(await _apply_env_updates(reg, "mcp", mcp_id, updates))
+    return result
+
+
+@app.post("/api/registry/agents/{agent_id}/config")
+async def registry_agent_config(agent_id: str, payload: dict = Body(...)):
+    """Сохранить значения env-переменных агента в .env + свежий статус."""
+    reg: Registry = state.get("registry")
+    if not reg:
+        raise HTTPException(503, "Registry not ready")
+    if agent_id not in reg.agents:
+        raise HTTPException(404, "Agent not found")
+    updates, skipped = sanitize_env_updates(payload.get("env") or {})
+    result = {"ok": True, "written": sorted(updates), "skipped": skipped}
+    result.update(await _apply_env_updates(reg, "agent", agent_id, updates))
+    result["agent"] = reg.agent_info(agent_id)
+    return result
+
+
+@app.post("/api/registry/mcp/{mcp_id}/start")
+async def registry_mcp_start(mcp_id: str, payload: dict = Body(default={})):
+    """Запустить (или перезапустить с restart=true) MCP-сервер.
+
+    Запустить = включить в реестре + поднять процесс + проверить alive.
+    Смена env подхватывается, т.к. os.environ уже обновлён /config.
+    """
+    reg: Registry = state.get("registry")
+    mcp: MCPManager = state.get("mcp")
+    if not reg or not reg.snapshot:
+        raise HTTPException(503, "Registry not ready")
+    if not mcp:
+        raise HTTPException(503, "MCP manager not ready")
+    mschema = reg.mcp_servers.get(mcp_id)
+    if not mschema:
+        raise HTTPException(404, "MCP server not found")
+
+    restart = bool((payload or {}).get("restart", False))
+    if restart:
+        await mcp.stop_one(mcp_id)
+
+    # «Запустить» = и включить (иначе оркестратор его не использует)
+    if not reg.snapshot.mcp_servers[mcp_id].enabled:
+        await reg.set_mcp_enabled(mcp_id, True)
+
+    alive = mcp_id in mcp.sessions
+    if not alive:
+        alive = await mcp.start_one(mcp_id, {
+            "command": mschema.command,
+            "args": mschema.args,
+            "env": mschema.env,
+        })
+
+    st = reg.snapshot.mcp_servers.get(mcp_id)
+    if st:
+        st.alive = mcp_id in mcp.sessions
+    await _sync_runtime()
+    return {
+        "ok": True,
+        "alive": alive,
+        "restarted": restart,
+        "error": mcp.errors.get(mcp_id),
+    }
+
+
+@app.post("/api/registry/mcp/{mcp_id}/stop")
+async def registry_mcp_stop(mcp_id: str):
+    """Остановить один MCP-сервер (не трогая остальные)."""
+    reg: Registry = state.get("registry")
+    mcp: MCPManager = state.get("mcp")
+    if not mcp:
+        raise HTTPException(503, "MCP manager not ready")
+    stopped = await mcp.stop_one(mcp_id)
+    if reg and reg.snapshot:
+        st = reg.snapshot.mcp_servers.get(mcp_id)
+        if st:
+            st.alive = mcp_id in mcp.sessions
+        await _sync_runtime()
+    return {"ok": True, "stopped": stopped}
 
 
 @app.get("/api/registry/capabilities")

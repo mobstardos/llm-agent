@@ -31,9 +31,13 @@ class MCPManager:
         project_root: str | None = None,
         agent_context: dict | None = None,
     ):
-        self._stack: AsyncExitStack | None = None
+        # Свой exit-stack на каждый сервер — иначе нельзя остановить
+        # один процесс, не закрыв остальные (нужно для restart из UI).
+        self._stacks: dict[str, AsyncExitStack] = {}
         self.sessions: dict[str, ClientSession] = {}
         self.tools: dict[str, list[Any]] = {}
+        # Причина последнего неудачного старта — для карточки в UI
+        self.errors: dict[str, str] = {}
         self.require_confirmation = require_confirmation or set()
 
         self.project_root = project_root or os.getenv("PROJECT_ROOT", "")
@@ -45,8 +49,6 @@ class MCPManager:
     # Lifecycle
     # ═══════════════════════════════════════════════════════
     async def start(self, servers: dict[str, dict]) -> None:
-        if self._stack is None:
-            self._stack = AsyncExitStack()
         for name, cfg in servers.items():
             if name in self.sessions:
                 continue
@@ -54,13 +56,23 @@ class MCPManager:
                 name, cfg["command"], cfg.get("args", []), cfg.get("env"),
             )
 
+    async def start_one(self, name: str, cfg: dict) -> bool:
+        """Запустить один сервер. True — если он теперь в sessions."""
+        if name in self.sessions:
+            return True
+        await self._start_server(
+            name, cfg["command"], cfg.get("args", []), cfg.get("env"),
+        )
+        return name in self.sessions
+
     async def _start_server(
         self, name: str, command: str, args: list[str],
         env: dict | None = None,
     ) -> None:
-        if self._stack is None:
-            self._stack = AsyncExitStack()
+        if name in self._stacks:
+            return
 
+        stack = AsyncExitStack()
         merged_env: dict[str, str] = {**os.environ}
         if env:
             for k, v in env.items():
@@ -71,22 +83,48 @@ class MCPManager:
             command=command, args=args, env=merged_env,
         )
         try:
-            read, write = await self._stack.enter_async_context(
+            read, write = await stack.enter_async_context(
                 stdio_client(params)
             )
-            session = await self._stack.enter_async_context(
+            session = await stack.enter_async_context(
                 ClientSession(read, write)
             )
             await session.initialize()
             tools_resp = await session.list_tools()
+            self._stacks[name] = stack
             self.sessions[name] = session
             self.tools[name] = list(tools_resp.tools)
+            self.errors.pop(name, None)
             logger.info(
                 "MCP '%s' запущен, %d инструментов",
                 name, len(self.tools[name]),
             )
         except Exception as e:
+            # Причина сохраняется для UI (карточка «не настроен/ошибка»)
+            self.errors[name] = str(e)
             logger.exception("Failed to start MCP '%s': %s", name, e)
+            try:
+                await stack.aclose()
+            except Exception:
+                pass
+
+    async def stop_one(self, name: str) -> bool:
+        """Остановить один сервер (закрыть его стек). True — был запущен."""
+        stack = self._stacks.pop(name, None)
+        self.sessions.pop(name, None)
+        self.tools.pop(name, None)
+        if stack is None:
+            return False
+        try:
+            await stack.aclose()
+        except Exception:
+            pass
+        return True
+
+    async def restart_one(self, name: str, cfg: dict) -> bool:
+        """Перезапустить один сервер (например, после смены env в UI)."""
+        await self.stop_one(name)
+        return await self.start_one(name, cfg)
 
     # ═══════════════════════════════════════════════════════
     # Tools
@@ -189,11 +227,6 @@ class MCPManager:
             self.agent_context["parent_id"] = parent_id
 
     async def stop(self) -> None:
-        if self._stack:
-            try:
-                await self._stack.aclose()
-            except Exception:
-                pass
-            self._stack = None
-            self.sessions.clear()
-            self.tools.clear()
+        for name in list(self._stacks):
+            await self.stop_one(name)
+        self.errors.clear()

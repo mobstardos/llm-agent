@@ -65,6 +65,7 @@ class Registry:
         self._profiles = None
         self._audit = None
         self._rollback = None
+        self._setup_checker = None
 
     # ═══════════════════════════════════════════════════════
     # Lazy subsystems
@@ -102,6 +103,14 @@ class Registry:
             from src.core.rollback import RollbackStore
             self._rollback = RollbackStore(self.base_dir)
         return self._rollback
+
+    @property
+    def setup_checker(self):
+        """RequirementChecker для отчётов настройки (кэш пакетов общий)."""
+        if self._setup_checker is None:
+            from src.core.health import RequirementChecker
+            self._setup_checker = RequirementChecker(self.runtime)
+        return self._setup_checker
 
     # ═══════════════════════════════════════════════════════
     # Loading
@@ -371,6 +380,20 @@ class Registry:
             return {}
         st = snap.mcp_servers[mcp_id]
         m = st.schema
+        # Быстрая оценка requires (env/пакеты/пути, без сети) — статус
+        # «не настроен» для карточки в UI (Task: быстрая настройка)
+        try:
+            from src.core.setup import module_requirements
+            rep = module_requirements(m, self.setup_checker)
+            requirements = {
+                "status": rep["status"],
+                "missing_hard": rep["missing_hard"],
+                "missing_soft": rep["missing_soft"],
+            }
+        except Exception as e:  # noqa: BLE001 — статус не должен ломать список
+            logger.debug("requirements для %s не посчитались: %s", mcp_id, e)
+            requirements = {"status": "ok", "missing_hard": [],
+                            "missing_soft": []}
         return {
             "id": m.id,
             "title": m.title or m.id,
@@ -388,8 +411,46 @@ class Registry:
                 }
                 for t in m.tools
             ],
+            "requirements": requirements,
             "user_overrides": self.runtime.get_mcp_params(mcp_id),
         }
+
+    def agent_requirements(self, agent_id: str) -> dict:
+        """Полный структурный отчёт по требованиям агента (для формы UI)."""
+        snap = self.snapshot
+        if not snap or agent_id not in snap.agents:
+            return {}
+        st = snap.agents[agent_id]
+        from src.core.setup import module_requirements
+        rep = module_requirements(
+            st.schema, self.setup_checker, include_external=True,
+        )
+        rep.update({
+            "id": agent_id,
+            "kind": "agent",
+            "title": st.schema.title,
+            "state": st.status.value,
+        })
+        return rep
+
+    def mcp_requirements(self, mcp_id: str) -> dict:
+        """Полный структурный отчёт по требованиям MCP (для формы UI)."""
+        snap = self.snapshot
+        if not snap or mcp_id not in snap.mcp_servers:
+            return {}
+        st = snap.mcp_servers[mcp_id]
+        from src.core.setup import module_requirements
+        rep = module_requirements(
+            st.schema, self.setup_checker, include_external=True,
+        )
+        rep.update({
+            "id": mcp_id,
+            "kind": "mcp",
+            "title": st.schema.title or mcp_id,
+            "state": "enabled" if st.enabled else "disabled",
+            "alive": st.alive,
+        })
+        return rep
 
     def capability_info(self, cap_id: str) -> dict:
         cap = self.capabilities.get(cap_id)
@@ -436,6 +497,20 @@ class Registry:
         if not self.snapshot:
             return {"error": "not_initialized"}
         snap = self.snapshot
+        # Сводка «сколько модулей не настроено» — для бейджа ⚙ и вкладки
+        # «Настройка» (быстрая оценка, без сетевых проверок)
+        mcp_not_configured = 0
+        mcp_degraded = 0
+        try:
+            from src.core.setup import module_requirements
+            for st in snap.mcp_servers.values():
+                rep = module_requirements(st.schema, self.setup_checker)
+                if rep["status"] == "not_configured":
+                    mcp_not_configured += 1
+                elif rep["status"] == "degraded":
+                    mcp_degraded += 1
+        except Exception as e:  # noqa: BLE001
+            logger.debug("setup-сводка не посчиталась: %s", e)
         return {
             "built_at": snap.built_at,
             "build_duration_ms": round(snap.build_duration_ms, 1),
@@ -447,6 +522,17 @@ class Registry:
             },
             "mcp_enabled": snap.enabled_mcp_ids,
             "mcp_alive": snap.alive_mcp_ids,
+            "setup": {
+                "agents_total": (
+                    snap.active_agents + snap.degraded_agents
+                    + snap.unavailable_agents + snap.disabled_agents
+                ),
+                "agents_broken": snap.degraded_agents
+                + snap.unavailable_agents,
+                "mcp_total": len(snap.mcp_servers),
+                "mcp_not_configured": mcp_not_configured,
+                "mcp_degraded": mcp_degraded,
+            },
             "prompt_length": len(snap.orchestrator_prompt),
             "prompt_hash": snap.orchestrator_prompt_hash,
         }

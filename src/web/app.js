@@ -1007,6 +1007,7 @@ document.addEventListener("click", (e) => {
 async function onTabOpen(tab) {
   try {
     if (tab === "system") await loadSystemInfo();
+    else if (tab === "setup" && window.SetupCenter) await window.SetupCenter.load();
     else if (tab === "agents") await loadAgents();
     else if (tab === "mcp") await loadMCP();
     else if (tab === "capabilities") await loadCapabilities();
@@ -1156,6 +1157,9 @@ async function loadAgents() {
       }[a.status] || "badge-gray";
 
       const enabled = a.status !== "disabled";
+      const setupBtn = (a.status === "degraded" || a.status === "unavailable")
+        ? `<button class="secondary" data-agent-setup="${escapeHtml(a.id)}">⚙️ Настроить</button>`
+        : "";
 
       card.innerHTML = `
         <div class="agent-header">
@@ -1175,6 +1179,7 @@ async function loadAgents() {
         ${reasonsHtml}
         <div class="agent-actions" style="margin-top:8px;display:flex;gap:6px">
           <button class="secondary" data-check="${escapeHtml(a.id)}">🔍 Проверить</button>
+          ${setupBtn}
         </div>
       `;
       list.appendChild(card);
@@ -1211,6 +1216,16 @@ async function loadAgents() {
       }
     };
   });
+
+  // Быстрая настройка агента: недостающий env → .env → свежий статус
+  list.querySelectorAll("[data-agent-setup]").forEach(el => {
+    el.onclick = () => {
+      if (window.SetupDialog) {
+        window.SetupDialog.open("agent", el.dataset.agentSetup,
+          { onChange: loadAgents });
+      }
+    };
+  });
 }
 
 $("agents-refresh").onclick = loadAgents;
@@ -1223,20 +1238,39 @@ async function loadMCP() {
   const list = $("mcp-list");
   const enabled = d.mcp_servers.filter(m => m.enabled).length;
   const alive = d.mcp_servers.filter(m => m.alive).length;
+  const broken = d.mcp_servers.filter(m =>
+    m.requirements && m.requirements.status === "not_configured").length;
   $("mcp-summary").textContent =
-    `Всего: ${d.mcp_servers.length} · включено: ${enabled} · alive: ${alive}`;
+    `Всего: ${d.mcp_servers.length} · включено: ${enabled} · alive: ${alive}` +
+    (broken ? ` · не настроено: ${broken}` : "");
 
   list.innerHTML = "";
   for (const m of d.mcp_servers) {
     const card = document.createElement("div");
     card.className = `agent-card${m.enabled ? "" : " status-disabled"}`;
+
+    // Статус настройки из быстрой оценки requires (env/пакеты/пути)
+    const req = m.requirements
+      || { status: "ok", missing_hard: [], missing_soft: [] };
+    const reasons = [...(req.missing_hard || []), ...(req.missing_soft || [])];
+    let badge;
+    if (m.alive) badge = '<span class="badge badge-green">alive</span>';
+    else if (req.status === "not_configured")
+      badge = '<span class="badge badge-red">не настроен</span>';
+    else if (req.status === "degraded")
+      badge = '<span class="badge badge-yellow">частично настроен</span>';
+    else badge = '<span class="badge badge-gray">offline</span>';
+    const missingHtml = (!m.alive && reasons.length)
+      ? `<div style="color:#fca5a5;font-size:11px;margin-top:6px">${
+          reasons.slice(0, 4).map(escapeHtml).join("<br>")
+        }</div>`
+      : "";
+
     card.innerHTML = `
       <div class="agent-header">
         <div class="agent-title">
           <code class="agent-id">${escapeHtml(m.id)}</code>
-          ${m.alive
-            ? '<span class="badge badge-green">alive</span>'
-            : '<span class="badge badge-gray">offline</span>'}
+          ${badge}
         </div>
         <label class="switch">
           <input type="checkbox" data-mcp="${escapeHtml(m.id)}"
@@ -1245,6 +1279,10 @@ async function loadMCP() {
         </label>
       </div>
       <div class="agent-desc">${escapeHtml(m.description || "")}</div>
+      ${missingHtml}
+      <div class="agent-actions" style="margin-top:8px;display:flex;gap:6px">
+        <button class="secondary" data-mcp-setup="${escapeHtml(m.id)}">⚙️ Настроить</button>
+      </div>
     `;
     list.appendChild(card);
   }
@@ -1259,6 +1297,15 @@ async function loadMCP() {
       } catch (e) {
         alert(e.message);
         el.checked = !el.checked;
+      }
+    };
+  });
+
+  // Быстрая настройка: форма недостающего env → .env → старт
+  list.querySelectorAll("[data-mcp-setup]").forEach(el => {
+    el.onclick = () => {
+      if (window.SetupDialog) {
+        window.SetupDialog.open("mcp", el.dataset.mcpSetup, { onChange: loadMCP });
       }
     };
   });
