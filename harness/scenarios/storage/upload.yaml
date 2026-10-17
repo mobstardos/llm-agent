@@ -1,0 +1,25 @@
+id: storage_upload
+title: Storage — загрузка файла
+category: storage
+tags: [smoke, storage]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Загрузи файл test.txt в хранилище под ключом test/hello.txt"
+
+options:
+  agent_id: storage
+  mcp_servers: [storage, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

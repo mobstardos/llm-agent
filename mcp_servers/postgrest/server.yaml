@@ -1,0 +1,30 @@
+id: postgrest
+schema_version: "1.5.0"
+title: PostgREST MCP
+description: Доступ к PostgreSQL через PostgREST API.
+
+command: uvx
+args: ['postgrest-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: POSTGREST_URL, level: hard}
+
+mode: read
+
+tools:
+  - {name: pgr_get, danger: read}
+  - {name: pgr_post, danger: write}
+  - {name: pgr_list_tables, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: postgrest-mcp (PyPI)
+# GitHub: https://github.com/PostgREST/postgrest
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

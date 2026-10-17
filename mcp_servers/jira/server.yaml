@@ -1,0 +1,35 @@
+id: jira
+schema_version: "1.5.0"
+title: Jira MCP
+description: "Jira (Atlassian): тикеты, спринты, доски, проекты."
+
+command: uvx
+args: ['mcp-atlassian']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: JIRA_URL, level: hard}
+    - {name: JIRA_USERNAME, level: hard}
+    - {name: JIRA_API_TOKEN, level: hard}
+
+mode: write
+
+tools:
+  - {name: jira_get_issue, danger: read}
+  - {name: jira_create_issue, danger: write}
+  - {name: jira_update_issue, danger: write}
+  - {name: jira_search, danger: read}
+  - {name: jira_get_board, danger: read}
+  - {name: jira_get_sprint, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-atlassian (PyPI)
+# GitHub: https://github.com/sooperset/mcp-atlassian
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

@@ -1,0 +1,31 @@
+id: weaviate
+schema_version: "1.5.0"
+title: Weaviate MCP
+description: GraphQL-native vector DB для semantic search.
+
+command: uvx
+args: ['weaviate-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: WEAVIATE_URL, level: hard}
+    - {name: WEAVIATE_API_KEY, level: soft}
+
+mode: write
+
+tools:
+  - {name: weaviate_query, danger: read}
+  - {name: weaviate_create_schema, danger: write}
+  - {name: weaviate_insert, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: weaviate-mcp (PyPI)
+# GitHub: https://github.com/weaviate/mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

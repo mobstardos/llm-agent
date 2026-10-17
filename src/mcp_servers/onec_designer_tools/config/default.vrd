@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<point xmlns="http://v8.1c.ru/8.2/virtual-resource-system"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		base="/mcptest"
+		ib="File='E:\bases\DemoHRMCorp1';Usr='Admin';Pwd=''"
+		enable="false">
+		<debug enable="true" url="tcp://localhost"/>
+	<httpServices publishByDefault="false"
+			publishExtensionsByDefault="false">
+		<service name="APA_MCP"
+				rootUrl="mcp"
+				enable="true"
+				reuseSessions="autouse"
+				sessionMaxAge="20"
+				poolSize="10"
+				poolTimeout="5"/>
+	</httpServices>
+</point>

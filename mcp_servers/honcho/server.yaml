@@ -1,0 +1,54 @@
+id: honcho
+schema_version: "1.5.0"
+title: Honcho Memory MCP
+description: "Honcho — межсессионная память агентов (Plastic Labs, AGPL-3.0): workspace → peers → sessions → conclusions через официальный MCP-эндпоинт (mcp.honcho.dev или self-hosted)"
+
+command: python
+args: ["-m", "src.mcp_servers.honcho.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: HONCHO_MCP_URL, level: soft}
+    - {name: HONCHO_API_KEY, level: soft}
+    - {name: HONCHO_WORKSPACE_ID, level: soft}
+
+env:
+  HONCHO_MCP_URL: "${HONCHO_MCP_URL}"
+  HONCHO_API_KEY: "${HONCHO_API_KEY}"
+  HONCHO_WORKSPACE_ID: "${HONCHO_WORKSPACE_ID}"
+
+mode: external
+
+tools:
+  # Обнаружение
+  - {name: honcho_tools_list, danger: read}
+  # Recall (только чтение)
+  - {name: list_workspaces, danger: read}
+  - {name: list_peers, danger: read}
+  - {name: get_peer_card, danger: read}
+  - {name: list_sessions, danger: read}
+  - {name: get_session_context, danger: read}
+  - {name: get_peer_context, danger: read}
+  - {name: get_representation, danger: read}
+  - {name: chat, danger: read}
+  - {name: workspace_chat, danger: read}
+  - {name: search, danger: read}
+  - {name: list_conclusions, danger: read}
+  - {name: get_conclusions, danger: read}
+  - {name: get_derived_conclusions, danger: read}
+  # Memory store (запись)
+  - {name: create_workspace, danger: external}
+  - {name: create_peer, danger: external}
+  - {name: set_peer_card, danger: external}
+  - {name: create_session, danger: external}
+  - {name: add_peers_to_session, danger: external}
+  - {name: add_messages_to_session, danger: external}
+  # Служебное / фоновая консолидация
+  - {name: schedule_dream, danger: external}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

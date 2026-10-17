@@ -1,0 +1,22 @@
+id: cluster
+version: "1.0.0"
+title: Кластер
+description: >
+  Мультиинстанс-аналитика: реестр инстансов (ops.instances: регистрация,
+  heartbeat, JSONB-метрики), нагрузка по зеркалам за окно (события,
+  tool-calls, сессии, планы), топ инструментов/агентов, чистка
+  устаревших записей. Только чтение; PG недоступен → 503.
+enabled: true
+
+requires:
+  python_packages:
+    - {name: psycopg, level: hard}
+
+api_router: api.py:create_router
+
+ui_tab:
+  file: ui.js
+  title: Кластер
+  icon: "🌐"
+
+ws_events: []

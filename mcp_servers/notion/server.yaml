@@ -1,0 +1,32 @@
+id: notion
+schema_version: "1.5.0"
+title: Notion MCP
+description: "Notion: страницы, базы данных, блоки, комментарии."
+
+command: npx
+args: ['-y', '@notionhq/notion-mcp-server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: NOTION_API_KEY, level: hard}
+
+mode: write
+
+tools:
+  - {name: notion_search, danger: read}
+  - {name: notion_get_page, danger: read}
+  - {name: notion_create_page, danger: write}
+  - {name: notion_update_page, danger: write}
+  - {name: notion_query_database, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', '@notionhq/notion-mcp-server' — VERIFIED
+# GitHub: https://github.com/makenotion/notion-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

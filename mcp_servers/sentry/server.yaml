@@ -1,0 +1,32 @@
+id: sentry
+schema_version: "1.5.0"
+title: Sentry MCP
+description: "Sentry: анализ ошибок, release tracking, source maps, events."
+
+command: uvx
+args: ['mcp-server-sentry']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SENTRY_AUTH_TOKEN, level: hard}
+    - {name: SENTRY_ORG, level: hard}
+
+mode: read
+
+tools:
+  - {name: sentry_list_issues, danger: read}
+  - {name: sentry_get_event, danger: read}
+  - {name: sentry_list_releases, danger: read}
+  - {name: sentry_search_events, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: 'mcp-server-sentry' — VERIFIED
+# GitHub: https://github.com/getsentry/sentry-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

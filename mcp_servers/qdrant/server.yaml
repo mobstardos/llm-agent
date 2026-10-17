@@ -1,0 +1,32 @@
+id: qdrant
+schema_version: "1.5.0"
+title: Qdrant MCP
+description: "Vector DB. Семантический поиск, гибридный retrieval."
+
+command: uvx
+args: ['qdrant-mcp-server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: QDRANT_URL, level: hard}
+    - {name: QDRANT_API_KEY, level: soft}
+
+mode: write
+
+tools:
+  - {name: qdrant_search, danger: read}
+  - {name: qdrant_upsert, danger: write}
+  - {name: qdrant_create_collection, danger: write}
+  - {name: qdrant_delete_collection, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: qdrant-mcp-server (PyPI)
+# GitHub: https://github.com/qdrant/mcp-server-qdrant
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

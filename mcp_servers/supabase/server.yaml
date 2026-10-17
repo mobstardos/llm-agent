@@ -1,0 +1,33 @@
+id: supabase
+schema_version: "1.5.0"
+title: Supabase MCP (official)
+description: "Supabase: SQL, Auth, Storage, Realtime + PostgREST built-in. Official."
+
+command: npx
+args: ['-y', '@supabase/mcp-server-supabase@latest']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SUPABASE_ACCESS_TOKEN, level: hard}
+    - {name: SUPABASE_PROJECT_REF, level: soft}
+
+mode: write
+
+tools:
+  - {name: supabase_sql, danger: read}
+  - {name: supabase_list_projects, danger: read}
+  - {name: supabase_create_table, danger: write}
+  - {name: supabase_storage_list, danger: read}
+  - {name: supabase_storage_upload, danger: write}
+  - {name: supabase_postgrest_query, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# npm: https://www.npmjs.com/package/@supabase/mcp-server-supabase (VERIFIED, OFFICIAL)
+# GitHub: https://github.com/supabase/mcp

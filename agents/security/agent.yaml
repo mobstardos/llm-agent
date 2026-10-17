@@ -1,0 +1,33 @@
+id: security
+schema_version: "1.5.0"
+title: Security агент
+version: "1.0.0"
+description: Секреты, SAST, SCA, SBOM, хэши
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [security, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 11
+routing_hints:
+  keywords: [безопасность, секреты, уязвимости, sast, sbom, cve, hash, подпись]
+  negative_keywords: [1с]
+  description_for_router: |
+    Безопасность: поиск утечек секретов, SAST-анализ,
+    аудит зависимостей, SBOM, хэши.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔒", color: "#dc2626", category: dev}

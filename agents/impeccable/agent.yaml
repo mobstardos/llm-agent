@@ -1,0 +1,32 @@
+id: impeccable
+schema_version: "1.5.0"
+title: Impeccable Design агент
+version: "1.0.0"
+description: Front-end дизайн-система с браузерным редактором для быстрых правок UI.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: IMPECCABLE_TOKEN, level: soft}
+
+mcp_servers: [impeccable]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: ["impeccable", "front-end", "frontend", "design system"]
+  negative_keywords: []
+  description_for_router: |
+    Front-end дизайн-система с браузерным редактором для быстрых правок UI.
+
+mode: write
+dangerous_tools: ['impeccable_apply_design_system', 'impeccable_save_changes']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "✨", color: "#3b82f6", category: design}
+
+# GitHub: https://github.com/impeccable-design/impeccable-mcp

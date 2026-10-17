@@ -1,0 +1,28 @@
+id: onec_tests
+schema_version: "1.5.0"
+title: 1C Tests MCP
+description: Автотесты 1С — YAxUnit и Vanessa Automation
+
+command: python
+args: ["-m", "src.mcp_servers.onec_tests.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: tests_info, danger: read}
+  - {name: run_yaxunit, danger: destructive}
+  - {name: run_vanessa, danger: destructive}
+  - {name: list_features, danger: read}
+  - {name: list_yaxunit_modules, danger: read}
+  - {name: parse_report, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

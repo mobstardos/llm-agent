@@ -1,0 +1,25 @@
+id: image_describe_basic
+title: Image — описание через Vision
+category: image
+tags: [smoke, image, vision]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Опиши что на изображении test.png"
+
+options:
+  agent_id: image
+  mcp_servers: [image, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 10}
+
+loop: agent.reasoning

@@ -1,0 +1,31 @@
+id: milvus
+schema_version: "1.5.0"
+title: Milvus MCP
+description: "Vector DB для больших объёмов (>1B vectors)."
+
+command: uvx
+args: ['mcp-server-milvus']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: MILVUS_HOST, level: hard}
+    - {name: MILVUS_PORT, level: soft}
+
+mode: write
+
+tools:
+  - {name: milvus_search, danger: read}
+  - {name: milvus_insert, danger: write}
+  - {name: milvus_create_collection, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: 'mcp-server-milvus' — VERIFIED
+# GitHub: https://github.com/milvus-io/milvus
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

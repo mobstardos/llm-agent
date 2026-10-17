@@ -1,0 +1,40 @@
+id: honcho_memory
+schema_version: "1.5.0"
+title: Honcho Memory агент (межсессионная память)
+version: "1.0.0"
+description: "Межсессионная память агентов через Honcho (Plastic Labs) — помнит пользователя между диалогами: representation, peer card, выводы (conclusions); режимы Recall (что ты знаешь обо мне) и Memory store (запомни…)"
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: HONCHO_MCP_URL, level: soft}
+    - {name: HONCHO_API_KEY, level: soft}
+
+mcp_servers: [honcho]
+depends_on: {hard: [], soft: [memory_official]}
+
+priority: 19
+routing_hints:
+  keywords: [память, межсессионная память, honcho, что ты знаешь обо мне,
+             вспомни, персонализация, предпочтения пользователя, выводы,
+             peer, сессия памяти, dream, консолидация памяти,
+             персональные данные пользователя]
+  negative_keywords: [pgvector, embedding, snowball]
+  description_for_router: |
+    Долговременная память между диалогами (Honcho, Plastic Labs): вспомнить
+    пользователя (representation, peer card, выводы), ответить «что ты
+    знаешь обо мне», записать новые наблюдения (memory store: сессия →
+    сообщения обеих сторон диалога). Слой долговременной памяти для
+    oac_orchestrator и других агентов.
+
+mode: external
+dangerous_tools: [create_workspace, create_peer, create_session,
+                  add_peers_to_session, add_messages_to_session,
+                  set_peer_card, schedule_dream]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 25, max_result_chars: 30000, timeout_seconds: 1800}
+ui: {icon: "🧠", color: "#14b8a6", category: ai_obs}

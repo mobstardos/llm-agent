@@ -1,0 +1,37 @@
+id: onec_designer
+schema_version: "1.5.0"
+title: 1С Designer агент
+version: "1.0.0"
+description: Управление 1С через 1cv8.exe DESIGNER
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [onec_designer, filesystem]
+depends_on:
+  hard: [file]
+  soft: [onec]
+
+priority: 13
+routing_hints:
+  keywords: [загрузи конфигурацию, собери cf, обнови бд, designer, 1cv8]
+  negative_keywords: [web, browser]
+  description_for_router: |
+    Операции с 1С: загрузка/выгрузка конфигурации, обновление БД,
+    сборка .cf/.cfe/.epf, проверка модулей.
+
+mode: destructive
+dangerous_tools:
+  - load_config
+  - update_db
+  - restore_ib
+  - create_ib
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 900}
+ui: {icon: "🛠", color: "#dc2626", category: 1c}

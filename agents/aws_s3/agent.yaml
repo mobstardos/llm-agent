@@ -1,0 +1,34 @@
+id: aws_s3
+schema_version: "1.5.0"
+title: AWS S3 агент
+version: "1.0.0"
+description: "S3 buckets: upload, download, list, delete, lifecycle."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AWS_ACCESS_KEY_ID, level: hard}
+    - {name: AWS_SECRET_ACCESS_KEY, level: hard}
+    - {name: AWS_REGION, level: soft}
+
+mcp_servers: [aws_s3]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [aws, s3, бакет, bucket]
+  negative_keywords: []
+  description_for_router: |
+    S3 buckets: upload, download, list, delete, lifecycle.
+
+mode: write
+dangerous_tools: [s3_upload, s3_delete_object]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🪣", color: "#ff9900", category: cloud}
+
+# GitHub: https://github.com/aws-samples/mcp-aws-s3

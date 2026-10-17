@@ -1,0 +1,23 @@
+id: enrichment_health
+title: Enrichment — проверка воркера
+category: dev
+tags: [smoke, dev, ollama]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь статус воркера обогащения событий"
+
+options:
+  agent_id: file
+  mcp_servers: [filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

@@ -1,0 +1,30 @@
+id: mysql
+schema_version: "1.5.0"
+title: MySQL / SQLite MCP
+description: Работа с MySQL и SQLite базами
+
+command: python
+args: ["-m", "src.mcp_servers.mysql.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: pymysql, level: soft, message: "pymysql не установлен"}
+  env_vars:
+    - {name: MYSQL_HOST, level: soft}
+    - {name: SQLITE_PATH, level: soft}
+
+mode: write
+
+tools:
+  - {name: list_tables, danger: read}
+  - {name: describe_table, danger: read}
+  - {name: run_query, danger: read}
+  - {name: execute_write_query, danger: write}
+  - {name: execute_migration, danger: destructive}
+  - {name: current_driver, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

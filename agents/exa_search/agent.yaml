@@ -1,0 +1,32 @@
+id: exa_search
+schema_version: "1.5.0"
+title: Exa Search агент
+version: "1.0.0"
+description: "AI-tuned web search — находит статьи, документацию, snippets."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: EXA_API_KEY, level: hard}
+
+mcp_servers: [exa_search]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [exa, search, research]
+  negative_keywords: []
+  description_for_router: |
+    AI-tuned web search — находит статьи, документацию, snippets.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔮", color: "#1a1a1a", category: search}
+
+# GitHub: https://github.com/exa-labs/exa-mcp-server

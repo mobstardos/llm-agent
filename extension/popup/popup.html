@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root { --bg:#14161a; --panel:#1c1f26; --line:#2a2f3a;
+            --fg:#d7dce4; --dim:#8b93a3; --accent:#5b9cf5; }
+    body { width: 320px; margin:0; background: var(--bg);
+           color: var(--fg); font: 13px/1.4 system-ui, sans-serif; }
+    header { display:flex; align-items:center; gap:8px;
+             padding:10px; background:var(--panel);
+             border-bottom:1px solid var(--line); font-weight:600; }
+    .dot { width:9px; height:9px; border-radius:50%; }
+    .dot.on{background:#4caf7d} .dot.off{background:#e57373}
+    section { padding:10px; }
+    label { display:block; color:var(--dim); font-size:11px;
+            margin-bottom:4px; }
+    input { width:100%; padding:6px 8px; background:#0f1115;
+            color:var(--fg); border:1px solid var(--line);
+            border-radius:6px; }
+    button { width:100%; margin-top:8px; padding:8px;
+             background:var(--accent); color:#fff; border:none;
+             border-radius:6px; cursor:pointer; }
+    button.sec { background:none; border:1px solid var(--line);
+                 color:var(--fg); }
+    #status { color:var(--dim); font-size:11px; margin-top:8px;
+              min-height:15px; white-space:pre-wrap; }
+    #hint { color:var(--dim); font-size:10px; margin-top:6px;
+            border-top:1px solid var(--line); padding-top:6px; }
+    #hint b { color:var(--fg); }
+    .auth-row { display:flex; gap:6px; }
+    .auth-row button { flex:1; margin-top:8px; }
+    .auth-state { font-size:11px; margin-top:4px;
+                  color:var(--dim); min-height:13px; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header><span id="dot" class="dot off"></span> LLM Agent Bridge</header>
+  <section>
+    <label>Адрес сервера (локальный llm-agent)</label>
+    <input id="url" type="text" spellcheck="false">
+    <button id="save" class="sec">💾 Сохранить адрес</button>
+    <button id="capture">📄 Захватить текущую страницу</button>
+    <button id="panel">💬 Открыть панель чата</button>
+    <button id="webui" class="sec">🌐 Открыть web-UI</button>
+    <div style="border-top:1px solid var(--line); margin-top:10px;
+                padding-top:4px; color:var(--dim); font-size:11px;">
+      🍪 Авторизация веб-чатов (куки → .env сервера)</div>
+    <div class="auth-row">
+      <button id="auth-deepseek" class="sec">🔑 DeepSeek</button>
+      <button id="auth-qwen" class="sec">🔑 Qwen</button>
+    </div>
+    <div id="auth-deepseek-state" class="auth-state">—</div>
+    <div id="auth-qwen-state" class="auth-state">—</div>
+    <div id="status">проверяем связь…</div>
+    <div id="hint">⌨ Разбудить агента: <b>Alt+Shift+B</b> — меняется в
+      настройках браузера (chrome://extensions/shortcuts или
+      about:addons → «Управление сочетаниями клавиш»)</div>
+  </section>
+  <script src="popup.js"></script>
+</body>
+</html>

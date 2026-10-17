@@ -1,0 +1,31 @@
+id: time
+schema_version: "1.5.0"
+title: Time агент
+version: "1.0.0"
+description: "Текущее время, таймзоны, конверсии."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mcp_servers: [time]
+depends_on: {hard: [], soft: []}
+
+priority: 12
+routing_hints:
+  keywords: [time, время, timezone]
+  negative_keywords: []
+  description_for_router: |
+    Текущее время, таймзоны, конверсии.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🕐", color: "#16a085", category: office}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

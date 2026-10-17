@@ -1,0 +1,32 @@
+id: github_official
+schema_version: "1.5.0"
+title: GitHub агент (official)
+version: "1.0.0"
+description: "GitHub: repos, issues, PRs, actions — official version. Дополнит существующий github MCP."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GITHUB_TOKEN, level: hard}
+
+mcp_servers: [github_official]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [github, issue, pull request, pr]
+  negative_keywords: []
+  description_for_router: |
+    GitHub: repos, issues, PRs, actions — official version. Дополнит существующий github MCP.
+
+mode: write
+dangerous_tools: [gh_off_create_issue, gh_off_create_pr]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🐙", color: "#24292e", category: devops}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

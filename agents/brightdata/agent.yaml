@@ -1,0 +1,32 @@
+id: brightdata
+schema_version: "1.5.0"
+title: Bright Data агент
+version: "1.0.0"
+description: "Web scraping с anti-bot bypass, residential proxies."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: BRIGHTDATA_API_KEY, level: hard}
+
+mcp_servers: [brightdata]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [brightdata, scraping, scrape]
+  negative_keywords: []
+  description_for_router: |
+    Web scraping с anti-bot bypass, residential proxies.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "💡", color: "#ffb800", category: browser}
+
+# GitHub: https://github.com/luminati-io/brightdata-mcp

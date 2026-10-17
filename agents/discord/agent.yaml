@@ -1,0 +1,32 @@
+id: discord
+schema_version: "1.5.0"
+title: Discord агент
+version: "1.0.0"
+description: "Discord: сервера, каналы, сообщения, роли."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: DISCORD_TOKEN, level: hard}
+
+mcp_servers: [discord]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [discord, дискорд, сервер, гильдия]
+  negative_keywords: []
+  description_for_router: |
+    Discord: сервера, каналы, сообщения, роли.
+
+mode: write
+dangerous_tools: [discord_send_message]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🎮", color: "#5865f2", category: comms}
+
+# GitHub: https://github.com/sergetic/discord-mcp

@@ -1,0 +1,31 @@
+id: shell
+schema_version: "1.5.0"
+title: Shell агент
+version: "1.0.0"
+description: Выполнение allowlist-команд
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [shell]
+depends_on: {hard: [], soft: []}
+
+priority: 5
+routing_hints:
+  keywords: [запусти, выполни, тесты, pytest, npm, сборка]
+  negative_keywords: [1с]
+  description_for_router: |
+    Запуск команд в sandbox: тесты, линтеры, сборка.
+    Ограничен allowlist.
+
+mode: destructive
+dangerous_tools: [run]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 20000, timeout_seconds: 300}
+ui: {icon: "💻", color: "#111827", category: dev}

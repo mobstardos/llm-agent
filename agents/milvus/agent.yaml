@@ -1,0 +1,33 @@
+id: milvus
+schema_version: "1.5.0"
+title: Milvus агент
+version: "1.0.0"
+description: "Vector DB для больших объёмов (>1B vectors)."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: MILVUS_HOST, level: hard}
+    - {name: MILVUS_PORT, level: soft}
+
+mcp_servers: [milvus]
+depends_on: {hard: [], soft: []}
+
+priority: 12
+routing_hints:
+  keywords: [milvus, vector]
+  negative_keywords: []
+  description_for_router: |
+    Vector DB для больших объёмов (>1B vectors).
+
+mode: write
+dangerous_tools: [milvus_insert, milvus_create_collection]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "💾", color: "#0080ff", category: database}
+
+# GitHub: https://github.com/milvus-io/milvus

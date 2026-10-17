@@ -1,0 +1,32 @@
+id: redis
+schema_version: "1.5.0"
+title: Redis агент
+version: "1.0.0"
+description: "Управление данными в Redis: ключи, хэши, списки, pub/sub, RedisSearch"
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: REDIS_URL, level: hard}
+
+mcp_servers: [redis]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [redis, кэш, очередь, pub, sub]
+  negative_keywords: []
+  description_for_router: |
+    Управление данными в Redis: ключи, хэши, списки, pub/sub, RedisSearch
+
+mode: write
+dangerous_tools: [redis_set, redis_delete, redis_hset, redis_publish]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "⚡", color: "#dc382d", category: database}
+
+# GitHub: https://github.com/redis/mcp-redis

@@ -1,0 +1,30 @@
+id: puppeteer
+schema_version: "1.5.0"
+title: Puppeteer MCP
+description: Puppeteer browser automation. Альтернатива Playwright.
+
+command: npx
+args: ['-y', '@modelcontextprotocol/server-puppeteer']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: write
+
+tools:
+  - {name: puppeteer_navigate, danger: read}
+  - {name: puppeteer_click, danger: write}
+  - {name: puppeteer_screenshot, danger: read}
+  - {name: puppeteer_evaluate, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: @modelcontextprotocol/server-puppeteer (npm)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

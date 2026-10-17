@@ -1,0 +1,47 @@
+id: browser
+schema_version: "1.5.0"
+title: Browser MCP
+description: Playwright-управление браузером
+
+command: python
+args: ["-m", "src.mcp_servers.browser.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: playwright, level: hard}
+
+mode: external
+
+tools:
+  - {name: navigate, danger: external}
+  - {name: new_page, danger: external}
+  - {name: close_page, danger: external}
+  - {name: click, danger: external}
+  - {name: fill, danger: external}
+  - {name: select_option, danger: external}
+  - {name: press_key, danger: external}
+  - {name: hover, danger: external}
+  - {name: wait_for_selector, danger: read}
+  - {name: wait_for_load_state, danger: read}
+  - {name: screenshot, danger: read}
+  - {name: screenshot_element, danger: read}
+  - {name: get_text, danger: read}
+  - {name: get_html, danger: read}
+  - {name: get_attribute, danger: read}
+  - {name: get_console_logs, danger: read}
+  - {name: get_network_requests, danger: read}
+  - {name: evaluate, danger: destructive}
+  - {name: list_pages, danger: read}
+  - {name: go_back, danger: external}
+  - {name: go_forward, danger: external}
+  - {name: reload, danger: external}
+  - {name: get_url, danger: read}
+  - {name: get_title, danger: read}
+  - {name: snapshot_visual, danger: write}
+  - {name: compare_visual, danger: read}
+
+process:
+  startup_timeout_seconds: 60
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,34 @@
+id: aws_s3
+schema_version: "1.5.0"
+title: AWS S3 MCP
+description: "S3 buckets: upload, download, list, delete, lifecycle."
+
+command: uvx
+args: ['mcp-aws-s3']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AWS_ACCESS_KEY_ID, level: hard}
+    - {name: AWS_SECRET_ACCESS_KEY, level: hard}
+    - {name: AWS_REGION, level: soft}
+
+mode: write
+
+tools:
+  - {name: s3_list_buckets, danger: read}
+  - {name: s3_list_objects, danger: read}
+  - {name: s3_upload, danger: write}
+  - {name: s3_download, danger: read}
+  - {name: s3_delete_object, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-aws-s3 (PyPI)
+# GitHub: https://github.com/aws-samples/mcp-aws-s3
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

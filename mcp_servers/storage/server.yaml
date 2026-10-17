@@ -1,0 +1,33 @@
+id: storage
+schema_version: "1.5.0"
+title: Storage MCP
+description: S3/MinIO/локальное хранилище
+
+command: python
+args: ["-m", "src.mcp_servers.storage.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: storage, ops: [upload], level: soft}
+
+mode: write
+
+tools:
+  - {name: upload, danger: write}
+  - {name: download, danger: write}
+  - {name: list_objects, danger: read}
+  - {name: delete_object, danger: destructive}
+  - {name: exists, danger: read}
+  - {name: presign, danger: read}
+  - {name: sync_up, danger: write}
+  - {name: sync_down, danger: write}
+  - {name: storage_info, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

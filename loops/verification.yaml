@@ -1,0 +1,41 @@
+id: agent.verification
+type: verification
+title: Проверка результата
+description: Запускается после reasoning, если были изменения.
+
+budget:
+  max_iterations: 3
+  max_tokens: 10000
+  max_duration_seconds: 120
+
+body:
+  - kind: check
+    params:
+      checker: git_diff
+      require_changes: true
+
+  - kind: check
+    params:
+      checker: todos
+      forbid: ["TODO", "FIXME", "pass  # stub"]
+
+  - kind: check
+    params:
+      checker: lint
+      command: "ruff check {files}"
+      timeout_seconds: 30
+
+  - kind: check
+    params:
+      checker: tests
+      command: "pytest -q"
+      timeout_seconds: 60
+
+on_success: null
+on_failure: agent.retry
+on_timeout: agent.escalation
+
+metrics:
+  - checks_passed
+  - checks_failed
+  - duration_ms

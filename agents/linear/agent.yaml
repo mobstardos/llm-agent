@@ -1,0 +1,32 @@
+id: linear
+schema_version: "1.5.0"
+title: Linear агент
+version: "1.0.0"
+description: "Linear: создание/обновление тикетов, поиск, проекты, спринты."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: LINEAR_API_KEY, level: hard}
+
+mcp_servers: [linear]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [linear, тикет, issue, sprint]
+  negative_keywords: []
+  description_for_router: |
+    Linear: создание/обновление тикетов, поиск, проекты, спринты.
+
+mode: write
+dangerous_tools: [linear_create_issue, linear_update_issue]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📋", color: "#5e6ad2", category: pm}
+
+# GitHub: https://github.com/linear/linear-mcp

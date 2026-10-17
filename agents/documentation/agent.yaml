@@ -1,0 +1,33 @@
+id: documentation
+schema_version: "1.5.0"
+title: Documentation агент
+version: "1.0.0"
+description: Docstring, Mermaid, OpenAPI, changelog
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [documentation, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 12
+routing_hints:
+  keywords: [документация, docstring, readme, mermaid, диаграмма, changelog, openapi]
+  negative_keywords: [1с]
+  description_for_router: |
+    Документация: docstrings, Mermaid-диаграммы, OpenAPI,
+    changelog, оглавление Markdown.
+
+mode: write
+dangerous_tools: [docstring_generate, mermaid_render, markdown_toc]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "📚", color: "#6366f1", category: dev}

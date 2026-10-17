@@ -1,0 +1,21 @@
+# Ruff configuration for llm-agent
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP", "SIM", "T20"]
+
+[lint.per-file-ignores]
+"install.py" = ["T20"]
+"setup.py" = ["T20"]
+"first_run.py" = ["T20"]
+"run.py" = ["T20"]
+"src/cli.py" = ["T20"]
+"src/journal/cli.py" = ["T20"]
+"src/db/init_db.py" = ["T20"]
+"src/route_analytics.py" = ["T20"]
+"src/db/autodetect.py" = ["T20"]
+"tests/*" = ["T20"]
+"scripts/test_*.py" = ["T20"]
+"harness/tests/*" = ["T20"]
+"src/mcp_servers/debug/server.py" = ["T201"]

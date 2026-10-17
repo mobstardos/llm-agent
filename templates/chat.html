@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Agent — Чат</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --fg: #e8e8f0;
+            --muted: #6b6b80;
+            --accent: #00d4aa;
+            --card: #1a1a24;
+            --border: #2a2a3a;
+        }
+        @font-face {
+            font-family: 'CaskaydiaCove Nerd Font';
+            src: local('CaskaydiaCove Nerd Font');
+        }
+        body {
+            font-family: 'CaskaydiaCove Nerd Font', monospace, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #root {
+            height: 100vh;
+            width: 100vw;
+        }
+        /* Header */
+        .header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-subtle);
+        }
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent), #00ffcc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            padding: 24px;
+            overflow: auto;
+            position: relative;
+        }
+        .message {
+            padding: 12px 16px;
+            margin: 8px 0;
+            max-width: 80%;
+            border-radius: 12px 12px 4px 12px;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+        .message.user {
+            background: linear-gradient(135deg, #00d4aa, #0088aa);
+            color: white;
+            margin-left: auto;
+            border-radius: 12px 4px 12px 12px;
+        }
+        .message.ai {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--fg);
+            margin-right: auto;
+            border-radius: 4px 12px 12px 12px;
+        }
+        .message.ai .name {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: right;
+            margin-bottom: 4px;
+        }
+        /* Input Area */
+        .input-area {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-subtle);
+            display: flex;
+            gap: 12px;
+        }
+        .input-area input {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--fg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-area input:focus {
+            border-color: var(--accent);
+        }
+        .input-area button {
+            background: var(--accent);
+            color: #0a0a0f;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .input-area button:hover {
+            background: #00ffcc;
+        }
+        /* Typing indicator */
+        .typing-indicator {
+            padding: 8px 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px 8px 4px 8px;
+            max-width: 80%;
+            margin: 8px auto;
+            color: var(--muted);
+            font-size: 12px;
+            display: none;
+        }
+        .typing-indicator span {
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        /* Status bar */
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 24px;
+            background: var(--bg-subtle);
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="header">
+            <h1>LLM Agent — Чат</h1>
+            <p>Модель: <span id="model-name">qwen2.5:3b</span></p>
+        </div>
+        <div class="chat-area" id="chat-area">
+            <div class="message ai">
+                <div class="name">Ассистент</div>
+                Привет! Я LLM Agent. Задавайте вопросы или запросы.
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Введите запрос...">
+            <button id="send-btn">Отправить</button>
+            <div class="typing-indicator" id="typing-indicator">
+                <span>▋</span>
+                <span>▋</span>
+                <span>▋</span>
+            </div>
+        </div>
+        <div class="status-bar">
+            Нажмите Enter для отправки · Функционал ограничен чатом
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chat-area');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const modelName = document.getElementById('model-name');
+
+        // Простая симуляция ответов от локальной модели
+        function generateResponse(userText) {
+            const lower = userText.toLowerCase();
+            
+            if (lower.includes('привет') || lower.includes('hello')) {
+                return 'Привет! Я работаю как LLM Agent. Чем могу помочь?';
+            }
+            if (lower.includes('файл')) {
+                return 'Я могу помочь создать, прочитать или изменить файл. Напишите какую задачу выполнить.';
+            }
+            if (lower.includes('sql')) {
+                return 'Я могу помочь написать SQL запрос. Какой запг вам нужен?';
+            }
+            if (lower.includes('код') || lower.includes('функция')) {
+                return 'Я могу написать код или функцию. Опишите, что нужно сделать.';
+            }
+            if (lower.includes('статус') || lower.includes('как дела')) {
+                return 'Система работает. Модель qwen2.5:3b запущена на GPU. Agent Inspector доступен по адресу http://127.0.0.1:7100';
+            }
+            return `Вы написали: "${userText}". Я обрабатываю ваш запрос с помощью локальной модели qwen2.5:3b.`;
+        }
+
+        function addMessage(text, isUser) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            msgDiv.innerHTML = isUser ? text : `<div class="name">Ассистент</div>${text}`;
+            chatArea.appendChild(msgDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function showTyping(show) {
+            document.getElementById('typing-indicator').style.display = show ? 'block' : 'none';
+        }
+
+        function appendResponse(text) {
+            setTimeout(() => {
+                addMessage(text, false);
+                showTyping(false);
+                userInput.focus();
+                userInput.value = '';
+            }, 800);
+        }
+
+        function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            
+            addMessage(text, true);
+            showTyping(true);
+            
+            // Симуляция ответа от модели
+            const response = generateResponse(text);
+            setTimeout(() => {
+                appendResponse(response);
+            }, 800);
+        }
+
+        // События
+        sendBtn.addEventListener('click', handleSend);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSend();
+            }
+        });
+
+        // Инициализация
+        modelName.textContent = 'qwen2.5:3b';
+        userInput.focus();
+    </script>
+</body>
+</html>

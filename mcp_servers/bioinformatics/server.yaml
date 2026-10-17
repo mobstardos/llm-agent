@@ -1,0 +1,30 @@
+id: bioinformatics
+schema_version: "1.5.0"
+title: Bioinformatics MCP
+description: "NCBI, Ensembl — генетические и биологические данные."
+
+command: uvx
+args: ['biothings-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: NCBI_API_KEY, level: soft}
+
+mode: read
+
+tools:
+  - {name: biothings_query, danger: read}
+  - {name: biothings_get_gene, danger: read}
+  - {name: biothings_get_variant, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: biothings-mcp (PyPI)
+# GitHub: https://github.com/biothings/mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

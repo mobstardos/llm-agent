@@ -1,0 +1,34 @@
+id: onec_query
+schema_version: "1.5.0"
+title: 1C Query Language
+description: Язык запросов 1С
+
+operations:
+  - id: validate
+  - id: execute
+  - id: explain
+
+providers:
+  - id: odata
+    display_name: "Выполнение через OData"
+    type: openai_compatible
+    priority: 10
+    supports: [execute]
+    cost_hint: free
+    health:
+      method: http_get
+      url: ""
+      timeout: 5.0
+
+  - id: parser_only
+    display_name: "Только валидация (без выполнения)"
+    type: local
+    priority: 50
+    supports: [validate, explain]
+    cost_hint: free
+    health:
+      method: which
+      binary: python
+
+strategy: fallback
+tie_breaker: [health, locality, alphabetical]

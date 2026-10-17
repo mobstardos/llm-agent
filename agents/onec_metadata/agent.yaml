@@ -1,0 +1,42 @@
+id: onec_metadata
+schema_version: "1.5.0"
+title: 1С Metadata агент
+version: "1.0.0"
+description: Работа с XML-выгрузкой конфигурации 1С
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: lxml, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: onec_metadata, ops: [read], level: soft}
+
+mcp_servers: [onec_metadata, filesystem]
+depends_on:
+  hard: [file]
+  soft: [onec]
+
+priority: 14
+routing_hints:
+  keywords: [справочник, документ, регистр, реквизит, метаданные, 1с конфигурация]
+  negative_keywords: [web, browser, sql]
+  description_for_router: |
+    Работа с метаданными 1С: чтение и создание справочников, документов,
+    регистров; добавление реквизитов и табличных частей; расширения конфигурации.
+
+mode: write
+dangerous_tools:
+  - create_object
+  - add_attribute
+  - add_tabular_section
+  - write_module
+  - create_extension
+  - adopt_object
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "📚", color: "#dc2626", category: 1c}

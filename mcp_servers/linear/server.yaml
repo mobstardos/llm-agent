@@ -1,0 +1,32 @@
+id: linear
+schema_version: "1.5.0"
+title: Linear MCP
+description: "Linear: создание/обновление тикетов, поиск, проекты, спринты."
+
+command: npx
+args: ['-y', 'linear-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: LINEAR_API_KEY, level: hard}
+
+mode: write
+
+tools:
+  - {name: linear_create_issue, danger: write}
+  - {name: linear_list_issues, danger: read}
+  - {name: linear_update_issue, danger: write}
+  - {name: linear_search, danger: read}
+  - {name: linear_list_projects, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: linear-mcp (npm)
+# GitHub: https://github.com/linear/linear-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

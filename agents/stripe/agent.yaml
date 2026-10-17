@@ -1,0 +1,32 @@
+id: stripe
+schema_version: "1.5.0"
+title: Stripe агент
+version: "1.0.0"
+description: "Stripe: платежи, refund, subscription, customers."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: STRIPE_SECRET_KEY, level: hard}
+
+mcp_servers: [stripe]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [stripe, платёж, payment]
+  negative_keywords: []
+  description_for_router: |
+    Stripe: платежи, refund, subscription, customers.
+
+mode: destructive
+dangerous_tools: [stripe_create_payment, stripe_refund, stripe_create_subscription]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "💳", color: "#635bff", category: ecommerce}
+
+# GitHub: https://github.com/stripe/stripe-mcp

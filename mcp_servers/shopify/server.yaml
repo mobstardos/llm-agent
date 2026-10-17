@@ -1,0 +1,32 @@
+id: shopify
+schema_version: "1.5.0"
+title: Shopify MCP
+description: "Shopify: товары, заказы, клиенты, инвентарь."
+
+command: npx
+args: ['-y', 'shopify-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SHOPIFY_ACCESS_TOKEN, level: hard}
+    - {name: SHOPIFY_SHOP, level: hard}
+
+mode: write
+
+tools:
+  - {name: shopify_list_products, danger: read}
+  - {name: shopify_create_product, danger: write}
+  - {name: shopify_list_orders, danger: read}
+  - {name: shopify_get_customer, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: shopify-mcp (npm)
+# GitHub: https://github.com/Shopify/shopify-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

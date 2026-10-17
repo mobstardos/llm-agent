@@ -1,0 +1,27 @@
+id: onec
+schema_version: "1.5.0"
+title: 1C OData MCP
+description: Чтение данных 1С через OData
+
+command: python
+args: ["-m", "src.mcp_servers.onec.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+  env_vars:
+    - {name: ONEC_BASE_URL, level: hard}
+
+mode: read
+
+tools:
+  - {name: get_metadata, danger: read}
+  - {name: get_catalog, danger: read}
+  - {name: get_document, danger: read}
+  - {name: get_register, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,31 @@
+id: git_official
+schema_version: "1.5.0"
+title: Git MCP (official)
+description: Git operations через official MCP. Дополнит существующий git MCP.
+
+command: uvx
+args: ['mcp-server-git']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: destructive
+
+tools:
+  - {name: git_status, danger: read}
+  - {name: git_log, danger: read}
+  - {name: git_diff, danger: read}
+  - {name: git_commit, danger: destructive}
+  - {name: git_branch, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-server-git (PyPI)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

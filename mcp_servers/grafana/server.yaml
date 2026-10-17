@@ -1,0 +1,33 @@
+id: grafana
+schema_version: "1.5.0"
+title: Grafana MCP
+description: "Grafana: query метрик, dashboards, alerts, data sources."
+
+command: uvx
+args: ['mcp-grafana']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GRAFANA_URL, level: hard}
+    - {name: GRAFANA_API_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: grafana_query, danger: read}
+  - {name: grafana_list_dashboards, danger: read}
+  - {name: grafana_get_dashboard, danger: read}
+  - {name: grafana_list_alerts, danger: read}
+  - {name: grafana_list_datasources, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-grafana (PyPI)
+# GitHub: https://github.com/grafana/mcp-server-grafana
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

@@ -1,0 +1,58 @@
+id: whisper
+schema_version: "1.5.0"
+title: Whisper
+description: Транскрипция аудио (локально)
+
+operations:
+  - id: transcribe
+    description: Транскрибировать аудио
+    input: [audio_path, lang]
+    output: text
+  - id: translate
+    description: Перевести аудио на английский
+    input: [audio_path]
+    output: text
+  - id: diarize
+    description: Разделить по спикерам (опционально)
+    input: [audio_path]
+    output: segments
+
+providers:
+  - id: faster_whisper_base
+    display_name: "faster-whisper base (локально)"
+    type: local
+    priority: 10
+    model: base
+    supports: [transcribe, translate]
+    cost_hint: free
+    health:
+      method: which
+      binary: python
+
+  - id: faster_whisper_large
+    display_name: "faster-whisper large-v3 (точнее, медленнее)"
+    type: local
+    priority: 20
+    model: large-v3
+    supports: [transcribe, translate, diarize]
+    cost_hint: free
+    health:
+      method: which
+      binary: python
+
+  - id: openai_whisper_api
+    display_name: "OpenAI Whisper API"
+    type: remote
+    priority: 100
+    base_url: https://api.openai.com/v1
+    api_key: "${OPENAI_API_KEY}"
+    model: whisper-1
+    supports: [transcribe, translate]
+    cost_hint: paid
+    health:
+      method: http_get
+      url: https://api.openai.com/v1/models
+      timeout: 5.0
+
+strategy: fallback
+tie_breaker: [health, latency, locality, cost, alphabetical]

@@ -1,0 +1,33 @@
+id: cloudflare
+schema_version: "1.5.0"
+title: Cloudflare агент
+version: "1.0.0"
+description: "Workers, KV, R2, D1, Pages — управление всей инфраструктурой Cloudflare."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: CLOUDFLARE_API_TOKEN, level: hard}
+    - {name: CLOUDFLARE_ACCOUNT_ID, level: hard}
+
+mcp_servers: [cloudflare]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [cloudflare, cf, workers, r2, kv, pages]
+  negative_keywords: []
+  description_for_router: |
+    Workers, KV, R2, D1, Pages — управление всей инфраструктурой Cloudflare.
+
+mode: destructive
+dangerous_tools: [cf_worker_deploy, cf_kv_set, cf_r2_upload, cf_pages_deploy]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "☁️", color: "#f38020", category: cloud}
+
+# GitHub: https://github.com/cloudflare/mcp-server-cloudflare

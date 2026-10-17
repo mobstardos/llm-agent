@@ -1,0 +1,67 @@
+{
+  "scenario_id": "file_apply_patch_basic",
+  "model": "mock",
+  "recorded_at": 1789797000,
+  "exchange_count": 4,
+  "exchanges": [
+    {
+      "seq": 0,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "type": "function",
+            "function": {
+              "name": "filesystem__read_file",
+              "arguments": "{\"path\": \"src/hello.py\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_2",
+            "type": "function",
+            "function": {
+              "name": "filesystem__apply_patch",
+              "arguments": "{\"path\": \"src/hello.py\", \"patch\": \"--- a/src/hello.py\\n+++ b/src/hello.py\\n@@ -1,2 +1,4 @@\\n def greet():\\n+    \\\"\\\"\\\"Печатает приветствие.\\\"\\\"\\\"\\n     print(\\\"hello\\\")\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 2,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_3",
+            "type": "function",
+            "function": {
+              "name": "filesystem__read_file",
+              "arguments": "{\"path\": \"src/hello.py\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 3,
+      "response": {
+        "role": "assistant",
+        "content": "Готово: добавлен docstring к функции greet() в src/hello.py.",
+        "tool_calls": null
+      }
+    }
+  ]
+}

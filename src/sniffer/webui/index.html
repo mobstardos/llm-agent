@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Universal Sniffer — панель мониторинга</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header id="topbar">
+  <div class="brand">
+    <span class="logo">&#9678;</span>
+    <div>
+      <h1>Universal Sniffer</h1>
+      <span class="sub" id="ports-line">инициализация&hellip;</span>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><span class="kpi-v" id="kpi-pps">0</span><span class="kpi-l">пак/с</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-packets">0</span><span class="kpi-l">пакетов</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-bytes">0</span><span class="kpi-l">объём</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-sessions">0</span><span class="kpi-l">сессий</span></div>
+    <div class="kpi"><span class="kpi-v" id="kpi-uptime">0с</span><span class="kpi-l">работы</span></div>
+  </div>
+  <div class="top-actions">
+    <span id="conn-dot" class="dot dot-off" title="Соединение с панелью"></span>
+    <button id="btn-sound" class="ghost" title="Звук тревог: вкл/выкл">&#128266; <span id="sound-label">звук</span></button>
+    <button id="btn-pause" class="ghost">&#10074;&#10074; пауза</button>
+  </div>
+</header>
+
+<nav id="tabs">
+  <button class="tab active" data-tab="stream">&#9878; Поток <span id="badge-packets" class="badge">0</span></button>
+  <button class="tab" data-tab="stats">&#128202; Статистика</button>
+  <button class="tab" data-tab="sessions">&#128279; Сессии <span id="badge-sessions" class="badge">0</span></button>
+  <button class="tab" data-tab="alerts">&#128680; Тревоги <span id="badge-alerts" class="badge">0</span></button>
+  <button class="tab" data-tab="config">&#9881; Настройки</button>
+</nav>
+
+<!-- ==================== ПОТОК ==================== -->
+<main id="tab-stream" class="tabpane active">
+  <section class="filters">
+    <input id="f-text" type="search" placeholder="Поиск: метод, команда, IP, таблица&hellip;">
+    <select id="f-proto"><option value="">Все протоколы</option></select>
+    <select id="f-type"><option value="">Все команды/методы</option></select>
+    <select id="f-client"><option value="">Все клиенты</option></select>
+    <select id="f-dir">
+      <option value="">TX и RX</option>
+      <option value="TX">TX &rarr; сервер</option>
+      <option value="RX">RX &larr; сервер</option>
+    </select>
+    <select id="f-valid">
+      <option value="">любая валидность</option>
+      <option value="1">только валидные</option>
+      <option value="0">только невалидные</option>
+    </select>
+    <input id="f-min" type="number" min="0" placeholder="разм. от">
+    <input id="f-max" type="number" min="0" placeholder="до">
+    <button id="f-clear" class="ghost" title="Сбросить фильтры">&times; сброс</button>
+    <label class="chk"><input type="checkbox" id="f-hideconn" checked> скрывать служебные</label>
+  </section>
+
+  <section class="table-wrap">
+    <table id="packets-table">
+      <thead>
+        <tr>
+          <th>#</th><th>время</th><th></th><th>клиент</th><th>канал</th>
+          <th>протокол</th><th>тип / метод</th><th>размер</th><th>информация</th>
+        </tr>
+      </thead>
+      <tbody id="packets-body"></tbody>
+    </table>
+    <div id="stream-empty" class="empty">Ожидание пакетов&hellip; Убедитесь, что клиенты подключаются к портам сниффера.</div>
+  </section>
+</main>
+
+<!-- ==================== СТАТИСТИКА ==================== -->
+<main id="tab-stats" class="tabpane">
+  <div class="grid-2">
+    <section class="card wide">
+      <h3>Пакетов в секунду</h3>
+      <canvas id="chart-pps" height="180"></canvas>
+    </section>
+    <section class="card">
+      <h3>По протоколам</h3>
+      <div id="proto-bars" class="bars"></div>
+    </section>
+    <section class="card">
+      <h3>Топ команд / методов</h3>
+      <div id="top-types" class="bars"></div>
+    </section>
+    <section class="card">
+      <h3>Активность клиентов</h3>
+      <div id="top-clients" class="bars"></div>
+    </section>
+    <section class="card">
+      <h3>Каналы перехвата</h3>
+      <div id="ports-stats" class="bars"></div>
+    </section>
+  </div>
+</main>
+
+<!-- ==================== СЕССИИ ==================== -->
+<main id="tab-sessions" class="tabpane">
+  <section class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>клиент</th><th>канал</th><th>цель</th><th>начало</th>
+          <th>TX пак</th><th>RX пак</th><th>TX/RX байт</th><th>состояние</th><th>протокол</th>
+        </tr>
+      </thead>
+      <tbody id="sessions-body"></tbody>
+    </table>
+    <div id="sessions-empty" class="empty">Пока нет ни одной сессии.</div>
+  </section>
+</main>
+
+<!-- ==================== ТРЕВОГИ ==================== -->
+<main id="tab-alerts" class="tabpane">
+  <section class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>время</th><th>важность</th><th>правило</th><th>детали</th><th>клиент</th><th>канал</th></tr>
+      </thead>
+      <tbody id="alerts-body"></tbody>
+    </table>
+    <div id="alerts-empty" class="empty">Тревог пока нет — это хорошо.</div>
+  </section>
+</main>
+
+<!-- ==================== НАСТРОЙКИ ==================== -->
+<main id="tab-config" class="tabpane">
+  <div class="grid-2">
+    <section class="card">
+      <h3>Управление</h3>
+      <div class="btn-col">
+        <button id="btn-reload">&#8635; Перечитать config.json</button>
+        <button id="btn-csv">&#128202; Сформировать CSV-отчёты сейчас</button>
+        <button id="btn-download-jsonl">&#11015; Скачать JSONL-лог</button>
+        <button id="btn-download-pcap">&#11015; Скачать PCAP (для Wireshark)</button>
+        <button id="btn-download-sqlite">&#11015; Скачать базу SQLite</button>
+      </div>
+      <div id="action-result" class="result"></div>
+      <h3 style="margin-top:18px">Загруженные парсеры</h3>
+      <div id="parsers-list" class="chips"></div>
+      <p class="hint">Свой парсер: положите .py-файл с NAME/detect/create_framer/parse
+      в папку <code>plugins/</code> рядом со сниффером и перезапустите. Шаблон — в README.md.</p>
+    </section>
+    <section class="card">
+      <h3>Текущий конфиг (config.json)</h3>
+      <p class="hint">Правила тревог, детализация консоли и экспорт применяются кнопкой
+      &laquo;Перечитать config.json&raquo; без остановки. Порты и веб-панель требуют перезапуска.</p>
+      <pre id="config-view" class="codeview">загрузка&hellip;</pre>
+    </section>
+  </div>
+</main>
+
+<!-- ==================== ДЕТАЛИ ПАКЕТА ==================== -->
+<aside id="drawer" class="drawer">
+  <div class="drawer-head">
+    <h3 id="drawer-title">Пакет</h3>
+    <button id="drawer-close" class="ghost">&times;</button>
+  </div>
+  <div id="drawer-body" class="drawer-body"></div>
+</aside>
+<div id="drawer-overlay" class="overlay"></div>
+
+<footer id="statusbar">
+  <span id="status-msg">готов</span>
+  <span class="flex1"></span>
+  <span id="status-evt"></span>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

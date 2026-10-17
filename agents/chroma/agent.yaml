@@ -1,0 +1,32 @@
+id: chroma
+schema_version: "1.5.0"
+title: Chroma агент
+version: "1.0.0"
+description: Lightweight embedded vector DB для разработки.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: CHROMA_PATH, level: soft}
+
+mcp_servers: [chroma]
+depends_on: {hard: [], soft: []}
+
+priority: 12
+routing_hints:
+  keywords: [chroma, chromadb, vector]
+  negative_keywords: []
+  description_for_router: |
+    Lightweight embedded vector DB для разработки.
+
+mode: write
+dangerous_tools: [chroma_add]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🎨", color: "#ff6b35", category: database}
+
+# GitHub: https://github.com/chroma-core/chroma

@@ -1,0 +1,28 @@
+id: bridge
+schema_version: "1.5.0"
+title: Bridge MCP
+description: >
+  Браузер через расширение: список вкладок, чтение страницы,
+  поиск по захватам, захват по запросу. Все инструменты read-only:
+  расширение выполняет только извлечение текста по явной задаче.
+
+command: python
+args: ["-m", "src.mcp_servers.bridge.server"]
+
+requires:
+  python_packages: []
+  env_vars:
+    - {name: PROJECT_ROOT, level: soft}
+
+mode: external
+
+tools:
+  - {name: bridge_tabs, danger: read}
+  - {name: bridge_read_tab, danger: read}
+  - {name: bridge_search_captures, danger: read}
+  - {name: bridge_get_capture, danger: read}
+
+process:
+  startup_timeout_seconds: 20
+  restart_policy: on_failure
+  max_restarts: 3

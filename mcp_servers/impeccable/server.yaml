@@ -1,0 +1,30 @@
+id: impeccable
+schema_version: "1.5.0"
+title: Impeccable Design MCP
+description: Front-end дизайн-система с браузерным редактором для быстрых правок UI.
+
+command: npx
+args: ['-y', 'impeccable']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: IMPECCABLE_TOKEN, level: soft}
+
+mode: write
+
+tools:
+  - {name: impeccable_open_editor, danger: read}
+  - {name: impeccable_apply_design_system, danger: write}
+  - {name: impeccable_get_components, danger: read}
+  - {name: impeccable_save_changes, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', 'impeccable' — VERIFIED
+# GitHub: https://github.com/impeccable-design/impeccable-mcp

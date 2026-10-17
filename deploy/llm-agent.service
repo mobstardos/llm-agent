@@ -1,0 +1,23 @@
+[Unit]
+Description=LLM Agent — мультиагентная система правки файлов и БД
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+# ЗАМЕНИ на свой путь и пользователя
+User=llmagent
+WorkingDirectory=/opt/llm-agent
+Environment=PATH=/opt/llm-agent/.venv/bin:/usr/bin:/bin
+EnvironmentFile=-/opt/llm-agent/.env
+ExecStart=/opt/llm-agent/.venv/bin/python run.py --port 8000
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Память журнала может расти — ограничиваем только аварийные случаи
+LimitNOFILE=8192
+
+[Install]
+WantedBy=multi-user.target

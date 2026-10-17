@@ -1,0 +1,33 @@
+id: google_sheets
+schema_version: "1.5.0"
+title: Google Sheets агент
+version: "1.0.0"
+description: "Google Sheets: чтение, запись, формулы, валидация."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GSHEETS_CLIENT_ID, level: hard}
+    - {name: GSHEETS_CLIENT_SECRET, level: hard}
+
+mcp_servers: [google_sheets]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [google sheets, таблицы, google sheets]
+  negative_keywords: []
+  description_for_router: |
+    Google Sheets: чтение, запись, формулы, валидация.
+
+mode: write
+dangerous_tools: [gsheets_update_values, gsheets_add_sheet]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📊", color: "#0f9d58", category: office}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

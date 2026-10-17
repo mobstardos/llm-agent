@@ -1,0 +1,32 @@
+id: pinecone
+schema_version: "1.5.0"
+title: Pinecone агент
+version: "1.0.0"
+description: Managed vector DB для семантического поиска.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PINECONE_API_KEY, level: hard}
+
+mcp_servers: [pinecone]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: [pinecone, vector]
+  negative_keywords: []
+  description_for_router: |
+    Managed vector DB для семантического поиска.
+
+mode: write
+dangerous_tools: [pinecone_upsert, pinecone_create_index]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🌲", color: "#000000", category: database}
+
+# GitHub: https://github.com/pinecone-io/pinecone-mcp

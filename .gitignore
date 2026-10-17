@@ -1,0 +1,53 @@
+# ── Секреты и локальная конфигурация ─────────────────────────────
+.env
+.env.local
+.env.*.bak
+*.cookies
+
+# ── Runtime-данные (создаются на машине пользователя при старте) ──
+# В git идут только .gitkeep-каркас и встроенные профили data/profiles/
+data/*
+!data/.gitkeep
+!data/profiles/
+!data/profiles/**
+!data/storage/.gitkeep
+!data/telemetry/.gitkeep
+!data/vectors/.gitkeep
+
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Node (сборка расширения) ──────────────────────────────────────
+node_modules/
+
+# ── Сниффер: перехваченный трафик и отчёты ────────────────────────
+capture/
+llm_sniffer_*.txt
+
+# ── Артефакты сборки / архивы / временные папки ───────────────────
+build/
+dist/
+*.spec.bak
+attic/
+patches/
+.inbox/
+tmp/
+outputs/
+biothings_output/
+*.patch.zip
+sqlite_mcp_server.db
+data/declarations_backups/
+
+# ── Журналы и временные файлы ─────────────────────────────────────
+logs/
+*.log
+nohup.out
+.DS_Store
+Thumbs.db

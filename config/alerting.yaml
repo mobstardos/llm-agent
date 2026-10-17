@@ -1,0 +1,38 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Правила алертов
+# ═══════════════════════════════════════════════════════════════════════
+
+rules:
+  - name: db_unavailable
+    condition: tcp_health_status{target="postgres"} == 0
+    window: 3
+    severity: critical
+    action: [ui_banner, audit_log]
+
+  - name: llm_slow
+    condition: loop_duration_p95 > 30000
+    window: 5m
+    severity: warn
+    action: [ui_banner]
+
+  - name: mcp_crash_loop
+    condition: rate(mcp_restarts_total[10m]) > 3
+    severity: warn
+    action: [ui_banner, auto_restart_mcp]
+
+  - name: agent_unavailable
+    condition: agent_status{agent=~".+"} == 1
+    window: 5
+    severity: info
+    action: [ui_banner]
+
+  - name: com_leak
+    condition: com_objects_active > 100
+    window: 10m
+    severity: warn
+    action: [ui_banner, auto_restart_com_worker]
+
+  - name: harness_regression
+    condition: harness_regression_detected > 0
+    severity: warn
+    action: [ui_banner, audit_log]

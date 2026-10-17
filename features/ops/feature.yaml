@@ -1,0 +1,23 @@
+id: ops
+version: "1.0.0"
+title: Эксплуатация
+description: >
+  Операции с зеркалами PostgreSQL: бэкапы (pg_dump через BackupManager,
+  список/создание/ротация keep_last) и ретенция (PGRetention — удаление
+  старых строк из journal.events_mirror/actions, ops.chat_messages/plans,
+  memory.tasks; dry-run по умолчанию, удаление — с confirm=true).
+  Авто-ретенция включается env PG_RETENTION_DAYS>0.
+enabled: true
+
+requires:
+  python_packages:
+    - {name: psycopg, level: hard}
+
+api_router: api.py:create_router
+
+ui_tab:
+  file: ui.js
+  title: Эксплуатация
+  icon: "🛠"
+
+ws_events: []

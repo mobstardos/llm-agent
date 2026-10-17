@@ -1,0 +1,32 @@
+id: seatunnel
+schema_version: "1.5.0"
+title: Apache SeaTunnel агент (official)
+version: "1.0.0"
+description: "Apache SeaTunnel: data integration, ETL pipelines. Official Apache SeaTunnel-tools."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SEATUNNEL_API_URL, level: hard}
+
+mcp_servers: [seatunnel]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: ["seatunnel", "etl", "pipeline"]
+  negative_keywords: []
+  description_for_router: |
+    Apache SeaTunnel: data integration, ETL pipelines. Official Apache SeaTunnel-tools.
+
+mode: write
+dangerous_tools: ['seatunnel_run_job']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🌊", color: "#ff6b35", category: specialized}
+
+# GitHub (VERIFIED): https://github.com/apache/seatunnel-tools

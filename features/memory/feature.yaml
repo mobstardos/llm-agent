@@ -1,0 +1,23 @@
+id: memory
+version: "1.0.0"
+title: Память
+description: >
+  Семантическая память агентов на pgvector: индекс прошлых задач
+  (диалоги, планы Supervisor, ошибки инструментов) в memory.tasks.
+  Поиск по смыслу (vector → FTS → ILIKE), статистика, ручная индексация
+  зеркал и очистка. Наполнение — фоновый индексатор (main.py блок 7.5).
+  PG недоступен → эндпоинты отвечают 503.
+enabled: true
+
+requires:
+  python_packages:
+    - {name: psycopg, level: hard}
+
+api_router: api.py:create_router
+
+ui_tab:
+  file: ui.js
+  title: Память
+  icon: "🧠"
+
+ws_events: []

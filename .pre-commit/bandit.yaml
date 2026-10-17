@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════════════════════════════════
+# bandit config — llm-agent
+# Рекомендация 4 (Sprint 2, P1)
+# ═══════════════════════════════════════════════════════════════════════
+
+# Исключения — каталоги и файлы, которые bandit не должен сканировать.
+# Все они либо содержат легитимные «опасные» паттерны (см. отчёт, §8),
+# либо это тесты с fake-credentials.
+
+skips:
+  # B101 — assert_used. В тестах и мастерах первого запуска assert
+  # используется как invariant (см. рекомендацию 5 — заменить в проде).
+  # Здесь мы только подсвечиваем, что осталось. Можно включить после
+  # выполнения рекомендации 5.
+  - B101
+
+  # B404 — import subprocess. subprocess используется в run.py для
+  # автозапуска qwenproxy, в build_exe.bat — везде shell=False (см.
+  # отчёт: 0 shell=True). Легитимно.
+  - B404
+
+  # B603 — subprocess_run. То же самое — subprocess.run без shell=True.
+  - B603
+
+exclude_dirs:
+  - .git
+  - .venv
+  - __pycache__
+  - extension/dist
+  - extension/icons
+  - attic            # legacy-код, не в проде
+  - data             # runtime-данные
+
+  # install.py / setup.py / first_run.py — CLI-мастера, используют
+  # print(), os.system('') для ANSI-цветов на Windows, except Exception
+  # с # noqa: BLE001 (осознанно). Проверяем отдельно.
+  - install.py
+  - setup.py
+  - first_run.py
+
+# Файлы, в которых разрешены特定的 паттерны:
+# (формат glob)
+exclude:
+  # tests/ — там используются mock и fake credentials (см. test_bridge.py)
+  - 'tests/.*'
+
+  # scripts/test_*.py — то же самое, тестовые скрипты
+  - 'scripts/test_.*'
+
+  # src/mcp_servers/debug/ — MCP-сервер для отладки Python-кода.
+  # exec() там легитимен (cProfile.run с пользовательским скриптом).
+  # См. отчёт §8.1 — не блокирующая, но требует approval-gate.
+  - 'src/mcp_servers/debug/.*'
+
+# Уровни confidence — bandit помечает low/medium/high.
+# Мы блокируем только medium и high. Low — пропускаем (см. отчёт:
+# 2 hardcoded_password в test_bridge.py — fake credentials).
+
+confience_threshold: medium
+
+# Список конкретных строк, которые нужно игнорировать (через
+# `# nosec` комментарий в коде — bandit тоже его понимает).
+# Например: `subprocess.run(["python", "-c", code])  # nosec B603`

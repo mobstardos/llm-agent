@@ -1,0 +1,42 @@
+id: sniffer
+schema_version: "1.5.0"
+title: Sniffer MCP
+description: UniversalSniffer — TCP-прокси перехват и разбор трафика
+
+command: python
+args: ["-m", "src.mcp_servers.sniffer.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+    - {name: SNIFFER_PANEL_URL, level: soft}
+
+env:
+  SNIFFER_PANEL_URL: "${SNIFFER_PANEL_URL}"
+
+mode: external
+
+tools:
+  - {name: sniffer_status, danger: read}
+  - {name: sniffer_start, danger: external}
+  - {name: sniffer_stop, danger: external}
+  - {name: sniffer_restart, danger: external}
+  - {name: sniffer_stats, danger: read}
+  - {name: sniffer_series, danger: read}
+  - {name: sniffer_sessions, danger: read}
+  - {name: sniffer_packets, danger: read}
+  - {name: sniffer_packet_detail, danger: read}
+  - {name: sniffer_alerts, danger: read}
+  - {name: sniffer_config_get, danger: external}
+  - {name: sniffer_reload, danger: external}
+  - {name: sniffer_export_csv, danger: external}
+  - {name: sniffer_list_capture, danger: read}
+  - {name: sniffer_read_capture, danger: read}
+  - {name: sniffer_analyze, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

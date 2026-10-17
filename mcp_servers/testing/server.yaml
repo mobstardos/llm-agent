@@ -1,0 +1,32 @@
+id: testing
+schema_version: "1.5.0"
+title: Testing MCP
+description: Тесты — discover, run, coverage, mutation
+
+command: python
+args: ["-m", "src.mcp_servers.testing.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: test_discover, danger: read}
+  - {name: test_run, danger: destructive}
+  - {name: test_run_single, danger: destructive}
+  - {name: test_run_file, danger: destructive}
+  - {name: test_list, danger: read}
+  - {name: test_coverage, danger: destructive}
+  - {name: test_generate, danger: write}
+  - {name: test_flaky_check, danger: destructive}
+  - {name: test_last_results, danger: read}
+  - {name: test_frameworks, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

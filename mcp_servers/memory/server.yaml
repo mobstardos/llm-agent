@@ -1,0 +1,29 @@
+id: memory
+schema_version: "1.5.0"
+title: Memory MCP
+description: Память проекта — recall, remember, profile, procedures
+
+command: python
+args: ["-m", "src.mcp_servers.memory.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+
+mode: write
+
+tools:
+  - {name: recall, danger: read}
+  - {name: remember, danger: write}
+  - {name: get_project_profile, danger: read}
+  - {name: find_procedure, danger: read}
+  - {name: save_procedure, danger: write}
+  - {name: who_uses, danger: read}
+  - {name: depends_on, danger: read}
+  - {name: recent_events, danger: read}
+  - {name: memory_stats, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

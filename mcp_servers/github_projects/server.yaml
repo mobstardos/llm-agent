@@ -1,0 +1,31 @@
+id: github_projects
+schema_version: "1.5.0"
+title: GitHub Projects MCP
+description: "GitHub Projects v2: доски, поля, views, items."
+
+command: npx
+args: ['-y', 'github-projects-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GITHUB_TOKEN, level: hard}
+
+mode: write
+
+tools:
+  - {name: gh_proj_list, danger: read}
+  - {name: gh_proj_create_item, danger: write}
+  - {name: gh_proj_update_item, danger: write}
+  - {name: gh_proj_get_views, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: github-projects-mcp (npm)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

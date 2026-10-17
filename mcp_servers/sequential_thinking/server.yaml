@@ -1,0 +1,27 @@
+id: sequential_thinking
+schema_version: "1.5.0"
+title: Sequential Thinking MCP
+description: Step-by-step reasoning для сложных задач.
+
+command: npx
+args: ['-y', '@modelcontextprotocol/server-sequential-thinking']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: read
+
+tools:
+  - {name: think_step, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: @modelcontextprotocol/server-sequential-thinking (npm)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

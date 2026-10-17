@@ -1,0 +1,33 @@
+id: reddit
+schema_version: "1.5.0"
+title: Reddit агент
+version: "1.0.0"
+description: "Reddit: чтение постов, комментариев, поиск по сабреддитам."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: REDDIT_CLIENT_ID, level: hard}
+    - {name: REDDIT_CLIENT_SECRET, level: hard}
+
+mcp_servers: [reddit]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: [reddit, реддит, сабреддит]
+  negative_keywords: []
+  description_for_router: |
+    Reddit: чтение постов, комментариев, поиск по сабреддитам.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🤖", color: "#ff4500", category: comms}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

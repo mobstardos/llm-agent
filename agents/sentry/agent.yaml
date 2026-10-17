@@ -1,0 +1,33 @@
+id: sentry
+schema_version: "1.5.0"
+title: Sentry агент
+version: "1.0.0"
+description: "Sentry: анализ ошибок, release tracking, source maps, events."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SENTRY_AUTH_TOKEN, level: hard}
+    - {name: SENTRY_ORG, level: hard}
+
+mcp_servers: [sentry]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [sentry, ошибка, stacktrace, release]
+  negative_keywords: []
+  description_for_router: |
+    Sentry: анализ ошибок, release tracking, source maps, events.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🚨", color: "#362d59", category: monitoring}
+
+# GitHub: https://github.com/getsentry/sentry-mcp

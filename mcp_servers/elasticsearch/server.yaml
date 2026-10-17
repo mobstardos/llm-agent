@@ -1,0 +1,34 @@
+id: elasticsearch
+schema_version: "1.5.0"
+title: Elasticsearch MCP
+description: "Поиск, индексация и аналитика в Elasticsearch (FTS, aggregations, indices)"
+
+command: python
+args: ['-m', 'src.mcp_servers.elasticsearch.server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: ELASTICSEARCH_URL, level: hard}
+    - {name: ELASTICSEARCH_API_KEY, level: soft}
+
+mode: write
+
+tools:
+  - {name: es_search, danger: read}
+  - {name: es_index_document, danger: write}
+  - {name: es_create_index, danger: write}
+  - {name: es_delete_index, danger: destructive}
+  - {name: es_aggregate, danger: read}
+  - {name: es_list_indices, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: elasticsearch>=8.15.0 (в requirements.txt)
+# GitHub: https://github.com/elastic/mcp-server-elasticsearch
+# Native Python — реализация в src/mcp_servers/<id>/server.py

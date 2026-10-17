@@ -1,0 +1,32 @@
+id: mongodb
+schema_version: "1.5.0"
+title: MongoDB агент
+version: "1.0.0"
+description: "Документо-ориентированная БД. CRUD, агрегации, индексы."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: MONGO_URI, level: hard}
+
+mcp_servers: [mongodb]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: [mongo, mongodb, документ, collection]
+  negative_keywords: []
+  description_for_router: |
+    Документо-ориентированная БД. CRUD, агрегации, индексы.
+
+mode: write
+dangerous_tools: [mongo_insert, mongo_update, mongo_delete]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🍃", color: "#47a248", category: database}
+
+# GitHub: https://github.com/mongodb-js/mcp

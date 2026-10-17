@@ -1,0 +1,32 @@
+id: aws_lambda
+schema_version: "1.5.0"
+title: AWS Lambda MCP
+description: "Управление Lambda-функциями: invoke, deploy, list, logs."
+
+command: uvx
+args: ['mcp-aws-lambda']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AWS_ACCESS_KEY_ID, level: hard}
+    - {name: AWS_SECRET_ACCESS_KEY, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: lambda_list, danger: read}
+  - {name: lambda_invoke, danger: destructive}
+  - {name: lambda_deploy, danger: destructive}
+  - {name: lambda_logs, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-aws-lambda (PyPI)
+# GitHub: https://github.com/aws-samples/mcp-aws-lambda
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Реестр extractors
+# ═══════════════════════════════════════════════════════════════════════
+# Расширяемая декларация — какие extractors активны, приоритеты, пороги.
+
+extractors:
+  - id: pdf_text
+    module: src.extraction.extractors.pdf
+    class: PdfTextExtractor
+    enabled: true
+    priority: 100
+    mime_types: [application/pdf]
+    min_chars_threshold: 500
+    fallback_to: [pdf_ocr]
+
+  - id: pdf_ocr
+    module: src.extraction.extractors.pdf
+    class: PdfOcrExtractor
+    enabled: true
+    priority: 50
+    mime_types: [application/pdf]
+    requires_capability: ocr
+
+  - id: docx
+    module: src.extraction.extractors.docx
+    class: DocxExtractor
+    enabled: true
+    priority: 100
+    mime_types:
+      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+  - id: xlsx
+    module: src.extraction.extractors.xlsx
+    class: XlsxExtractor
+    enabled: true
+    priority: 100
+    mime_types:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+  - id: image_vision
+    module: src.extraction.extractors.image
+    class: ImageVisionExtractor
+    enabled: true
+    priority: 100
+    mime_types: [image/png, image/jpeg, image/webp]
+    requires_capability: vision
+
+  - id: image_ocr
+    module: src.extraction.extractors.image
+    class: ImageOcrExtractor
+    enabled: true
+    priority: 50
+    mime_types: [image/png, image/jpeg, image/webp, image/gif, image/bmp]
+    requires_capability: ocr
+
+  - id: image_metadata
+    module: src.extraction.extractors.image
+    class: ImageMetadataExtractor
+    enabled: true
+    priority: 20
+    mime_types: [image/png, image/jpeg, image/webp, image/gif, image/bmp]
+
+  - id: audio_whisper
+    module: src.extraction.extractors.audio
+    class: AudioWhisperExtractor
+    enabled: true
+    priority: 100
+    mime_types: [audio/mpeg, audio/wav, audio/ogg, audio/mp4]
+    requires_capability: whisper
+
+  - id: audio_metadata
+    module: src.extraction.extractors.audio
+    class: AudioMetadataExtractor
+    enabled: true
+    priority: 20
+    mime_types: [audio/mpeg, audio/wav, audio/ogg, audio/mp4]
+
+  - id: text
+    module: src.extraction.extractors.text
+    class: TextExtractor
+    enabled: true
+    priority: 100
+    mime_types:
+      - "text/*"
+      - application/json
+      - application/x-yaml
+
+# Глобальные лимиты
+limits:
+  max_file_size_bytes: 104857600
+  max_chars: 100000
+  min_chars: 100
+  timeout_seconds: 60
+  cache_ttl_days: 30

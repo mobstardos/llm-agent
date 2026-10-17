@@ -1,0 +1,31 @@
+id: playwright_official
+schema_version: "1.5.0"
+title: Playwright агент (official Microsoft)
+version: "1.0.0"
+description: Официальный Playwright MCP от Microsoft. Стандартный протокол.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mcp_servers: [playwright_official]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [playwright, browser, автоматизация]
+  negative_keywords: []
+  description_for_router: |
+    Официальный Playwright MCP от Microsoft. Стандартный протокол.
+
+mode: write
+dangerous_tools: [pw_click, pw_type, pw_evaluate]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🎭", color: "#2ead33", category: browser}
+
+# GitHub: https://github.com/microsoft/playwright-mcp

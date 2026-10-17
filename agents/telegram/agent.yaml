@@ -1,0 +1,32 @@
+id: telegram
+schema_version: "1.5.0"
+title: Telegram агент
+version: "1.0.0"
+description: "Telegram Bot API: сообщения, каналы, sticker-паки."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TELEGRAM_BOT_TOKEN, level: hard}
+
+mcp_servers: [telegram]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [telegram, телеграм, tg, бот]
+  negative_keywords: []
+  description_for_router: |
+    Telegram Bot API: сообщения, каналы, sticker-паки.
+
+mode: write
+dangerous_tools: [tg_send_message, tg_send_photo]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "✈️", color: "#26a5e4", category: comms}
+
+# GitHub: https://github.com/Chainlit/telegram-mcp

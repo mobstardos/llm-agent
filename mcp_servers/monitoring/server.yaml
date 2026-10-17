@@ -1,0 +1,32 @@
+id: monitoring
+schema_version: "1.5.0"
+title: Monitoring MCP
+description: Log parser, Prometheus, Jaeger
+
+command: python
+args: ["-m", "src.mcp_servers.monitoring.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: read
+
+tools:
+  - {name: log_tail, danger: read}
+  - {name: log_grep, danger: read}
+  - {name: log_stats, danger: read}
+  - {name: log_parse_json, danger: read}
+  - {name: prometheus_query, danger: external}
+  - {name: prometheus_query_range, danger: external}
+  - {name: prometheus_targets, danger: external}
+  - {name: jaeger_trace, danger: external}
+  - {name: jaeger_services, danger: external}
+  - {name: monitoring_info, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

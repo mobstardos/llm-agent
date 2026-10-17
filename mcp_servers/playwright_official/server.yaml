@@ -1,0 +1,31 @@
+id: playwright_official
+schema_version: "1.5.0"
+title: Playwright MCP (official Microsoft)
+description: Официальный Playwright MCP от Microsoft. Стандартный протокол.
+
+command: npx
+args: ['-y', '@playwright/mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: write
+
+tools:
+  - {name: pw_navigate, danger: read}
+  - {name: pw_click, danger: write}
+  - {name: pw_type, danger: write}
+  - {name: pw_screenshot, danger: read}
+  - {name: pw_evaluate, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: @playwright/mcp (npm)
+# GitHub: https://github.com/microsoft/playwright-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

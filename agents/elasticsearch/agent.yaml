@@ -1,0 +1,33 @@
+id: elasticsearch
+schema_version: "1.5.0"
+title: Elasticsearch агент
+version: "1.0.0"
+description: "Поиск, индексация и аналитика в Elasticsearch (FTS, aggregations, indices)"
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: ELASTICSEARCH_URL, level: hard}
+    - {name: ELASTICSEARCH_API_KEY, level: soft}
+
+mcp_servers: [elasticsearch]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [elasticsearch, elastic, ft, поиск, индекс]
+  negative_keywords: []
+  description_for_router: |
+    Поиск, индексация и аналитика в Elasticsearch (FTS, aggregations, indices)
+
+mode: write
+dangerous_tools: [es_index_document, es_create_index, es_delete_index]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔍", color: "#feczadfe", category: database}
+
+# GitHub: https://github.com/elastic/mcp-server-elasticsearch

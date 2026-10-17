@@ -1,0 +1,111 @@
+# ═══════════════════════════════════════════════════════════════════════
+# .dockerignore — что исключить из контекста сборки
+# Рекомендация 10 (Sprint 4, P2)
+# ═══════════════════════════════════════════════════════════════════════
+# Уменьшает размер контекста и ускоряет build (особенно для повторных
+# билдов). Без .dockerignore Docker отправляет ВСЁ содержимое каталога
+# в daemon — может быть гигабайты данных/.
+
+# ─── VCS ──────────────────────────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+.github
+
+# ─── Python cache ─────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ─── Virtual envs ─────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ─── IDE ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ─── Runtime data (примонтируем volume) ──────────────────────────────
+data/
+logs/
+shadows/
+*.sqlite
+*.lance
+*.db
+journal.sqlite
+memory.sqlite
+cache.sqlite
+policies.sqlite
+audit.db
+extraction.sqlite
+loop_telemetry.sqlite
+
+# ─── Tests и dev-артефакты ────────────────────────────────────────────
+tests/
+scripts/test_*.py
+harness/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+test-results.xml
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# ─── Build artifacts ──────────────────────────────────────────────────
+build/
+dist/
+*.egg-info/
+*.spec.bak
+
+# ─── Extension build artifacts ────────────────────────────────────────
+extension/dist/
+extension/icons/*.tmp
+
+# ─── Логи и временные файлы ───────────────────────────────────────────
+*.log
+*.out
+*.err
+tmp/
+temp/
+
+# ─── Документация (большой объём, не нужна в runtime) ─────────────────
+docs/
+*.md
+!README.md  # README оставляем — понадобится для контекста
+
+# ─── Patches и legacy (не нужны в runtime) ───────────────────────────
+patches/
+attic/
+
+# ─── OS-специфичные ───────────────────────────────────────────────────
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# ─── Environment files (секреты!) ────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.development
+deploy/env.example  # пример — оставляем
+
+# ─── Docker-специфичные (чтобы избежать рекурсии) ────────────────────
+Dockerfile
+docker-compose*.yml
+.dockerignore

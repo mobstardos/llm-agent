@@ -1,0 +1,33 @@
+id: debug
+schema_version: "1.5.0"
+title: Debug агент
+version: "1.0.0"
+description: Отладка и профилирование
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [debug, filesystem]
+depends_on:
+  hard: [file]
+  soft: [testing]
+
+priority: 9
+routing_hints:
+  keywords: [отладка, профиль, профайлер, медленно, утечка, memory, cpu, py-spy]
+  negative_keywords: [1с, база]
+  description_for_router: |
+    Отладка и профилирование: CPU, память, трассировка,
+    бенчмарк, py-spy, pdb.
+
+mode: destructive
+dangerous_tools: [profile_cpu, profile_memory, py_spy_record, run_with_pdb]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 1800}
+ui: {icon: "🐛", color: "#dc2626", category: dev}

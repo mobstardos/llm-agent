@@ -1,0 +1,32 @@
+id: headroom
+schema_version: "1.5.0"
+title: Headroom MCP
+description: Cross-agent memory и сжатие контекста. Claude/Codex/Cursor делятся фактами через общий memory.
+
+command: python
+args: ['-m', 'src.mcp_servers.headroom.server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: HEADROOM_BIN, level: soft}
+    - {name: HEADROOM_PROJECT_ROOT, level: soft}
+
+mode: write
+
+tools:
+  - {name: headroom_compress, danger: read}
+  - {name: headroom_save_memory, danger: write}
+  - {name: headroom_load_memory, danger: read}
+  - {name: headroom_learn, danger: write}
+  - {name: headroom_status, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: headroom-ai[all] (PyPI)
+# GitHub: https://github.com/headroom-ai/headroom

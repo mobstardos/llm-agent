@@ -1,0 +1,38 @@
+id: onec_qa
+schema_version: "1.5.0"
+title: 1C QA агент (тестирование форм)
+version: "1.0.0"
+description: ИИ-тестирование управляемых форм 1С через MCP QA — чтение окон и полей, ввод значений, нажатие кнопок, проверка результата на тестовой базе
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: ONEC_QA_URL, level: soft}
+
+mcp_servers: [onec_qa]
+depends_on: {hard: [], soft: [onec, onec_designer_tools]}
+
+priority: 18
+routing_hints:
+  keywords: [1с qa, тестирование 1с, тест-клиент, тестовая база, testclient,
+             ui_click, ui_window, ui_input, ui_table, qa_start, qa_status,
+             форма 1с, проверить форму, управляемые формы, форма тестирование,
+             mcp qa, открыть форму, заполнить форму, провести документ]
+  negative_keywords: [vanessa, gherkin, yaxunit]
+  description_for_router: |
+    Управление тестовой базой 1С через логическую модель форм (MCP QA,
+    Docker comol/qa_mcp): читать окна/поля, находить элементы, вводить
+    значения, нажимать кнопки, проверять результат. Только тестовая база —
+    действия изменяют данные.
+
+mode: external
+dangerous_tools: [qa_start, qa_stop, qa_reconnect, ui_open, ui_close_form,
+                  ui_click, ui_input, ui_set, ui_select, ui_field, ui_dialog,
+                  ui_table]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 25, max_result_chars: 30000, timeout_seconds: 1800}
+ui: {icon: "🧪", color: "#ec4899", category: onec}

@@ -1,0 +1,32 @@
+id: google_sheets
+schema_version: "1.5.0"
+title: Google Sheets MCP
+description: "Google Sheets: чтение, запись, формулы, валидация."
+
+command: npx
+args: ['-y', 'mcp-gsheets']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GSHEETS_CLIENT_ID, level: hard}
+    - {name: GSHEETS_CLIENT_SECRET, level: hard}
+
+mode: write
+
+tools:
+  - {name: gsheets_list, danger: read}
+  - {name: gsheets_get_values, danger: read}
+  - {name: gsheets_update_values, danger: write}
+  - {name: gsheets_add_sheet, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', 'mcp-gsheets' — VERIFIED
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

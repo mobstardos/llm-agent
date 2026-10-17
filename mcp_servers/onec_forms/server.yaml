@@ -1,0 +1,30 @@
+id: onec_forms
+schema_version: "1.5.0"
+title: 1C Forms MCP
+description: Управляемые формы 1С
+
+command: python
+args: ["-m", "src.mcp_servers.onec_forms.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: lxml, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: read_form, danger: read}
+  - {name: list_forms, danger: read}
+  - {name: get_form_bsl, danger: read}
+  - {name: write_form_bsl, danger: write}
+  - {name: create_form, danger: write}
+  - {name: analyze_form, danger: read}
+  - {name: list_handlers, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

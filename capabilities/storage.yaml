@@ -1,0 +1,48 @@
+id: storage
+schema_version: "1.5.0"
+title: Cloud Storage
+description: S3/MinIO/локальное хранилище
+
+operations:
+  - id: upload
+  - id: download
+  - id: list
+  - id: delete
+  - id: presign
+
+providers:
+  - id: minio_local
+    display_name: "MinIO (локально)"
+    type: local
+    priority: 10
+    base_url: http://localhost:9000
+    supports: [upload, download, list, delete, presign]
+    cost_hint: free
+    health:
+      method: http_get
+      url: http://localhost:9000/minio/health/live
+      timeout: 5.0
+
+  - id: s3_aws
+    display_name: "AWS S3"
+    type: remote
+    priority: 50
+    base_url: ""
+    supports: [upload, download, list, delete, presign]
+    cost_hint: paid
+    health:
+      method: which
+      binary: python
+
+  - id: local_fs
+    display_name: "Локальная файловая система"
+    type: local
+    priority: 100
+    supports: [upload, download, list, delete]
+    cost_hint: free
+    health:
+      method: which
+      binary: python
+
+strategy: fallback
+tie_breaker: [health, locality, cost, alphabetical]

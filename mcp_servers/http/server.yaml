@@ -1,0 +1,33 @@
+id: http
+schema_version: "1.5.0"
+title: HTTP Client MCP
+description: HTTP, GraphQL, WebSocket, load test
+
+command: python
+args: ["-m", "src.mcp_servers.http.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+
+mode: external
+
+tools:
+  - {name: http_request, danger: external}
+  - {name: http_get, danger: external}
+  - {name: http_post, danger: external}
+  - {name: http_put, danger: external}
+  - {name: http_patch, danger: external}
+  - {name: http_delete, danger: external}
+  - {name: http_assert_status, danger: external}
+  - {name: http_assert_json, danger: external}
+  - {name: graphql_query, danger: external}
+  - {name: websocket_send_receive, danger: external}
+  - {name: load_test, danger: external}
+  - {name: sse_read, danger: external}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

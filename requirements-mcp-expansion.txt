@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════
+# requirements-mcp-expansion.txt — доп. зависимости для Sprint 6
+# ═══════════════════════════════════════════════════════════════════════
+#
+# Эти пакеты УЖЕ в основном requirements.txt (elasticsearch, redis, httpx),
+# но продублированы здесь для явности — если вы ставите только MCP-expansion
+# без основного requirements.txt.
+#
+# 5 нативных MCP-серверов Sprint 6:
+#   - elasticsearch  (src/mcp_servers/elasticsearch/server.py)
+#   - redis          (src/mcp_servers/redis/server.py)
+#   - brave_search   (src/mcp_servers/brave_search/server.py)
+#   - exa_search     (src/mcp_servers/exa_search/server.py)
+#   - tavily_search  (src/mcp_servers/tavily_search/server.py)
+# ═══════════════════════════════════════════════════════════════════════
+
+# ─── Нативные MCP (deps для 5 серверов) ──────────────────────────────
+elasticsearch>=8.15.0       # для src/mcp_servers/elasticsearch/
+redis>=5.0.0                # для src/mcp_servers/redis/
+httpx>=0.27.2               # для brave_search, exa_search, tavily_search (уже стоит)
+
+# ─── MCP protocol (пиннинг <2.0 — критично!) ─────────────────────────
+mcp~=1.1.3                  # mcp 2.x удалил @app.list_tools() — сломает все MCP
+
+# ─── Доп. dev tools для нативных MCP ──────────────────────────────────
+# (если будете писать свои нативные MCP, эти пакеты помогут)
+mcp-cli>=0.1.0             # CLI для тестирования MCP-серверов

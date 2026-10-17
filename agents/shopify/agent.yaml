@@ -1,0 +1,33 @@
+id: shopify
+schema_version: "1.5.0"
+title: Shopify агент
+version: "1.0.0"
+description: "Shopify: товары, заказы, клиенты, инвентарь."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SHOPIFY_ACCESS_TOKEN, level: hard}
+    - {name: SHOPIFY_SHOP, level: hard}
+
+mcp_servers: [shopify]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [shopify, магазин, товар]
+  negative_keywords: []
+  description_for_router: |
+    Shopify: товары, заказы, клиенты, инвентарь.
+
+mode: write
+dangerous_tools: [shopify_create_product]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🛍️", color: "#95bf47", category: ecommerce}
+
+# GitHub: https://github.com/Shopify/shopify-mcp

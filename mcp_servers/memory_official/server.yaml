@@ -1,0 +1,30 @@
+id: memory_official
+schema_version: "1.5.0"
+title: Memory MCP (official)
+description: "Knowledge graph memory — entities, relations (alternative to your memory facade)."
+
+command: npx
+args: ['-y', '@modelcontextprotocol/server-memory']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: write
+
+tools:
+  - {name: mem_create_entities, danger: write}
+  - {name: mem_create_relations, danger: write}
+  - {name: mem_search, danger: read}
+  - {name: mem_get_graph, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: @modelcontextprotocol/server-memory (npm)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

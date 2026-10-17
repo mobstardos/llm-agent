@@ -1,0 +1,33 @@
+id: documentation
+schema_version: "1.5.0"
+title: Documentation MCP
+description: Docstring, Mermaid, OpenAPI, changelog
+
+command: python
+args: ["-m", "src.mcp_servers.documentation.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: docstring_extract, danger: read}
+  - {name: docstring_generate, danger: write}
+  - {name: docstring_coverage, danger: read}
+  - {name: api_docs_extract, danger: read}
+  - {name: mermaid_render, danger: write}
+  - {name: mermaid_generate_from_graph, danger: write}
+  - {name: openapi_from_fastapi, danger: read}
+  - {name: changelog_from_git, danger: read}
+  - {name: readme_outline, danger: read}
+  - {name: markdown_toc, danger: write}
+  - {name: markdown_lint, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

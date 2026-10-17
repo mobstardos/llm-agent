@@ -1,0 +1,33 @@
+id: migration
+schema_version: "1.5.0"
+title: Migration агент
+version: "1.0.0"
+description: БД миграции (Alembic, Django, Prisma)
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [migration, filesystem]
+depends_on:
+  hard: [file]
+  soft: [postgres, mysql]
+
+priority: 11
+routing_hints:
+  keywords: [миграция, alembic, django migrate, prisma, схема бд]
+  negative_keywords: [1с, web]
+  description_for_router: |
+    Миграции БД: Alembic (SQLAlchemy), Django, Prisma.
+    Создание, применение, откат, схема.
+
+mode: destructive
+dangerous_tools: [migration_up, migration_down, migration_stamp]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 1800}
+ui: {icon: "📦", color: "#0891b2", category: db}

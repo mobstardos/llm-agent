@@ -1,0 +1,30 @@
+id: brightdata
+schema_version: "1.5.0"
+title: Bright Data MCP
+description: "Web scraping с anti-bot bypass, residential proxies."
+
+command: npx
+args: ['-y', '@brightdata/mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: BRIGHTDATA_API_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: bd_scrape, danger: read}
+  - {name: bd_search, danger: read}
+  - {name: bd_extract, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: @brightdata/mcp (npm)
+# GitHub: https://github.com/luminati-io/brightdata-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

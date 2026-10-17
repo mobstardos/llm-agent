@@ -1,0 +1,32 @@
+id: aws_cloudwatch
+schema_version: "1.5.0"
+title: AWS CloudWatch MCP
+description: "Мониторинг: metrics, logs, alarms, dashboards."
+
+command: uvx
+args: ['mcp-aws-cloudwatch']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AWS_ACCESS_KEY_ID, level: hard}
+    - {name: AWS_SECRET_ACCESS_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: cw_get_metric, danger: read}
+  - {name: cw_get_logs, danger: read}
+  - {name: cw_list_alarms, danger: read}
+  - {name: cw_get_dashboard, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-aws-cloudwatch (PyPI)
+# GitHub: https://github.com/aws-samples/mcp-aws-cloudwatch
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

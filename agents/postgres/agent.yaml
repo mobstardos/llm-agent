@@ -1,0 +1,30 @@
+id: postgres
+schema_version: "1.5.0"
+title: PostgreSQL агент
+version: "1.0.0"
+description: Работа с PostgreSQL
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PG_HOST, level: soft}
+
+mcp_servers: [postgres]
+depends_on: {hard: [], soft: []}
+
+priority: 20
+routing_hints:
+  keywords: [postgres, postgresql, pg, схема, таблица]
+  negative_keywords: [mysql, 1с]
+  description_for_router: |
+    Работа с PostgreSQL: схемы, таблицы, SELECT, миграции.
+
+mode: write
+dangerous_tools: [execute_write_query, execute_migration]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🐘", color: "#0891b2", category: db}

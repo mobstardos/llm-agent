@@ -1,0 +1,31 @@
+id: argocd
+schema_version: "1.5.0"
+title: ArgoCD MCP (argoproj-labs)
+description: GitOps для Kubernetes через ArgoCD. Official argoproj-labs. Manage apps, sync, deployments.
+
+command: npx
+args: ['-y', 'argocd-mcp@latest']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: ARGOCD_SERVER, level: hard}
+    - {name: ARGOCD_TOKEN, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: argocd_list_apps, danger: read}
+  - {name: argocd_sync, danger: destructive}
+  - {name: argocd_get_app, danger: read}
+  - {name: argocd_create_app, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# npm: https://www.npmjs.com/package/argocd-mcp (VERIFIED)
+# GitHub: https://github.com/argoproj-labs/mcp-for-argocd

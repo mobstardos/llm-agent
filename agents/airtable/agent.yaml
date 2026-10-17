@@ -1,0 +1,32 @@
+id: airtable
+schema_version: "1.5.0"
+title: Airtable агент
+version: "1.0.0"
+description: "Airtable: bases, tables, records, views."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AIRTABLE_API_KEY, level: hard}
+
+mcp_servers: [airtable]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [airtable, база, record]
+  negative_keywords: []
+  description_for_router: |
+    Airtable: bases, tables, records, views.
+
+mode: write
+dangerous_tools: [airtable_create_record, airtable_update_record]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🗂️", color: "#fcb400", category: office}
+
+# GitHub: https://github.com/airtable/airtable-mcp

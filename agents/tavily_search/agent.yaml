@@ -1,0 +1,32 @@
+id: tavily_search
+schema_version: "1.5.0"
+title: Tavily Search агент
+version: "1.0.0"
+description: AI-tuned search для RAG — находит релевантный контент для LLM.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TAVILY_API_KEY, level: hard}
+
+mcp_servers: [tavily_search]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [tavily, search, research, rag]
+  negative_keywords: []
+  description_for_router: |
+    AI-tuned search для RAG — находит релевантный контент для LLM.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔍", color: "#654ff0", category: search}
+
+# GitHub: https://github.com/tavily-ai/tavily-mcp

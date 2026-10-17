@@ -1,0 +1,31 @@
+id: playwright_cli
+schema_version: "1.5.0"
+title: Playwright CLI агент
+version: "1.0.0"
+description: Тестирование сайтов в нескольких браузерах + автоскриншоты для QA.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mcp_servers: [playwright_cli]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: ["playwright cli", "qa", "тестирование", "screenshot"]
+  negative_keywords: []
+  description_for_router: |
+    Тестирование сайтов в нескольких браузерах + автоскриншоты для QA.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🎭", color: "#2ead33", category: browser}
+
+# GitHub: https://github.com/microsoft/playwright-mcp

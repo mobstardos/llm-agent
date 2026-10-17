@@ -1,0 +1,33 @@
+id: trello
+schema_version: "1.5.0"
+title: Trello агент
+version: "1.0.0"
+description: "Trello: доски, карточки, списки, метки."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TRELLO_API_KEY, level: hard}
+    - {name: TRELLO_TOKEN, level: hard}
+
+mcp_servers: [trello]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [trello, трелло, доска, карточка]
+  negative_keywords: []
+  description_for_router: |
+    Trello: доски, карточки, списки, метки.
+
+mode: write
+dangerous_tools: [trello_create_card, trello_move_card]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📋", color: "#0079bf", category: pm}
+
+# GitHub: https://github.com/trello/mcp-trello

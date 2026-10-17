@@ -1,0 +1,32 @@
+id: notion
+schema_version: "1.5.0"
+title: Notion агент
+version: "1.0.0"
+description: "Notion: страницы, базы данных, блоки, комментарии."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: NOTION_API_KEY, level: hard}
+
+mcp_servers: [notion]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [notion, нотион, страница, база знаний]
+  negative_keywords: []
+  description_for_router: |
+    Notion: страницы, базы данных, блоки, комментарии.
+
+mode: write
+dangerous_tools: [notion_create_page, notion_update_page]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📝", color: "#000000", category: pm}
+
+# GitHub: https://github.com/makenotion/notion-mcp

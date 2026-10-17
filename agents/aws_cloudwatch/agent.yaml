@@ -1,0 +1,33 @@
+id: aws_cloudwatch
+schema_version: "1.5.0"
+title: AWS CloudWatch агент
+version: "1.0.0"
+description: "Мониторинг: metrics, logs, alarms, dashboards."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AWS_ACCESS_KEY_ID, level: hard}
+    - {name: AWS_SECRET_ACCESS_KEY, level: hard}
+
+mcp_servers: [aws_cloudwatch]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: [cloudwatch, aws logs, aws metrics]
+  negative_keywords: []
+  description_for_router: |
+    Мониторинг: metrics, logs, alarms, dashboards.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📊", color: "#ff4f8b", category: cloud}
+
+# GitHub: https://github.com/aws-samples/mcp-aws-cloudwatch

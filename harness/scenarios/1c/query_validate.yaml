@@ -1,0 +1,32 @@
+id: onec_query_validate
+title: 1C Query — валидация запроса
+category: 1c
+tags: [smoke, 1c, query]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: |
+  Проверь запрос:
+  ВЫБРАТЬ
+    Номенклатура.Наименование КАК Имя
+  ИЗ
+    Справочник.Номенклатура КАК Номенклатура
+  ГДЕ
+    Номенклатура.ПометкаУдаления = ЛОЖЬ
+
+options:
+  agent_id: onec_query
+  mcp_servers: [onec_query]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

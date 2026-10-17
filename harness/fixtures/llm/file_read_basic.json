@@ -1,0 +1,33 @@
+{
+  "scenario_id": "file_read_basic",
+  "model": "mock",
+  "recorded_at": 1789797000,
+  "exchange_count": 2,
+  "exchanges": [
+    {
+      "seq": 0,
+      "response": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "type": "function",
+            "function": {
+              "name": "filesystem__read_file",
+              "arguments": "{\"path\": \"src/hello.py\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 1,
+      "response": {
+        "role": "assistant",
+        "content": "В файле src/hello.py определена функция greet(), которая печатает 'hello'.",
+        "tool_calls": null
+      }
+    }
+  ]
+}

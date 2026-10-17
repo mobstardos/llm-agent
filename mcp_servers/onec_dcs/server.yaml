@@ -1,0 +1,31 @@
+id: onec_dcs
+schema_version: "1.5.0"
+title: 1C DCS MCP
+description: Схемы компоновки данных 1С
+
+command: python
+args: ["-m", "src.mcp_servers.onec_dcs.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: lxml, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: read_dcs, danger: read}
+  - {name: list_dcs, danger: read}
+  - {name: find_dcs, danger: read}
+  - {name: create_dcs, danger: write}
+  - {name: add_calculated_field, danger: write}
+  - {name: add_parameter, danger: write}
+  - {name: analyze_dcs, danger: read}
+  - {name: validate_dcs, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,31 @@
+id: reddit
+schema_version: "1.5.0"
+title: Reddit MCP
+description: "Reddit: чтение постов, комментариев, поиск по сабреддитам."
+
+command: npx
+args: ['-y', 'reddit-mcp-server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: REDDIT_CLIENT_ID, level: hard}
+    - {name: REDDIT_CLIENT_SECRET, level: hard}
+
+mode: read
+
+tools:
+  - {name: reddit_search, danger: read}
+  - {name: reddit_get_post, danger: read}
+  - {name: reddit_get_subreddit, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', 'reddit-mcp-server' — VERIFIED
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

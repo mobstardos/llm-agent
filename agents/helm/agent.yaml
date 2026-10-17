@@ -1,0 +1,32 @@
+id: helm
+schema_version: "1.5.0"
+title: Helm агент
+version: "1.0.0"
+description: Управление Helm-чартами в Kubernetes.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: KUBECONFIG, level: soft}
+
+mcp_servers: [helm]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: [helm, chart, релиз k8s]
+  negative_keywords: []
+  description_for_router: |
+    Управление Helm-чартами в Kubernetes.
+
+mode: destructive
+dangerous_tools: [helm_install, helm_uninstall, helm_upgrade]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "⎈", color: "#0f1689", category: devops}
+
+# GitHub: https://github.com/vic3king/helm-mcp

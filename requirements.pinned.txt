@@ -1,0 +1,137 @@
+# ═══════════════════════════════════════════════════════════════════════
+# requirements.txt — PINNED версии (патч для рекомендации 8, Sprint 2 P1)
+# ═══════════════════════════════════════════════════════════════════════
+# Что изменилось vs оригинального requirements.txt:
+#
+#  1. Критичные пакеты переключены с >= на ~= (compatible release).
+#     ~=X.Y.Z разрешает патч-апдейты (Z), но не минорные (Y) — это
+#     баланс между фиксами безопасности и защитой от сюрпризов.
+#
+#  2. Закреплены версии 7 пакетов, обновление которых рискует сломать
+#     сборку (список с обоснованиями ниже):
+#       - mcp              (mcp 2.x удалил @app.list_tools() — критично)
+#       - fastapi          (Breaking changes в lifespan/Pydantic v2)
+#       - pydantic         (API стабилен, но v2 → v3 будет болезненно)
+#       - psycopg          (async API стабилен с 3.2, но есть нюансы)
+#       - openai           (API Python SDK менялся несовместимо в 1.x)
+#       - uvicorn          (websockets & lifespan настройки)
+#       - httpx            (http2 — нестабилен на Windows)
+#
+#  3. Некритичные пакеты (tree-sitter-грамматики, whisper, pandas, ...)
+#     оставлены с >= — их обновления редко ломают.
+#
+# Применение:
+#   cp requirements.txt requirements.txt.bak   # бэкап оригинала
+#   cp /path/to/patch/requirements.pinned.txt requirements.txt
+#   pip install -r requirements.txt            # проверить сходимость
+#   git diff requirements.txt                  # показать изменения
+# ═══════════════════════════════════════════════════════════════════════
+
+# ─── Web-сервер ─────────────────────────────────────────────────────────
+fastapi~=0.115.0          # был >=0.115.0 — PIN: lifespan & Pydantic v2 contract
+uvicorn[standard]~=0.30.6  # был >=0.30.6 — PIN: websockets & lifespan
+websockets~=13.1          # был >=13.1
+python-multipart~=0.0.9   # был >=0.0.9
+
+# ─── LLM и HTTP ─────────────────────────────────────────────────────────
+openai~=1.51.0            # был >=1.51.0 — PIN: Python SDK API стабилен с 1.51
+httpx~=0.27.2             # был >=0.27.2 — PIN: http2 на Windows хрупок
+httpx[http2]~=0.27.2
+aiohttp~=3.10.0
+
+# ─── MCP ────────────────────────────────────────────────────────────────
+# ВАЖНО: mcp 2.x удалил декораторы @app.list_tools() — проект собран под 1.x
+# Оригинал уже pinned с верхней границей: mcp>=1.1.3,<2.0
+# Меняем на ~= (compatible release) — это даёт тот же эффект для major.minor
+mcp~=1.1.3                # equivalent: >=1.1.3,<2.0  (compatible release)
+# Семантика ~=: для mcp~=1.1.3 — разрешено 1.1.x (включая 1.1.4+), но НЕ 1.2+
+
+# ─── Валидация и конфиги ────────────────────────────────────────────────
+pydantic~=2.9.2           # был >=2.9.2 — PIN: v2 → v3 будет болезненно
+pydantic-settings~=2.5.2
+python-dotenv~=1.0.1
+PyYAML~=6.0.2
+
+# ─── Базы данных ────────────────────────────────────────────────────────
+pymysql~=1.1.1
+# PostgreSQL — основной драйвер (psycopg3). Альтернативы:
+#   psycopg2-binary~=2.9.9  (старее, но стабильнее на части Windows)
+#   pg8000~=1.31.5          (pure-python fallback)
+# run.py сам определяет, какой драйвер доступен.
+psycopg[binary,pool]~=3.2.0  # был >=3.2.0 — PIN: async API стабилен с 3.2
+pgvector~=0.3.0
+psycopg_pool~=3.2.0
+
+# ─── Память проекта ─────────────────────────────────────────────────────
+lancedb~=0.13.0
+pyarrow~=17.0.0
+sentence-transformers~=3.0.0
+tiktoken~=0.7.0
+xxhash~=3.4.0
+sqlparse~=0.5.0
+
+# ─── Ollama (малая LLM для фонового обогащения памяти) ─────────────────
+ollama~=0.4.0
+
+# ─── File watching / мониторинг ─────────────────────────────────────────
+watchdog~=4.0.0
+psutil~=6.0.0
+
+# ─── Extraction (PDF, DOCX, XLSX, изображения) ──────────────────────────
+pdfplumber~=0.11.0
+python-docx~=1.1.0
+openpyxl~=3.1.0
+Pillow~=10.4.0
+numpy~=2.0.0
+scikit-image~=0.24.0
+pytesseract~=0.3.13
+
+# ─── Tree-sitter (граф кода: Python, JS/TS, Go, Rust, Java...) ─────────
+tree-sitter~=0.23.0
+tree-sitter-python~=0.23.0
+tree-sitter-javascript~=0.23.0
+tree-sitter-typescript~=0.23.0
+tree-sitter-go~=0.23.0
+tree-sitter-rust~=0.23.0
+tree-sitter-java~=0.23.0
+tree-sitter-c-sharp~=0.23.0
+tree-sitter-php~=0.23.0
+tree-sitter-ruby~=0.23.0
+
+# ─── Browser MCP (Playwright) ───────────────────────────────────────────
+playwright~=1.48.0
+
+# ─── Media MCP (аудио/видео) ────────────────────────────────────────────
+faster-whisper~=1.0.0
+ffmpeg-python~=0.2.0
+
+# ─── Cluster / Multi-instance (опционально) ─────────────────────────────
+redis~=5.0.0
+
+# ─── CDC + Kafka (опционально) ──────────────────────────────────────────
+aiokafka~=0.11.0
+
+# ─── Dev tools (P0) ─────────────────────────────────────────────────────
+pathspec~=0.12.0
+pgserver~=0.1.6; platform_system != "Windows"
+
+# ─── Dev tools (P1) ─────────────────────────────────────────────────────
+# Перенесены в requirements-dev.txt (рекомендация 4)
+# pip-audit, bandit, safety, PyGithub, alembic, pytest*, mutmut, py-spy, memray
+
+# ─── Dev tools (P2) ─────────────────────────────────────────────────────
+pymongo~=4.9.0
+elasticsearch~=8.15.0
+pymssql~=2.3.0; platform_system != "Darwin"
+griffe~=1.3.0
+pydoc-markdown~=4.8.0
+duckdb~=1.1.0
+pandas~=2.2.0
+cssutils~=2.11.0
+
+# ─── Kubernetes (опционально) ───────────────────────────────────────────
+kubernetes~=31.0.0
+kubernetes-asyncio~=31.0.0
+
+# ─── CLI ────────────────────────────────────────────────────────────────
+rich~=13.9.0

@@ -1,0 +1,30 @@
+id: pinecone
+schema_version: "1.5.0"
+title: Pinecone MCP
+description: Managed vector DB для семантического поиска.
+
+command: uvx
+args: ['mcp-pinecone']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PINECONE_API_KEY, level: hard}
+
+mode: write
+
+tools:
+  - {name: pinecone_query, danger: read}
+  - {name: pinecone_upsert, danger: write}
+  - {name: pinecone_create_index, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: 'mcp-pinecone' — VERIFIED
+# GitHub: https://github.com/pinecone-io/pinecone-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

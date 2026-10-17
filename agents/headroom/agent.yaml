@@ -1,0 +1,33 @@
+id: headroom
+schema_version: "1.5.0"
+title: Headroom агент
+version: "1.0.0"
+description: Cross-agent memory и сжатие контекста. Claude/Codex/Cursor делятся фактами через общий memory.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: HEADROOM_BIN, level: soft}
+    - {name: HEADROOM_PROJECT_ROOT, level: soft}
+
+mcp_servers: [headroom]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: ["headroom", "memory", "compress", "context"]
+  negative_keywords: []
+  description_for_router: |
+    Cross-agent memory и сжатие контекста. Claude/Codex/Cursor делятся фактами через общий memory.
+
+mode: write
+dangerous_tools: ['headroom_save_memory', 'headroom_learn']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🧠", color: "#9333ea", category: ai_obs}
+
+# GitHub: https://github.com/headroom-ai/headroom

@@ -1,0 +1,31 @@
+id: vault
+schema_version: "1.5.0"
+title: HashiCorp Vault MCP
+description: Secrets management через HashiCorp Vault.
+
+command: uvx
+args: ['vault-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: VAULT_ADDR, level: hard}
+    - {name: VAULT_TOKEN, level: hard}
+
+mode: read
+
+tools:
+  - {name: vault_read, danger: read}
+  - {name: vault_list_secrets, danger: read}
+  - {name: vault_write, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: vault-mcp (PyPI)
+# GitHub: https://github.com/hashicorp/vault-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

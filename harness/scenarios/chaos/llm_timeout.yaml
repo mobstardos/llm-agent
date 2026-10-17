@@ -1,0 +1,30 @@
+id: llm_timeout_recovery
+title: Реакция на таймаут LLM
+category: chaos
+tags: [chaos, retry]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "content"
+
+prompt: "Прочитай test.txt"
+
+options:
+  agent_id: file
+
+chaos:
+  inject:
+    - at_iteration: 0
+      type: llm_error
+      count: 1
+  expect:
+    - type: recovered_after_retries
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

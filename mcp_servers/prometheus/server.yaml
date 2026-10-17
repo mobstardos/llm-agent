@@ -1,0 +1,31 @@
+id: prometheus
+schema_version: "1.5.0"
+title: Prometheus MCP
+description: "Prometheus: PromQL запросы, alertmanager, targets."
+
+command: uvx
+args: ['prometheus-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROMETHEUS_URL, level: hard}
+
+mode: read
+
+tools:
+  - {name: prom_query, danger: read}
+  - {name: prom_list_alerts, danger: read}
+  - {name: prom_list_targets, danger: read}
+  - {name: prom_get_metrics, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: prometheus-mcp (PyPI)
+# GitHub: https://github.com/prometheus/prometheus
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

@@ -1,0 +1,27 @@
+id: lsp_status_check
+title: LSP — проверка доступности
+category: dev
+tags: [smoke, dev, lsp]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.py": |
+        def hello():
+            return 42
+
+prompt: "Проверь, какие LSP-серверы доступны"
+
+options:
+  agent_id: lsp
+  mcp_servers: [lsp, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

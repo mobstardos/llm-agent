@@ -1,0 +1,34 @@
+id: jira
+schema_version: "1.5.0"
+title: Jira агент
+version: "1.0.0"
+description: "Jira (Atlassian): тикеты, спринты, доски, проекты."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: JIRA_URL, level: hard}
+    - {name: JIRA_USERNAME, level: hard}
+    - {name: JIRA_API_TOKEN, level: hard}
+
+mcp_servers: [jira]
+depends_on: {hard: [], soft: []}
+
+priority: 8
+routing_hints:
+  keywords: [jira, джира, ticket, sprint, доска]
+  negative_keywords: []
+  description_for_router: |
+    Jira (Atlassian): тикеты, спринты, доски, проекты.
+
+mode: write
+dangerous_tools: [jira_create_issue, jira_update_issue]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🎯", color: "#0052cc", category: pm}
+
+# GitHub: https://github.com/sooperset/mcp-atlassian

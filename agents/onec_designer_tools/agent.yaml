@@ -1,0 +1,34 @@
+id: onec_designer_tools
+schema_version: "1.5.0"
+title: 1C Designer Tools агент
+version: "1.0.0"
+description: выполнение кода и запросов 1С через Конструктор MCP, журнал регистрации
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: ONEC_MCP_URL, level: soft}
+
+mcp_servers: [onec_designer_tools]
+depends_on: {hard: [], soft: [onec, onec_designer]}
+
+priority: 16
+routing_hints:
+  keywords: [1с, конструктор mcp, vcexecutecode, vcexecutequery, запрос 1с,
+             журнал регистрации, bsl, bslcode, querytext, валидация запроса,
+             последняя ошибка 1с]
+  negative_keywords: []
+  description_for_router: |
+    Выполнение кода 1С (bsl) и запросов к базе через Конструктор MCP серверов,
+    валидация синтаксиса запросов, диагностика последней ошибки Журнала
+    регистрации. Требует установленный и опубликованный Конструктор MCP в базе.
+
+mode: external
+dangerous_tools: [vcexecutecode, vcexecutequery]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 20000, timeout_seconds: 300}
+ui: {icon: "🧩", color: "#f59e0b", category: onec}

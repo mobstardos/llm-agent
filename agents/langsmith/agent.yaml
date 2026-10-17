@@ -1,0 +1,32 @@
+id: langsmith
+schema_version: "1.5.0"
+title: LangSmith агент
+version: "1.0.0"
+description: "Трейсинг LLM-вызовов, дебаг prompt'ов, chains, runs."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: LANGCHAIN_API_KEY, level: hard}
+
+mcp_servers: [langsmith]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [langsmith, trace, langchain]
+  negative_keywords: []
+  description_for_router: |
+    Трейсинг LLM-вызовов, дебаг prompt'ов, chains, runs.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🪡", color: "#1c3c3c", category: ai_obs}
+
+# GitHub: https://github.com/langchain-ai/langsmith-mcp

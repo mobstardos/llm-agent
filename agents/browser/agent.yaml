@@ -1,0 +1,35 @@
+id: browser
+schema_version: "1.5.0"
+title: Browser агент
+version: "1.0.0"
+description: Автоматизация браузера, тестирование UI, скриншоты
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: playwright, level: hard,
+       message: "playwright не установлен — выполните playwright install chromium"}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: browser, ops: [navigate], level: soft}
+
+mcp_servers: [browser, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 12
+routing_hints:
+  keywords: [браузер, browser, page, ui, скриншот, screenshot, открой сайт]
+  negative_keywords: [база, sql, 1с]
+  description_for_router: |
+    Автоматизация браузера: открыть URL, клики, заполнение форм,
+    скриншоты, инспекция console/network, visual regression.
+
+mode: external
+dangerous_tools: [click, fill, evaluate]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "🌐", color: "#0ea5e9", category: dev}

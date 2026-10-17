@@ -1,0 +1,62 @@
+id: onec_qa
+schema_version: "1.5.0"
+title: 1C QA MCP
+description: MCP QA — ИИ-тестирование управляемых форм 1С через тест-клиент (Docker comol/qa_mcp)
+
+command: python
+args: ["-m", "src.mcp_servers.onec_qa.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: ONEC_QA_URL, level: soft}
+    - {name: ONEC_QA_HTTP_TOKEN, level: soft}
+
+env:
+  ONEC_QA_URL: "${ONEC_QA_URL}"
+  ONEC_QA_HTTP_TOKEN: "${ONEC_QA_HTTP_TOKEN}"
+
+mode: external
+
+tools:
+  # Жизненный цикл сеанса (qa_*)
+  - {name: qa_tools_list, danger: read}
+  - {name: qa_status, danger: read}
+  - {name: qa_start, danger: external}
+  - {name: qa_stop, danger: external}
+  - {name: qa_reconnect, danger: external}
+  - {name: qa_command_status, danger: read}
+  - {name: qa_doctor, danger: read}
+  - {name: qa_profiles, danger: read}
+  - {name: qa_data_candidates, danger: read}
+  # Окна и формы (ui_*)
+  - {name: ui_active_window, danger: read}
+  - {name: ui_window_tree, danger: read}
+  - {name: ui_window_changes, danger: read}
+  - {name: ui_inspect, danger: read}
+  - {name: ui_open, danger: external}
+  - {name: ui_close_form, danger: external}
+  - {name: ui_form, danger: read}
+  - {name: ui_form_schema, danger: read}
+  # Элементы и ввод
+  - {name: ui_find, danger: read}
+  - {name: ui_select, danger: external}
+  - {name: ui_click, danger: external}
+  - {name: ui_input, danger: external}
+  - {name: ui_set, danger: external}
+  - {name: ui_get_text, danger: read}
+  - {name: ui_field, danger: external}
+  - {name: ui_dialog, danger: external}
+  - {name: ui_wait, danger: read}
+  - {name: ui_messages, danger: read}
+  - {name: ui_errors, danger: read}
+  - {name: ui_assert, danger: read}
+  # Таблицы
+  - {name: ui_list, danger: read}
+  - {name: ui_table, danger: external}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,34 @@
+id: redis
+schema_version: "1.5.0"
+title: Redis MCP
+description: "Управление данными в Redis: ключи, хэши, списки, pub/sub, RedisSearch"
+
+command: python
+args: ['-m', 'src.mcp_servers.redis.server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: REDIS_URL, level: hard}
+
+mode: write
+
+tools:
+  - {name: redis_get, danger: read}
+  - {name: redis_set, danger: write}
+  - {name: redis_delete, danger: destructive}
+  - {name: redis_hset, danger: write}
+  - {name: redis_publish, danger: write}
+  - {name: redis_search, danger: read}
+  - {name: redis_keys, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: redis>=5.0.0 (в requirements.txt)
+# GitHub: https://github.com/redis/mcp-redis
+# Native Python — реализация в src/mcp_servers/<id>/server.py

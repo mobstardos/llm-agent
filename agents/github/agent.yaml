@@ -1,0 +1,43 @@
+id: github
+schema_version: "1.5.0"
+title: GitHub агент
+version: "1.0.0"
+description: PR, issues, actions
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+    - {name: GITHUB_TOKEN, level: soft,
+       message: "GITHUB_TOKEN не задан — только чтение без аутентификации"}
+
+mcp_servers: [github, git, filesystem]
+depends_on:
+  hard: [git]
+  soft: [file]
+
+priority: 11
+routing_hints:
+  keywords: [pr, pull request, issue, github, actions, релиз]
+  negative_keywords: [1с, база]
+  description_for_router: |
+    GitHub: PR (create/list/review/merge), issues, actions (logs/rerun),
+    релизы. Требует GITHUB_TOKEN.
+
+mode: external
+dangerous_tools:
+  - gh_create_pr
+  - gh_merge_pr
+  - gh_close_pr
+  - gh_create_issue
+  - gh_close_issue
+  - gh_rerun
+  - gh_create_release
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 40000, timeout_seconds: 600}
+ui: {icon: "🐙", color: "#333", category: dev}

@@ -1,0 +1,32 @@
+id: trello
+schema_version: "1.5.0"
+title: Trello MCP
+description: "Trello: доски, карточки, списки, метки."
+
+command: uvx
+args: ['trello-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TRELLO_API_KEY, level: hard}
+    - {name: TRELLO_TOKEN, level: hard}
+
+mode: write
+
+tools:
+  - {name: trello_get_boards, danger: read}
+  - {name: trello_create_card, danger: write}
+  - {name: trello_move_card, danger: write}
+  - {name: trello_search, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: trello-mcp (PyPI)
+# GitHub: https://github.com/trello/mcp-trello
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

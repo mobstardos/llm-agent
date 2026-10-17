@@ -1,0 +1,31 @@
+id: figma
+schema_version: "1.5.0"
+title: Figma MCP
+description: "Чтение Figma-файлов: компоненты, переменные, токены дизайна."
+
+command: npx
+args: ['-y', 'figma-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: FIGMA_ACCESS_TOKEN, level: hard}
+
+mode: read
+
+tools:
+  - {name: figma_get_file, danger: read}
+  - {name: figma_get_components, danger: read}
+  - {name: figma_get_variables, danger: read}
+  - {name: figma_export_image, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: figma-mcp (npm)
+# GitHub: https://github.com/figma/figma-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

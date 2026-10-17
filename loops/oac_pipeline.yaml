@@ -1,0 +1,74 @@
+id: agent.oac_pipeline
+type: reasoning
+title: "OAC-конвейер: анализ → план → подтверждение → выполнение → проверка"
+description: |
+  Методология OpenAgents Control (OAC, alexeyk222/Agents), адаптированная для
+  llm-agent: агент сначала понимает контекст и правила (анализ), предлагает
+  план и ждёт подтверждения пользователя, затем выполняет изменения
+  инструментами и проверяет результат проверками верификации.
+  Контекст подаётся по принципу MVI (Minimal Viable Information) — только
+  файлы, нужные для текущего шага; см. docs/OAC_INTEGRATION.md и
+  agents/_templates/oac/.
+  Примечание: pydantic-схема LoopSpec поддерживает фиксированный набор типов
+  (reasoning/verification/…), поэтому конвейер объявлен типом reasoning.
+
+trigger:
+  kind: manual
+
+budget:
+  max_iterations: 10
+  max_tokens: 60000
+  max_duration_seconds: 900
+
+body:
+  # ── 1. Анализ: собрать контекст задачи, правила проекта, MVI-бандл ──
+  - kind: llm_call
+    params:
+      tools: from_agent_spec
+      on_token: emit_to_ws
+
+  # ── 2. План: предложить шаги и дождаться подтверждения пользователя ──
+  #    (approval-gate: опасные tool-calls проходят через from_policy)
+  - kind: tool_calls
+    params:
+      for_each: msg.tool_calls
+      approval: from_policy
+      on_result: append_to_messages
+
+  # ── 3. Выполнение: основной цикл LLM ↔ tools до финального ответа ──
+  - kind: llm_call
+    params:
+      tools: from_agent_spec
+      on_token: emit_to_ws
+
+  # ── 4. Проверка (verify): изменения есть, временных заглушек нет ──
+  - kind: check
+    params:
+      checker: git_diff
+      require_changes: true
+
+  - kind: check
+    params:
+      checker: todos
+      forbid: ["TODO", "FIXME", "pass  # stub"]
+
+  - kind: check
+    params:
+      checker: lint
+      command: "ruff check {files}"
+      timeout_seconds: 30
+
+on_success: null
+on_failure: agent.retry
+on_timeout: agent.escalation
+
+metrics:
+  - steps
+  - tool_calls
+  - tokens_input
+  - tokens_output
+  - checks_passed
+  - checks_failed
+  - duration_ms
+
+trace_level: normal

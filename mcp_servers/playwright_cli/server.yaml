@@ -1,0 +1,29 @@
+id: playwright_cli
+schema_version: "1.5.0"
+title: Playwright CLI MCP
+description: Тестирование сайтов в нескольких браузерах + автоскриншоты для QA.
+
+command: npx
+args: ['-y', '@playwright/mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: read
+
+tools:
+  - {name: pw_cli_test_site, danger: read}
+  - {name: pw_cli_screenshot_all, danger: read}
+  - {name: pw_cli_compare_browsers, danger: read}
+  - {name: pw_cli_generate_report, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', '@playwright/mcp' — VERIFIED
+# GitHub: https://github.com/microsoft/playwright-mcp

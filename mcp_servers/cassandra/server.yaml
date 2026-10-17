@@ -1,0 +1,33 @@
+id: cassandra
+schema_version: "1.5.0"
+title: Cassandra MCP (community)
+description: "Apache Cassandra: wide-column store, CQL queries. Community реализация."
+
+command: npx
+args: ['-y', 'mcp-cassandra-server-uvipatil']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: CASSANDRA_HOST, level: hard}
+    - {name: CASSANDRA_PORT, level: soft}
+    - {name: CASSANDRA_USERNAME, level: soft}
+    - {name: CASSANDRA_PASSWORD, level: soft}
+
+mode: write
+
+tools:
+  - {name: cassandra_query, danger: read}
+  - {name: cassandra_execute, danger: write}
+  - {name: cassandra_list_keyspaces, danger: read}
+  - {name: cassandra_list_tables, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# npm: https://www.npmjs.com/package/mcp-cassandra-server-uvipatil (VERIFIED, community)
+# Альтернатива: https://github.com/sahil1115/mcp-cassandra-server

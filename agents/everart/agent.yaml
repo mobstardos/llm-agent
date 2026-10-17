@@ -1,0 +1,32 @@
+id: everart
+schema_version: "1.5.0"
+title: EverArt агент
+version: "1.0.0"
+description: "Image generation через AI models (DALL-E, Stable Diffusion)."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: EVERART_API_KEY, level: hard}
+
+mcp_servers: [everart]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: [image, generate, dall-e, stable diffusion]
+  negative_keywords: []
+  description_for_router: |
+    Image generation через AI models (DALL-E, Stable Diffusion).
+
+mode: write
+dangerous_tools: [everart_generate]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🎨", color: "#ff6b6b", category: design}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

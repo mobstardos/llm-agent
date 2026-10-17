@@ -1,0 +1,32 @@
+id: google_calendar
+schema_version: "1.5.0"
+title: Google Calendar MCP
+description: "Google Calendar: события, расписания, напоминания."
+
+command: npx
+args: ['-y', 'mcp-server-google-calendar']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GCAL_CLIENT_ID, level: hard}
+    - {name: GCAL_CLIENT_SECRET, level: hard}
+
+mode: write
+
+tools:
+  - {name: gcal_list_events, danger: read}
+  - {name: gcal_create_event, danger: write}
+  - {name: gcal_update_event, danger: write}
+  - {name: gcal_delete_event, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', 'mcp-server-google-calendar' — VERIFIED
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

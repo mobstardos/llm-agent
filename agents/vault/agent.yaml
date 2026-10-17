@@ -1,0 +1,33 @@
+id: vault
+schema_version: "1.5.0"
+title: HashiCorp Vault агент
+version: "1.0.0"
+description: Secrets management через HashiCorp Vault.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: VAULT_ADDR, level: hard}
+    - {name: VAULT_TOKEN, level: hard}
+
+mcp_servers: [vault]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [vault, hashicorp, секрет]
+  negative_keywords: []
+  description_for_router: |
+    Secrets management через HashiCorp Vault.
+
+mode: read
+dangerous_tools: [vault_write]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🗝️", color: "#000000", category: security}
+
+# GitHub: https://github.com/hashicorp/vault-mcp

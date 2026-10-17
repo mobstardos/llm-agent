@@ -1,0 +1,88 @@
+{
+  "listen_host": "127.0.0.1",
+  "ports": [
+    {
+      "listen": 9000,
+      "target_host": "127.0.0.1",
+      "target_port": 9001,
+      "name": "RemoteServer TCP",
+      "parser": "auto"
+    },
+    {
+      "listen": 9010,
+      "target_host": "127.0.0.1",
+      "target_port": 9011,
+      "name": "Thrift RPC",
+      "parser": "auto"
+    }
+  ],
+  "web": {
+    "enabled": true,
+    "host": "0.0.0.0",
+    "port": 9500
+  },
+  "console": {
+    "enabled": true,
+    "colors": true,
+    "verbosity": "summary"
+  },
+  "detection": {
+    "mode": "auto",
+    "fallback": "hexdump"
+  },
+  "buffers": {
+    "recv_size": 65536,
+    "connect_timeout": 10
+  },
+  "storage": {
+    "dir": "capture",
+    "jsonl": true,
+    "jsonl_rotation_mb": 50,
+    "jsonl_keep": 5,
+    "sqlite": true,
+    "sqlite_file": "capture/traffic.db",
+    "sqlite_retention_rows": 500000,
+    "pcap": true,
+    "pcap_file": "capture/traffic.pcap",
+    "pcap_rotation_mb": 200,
+    "pcap_keep": 5,
+    "csv_reports": true,
+    "reports_dir": "capture/reports",
+    "text_logs_per_client": false,
+    "clients_dir": "capture/clients"
+  },
+  "alerts": {
+    "cooldown_sec": 30,
+    "webhook_url": "",
+    "silence_sec": 0,
+    "alerts_file": "capture/alerts.jsonl",
+    "rules": [
+      {
+        "name": "Thrift EXCEPTION",
+        "severity": "crit",
+        "match": {"protocol": "THRIFT", "msg_type": "EXCEPTION"},
+        "actions": ["console", "web", "sound"]
+      },
+      {
+        "name": "Откат безналичной оплаты",
+        "severity": "crit",
+        "match": {"method_type": "CASHLESS_ROLLBACK"},
+        "threshold": {"count": 2, "window_sec": 60},
+        "actions": ["console", "web", "sound"]
+      },
+      {
+        "name": "Гигантский пакет",
+        "severity": "warn",
+        "size_gt": 1000000,
+        "actions": ["console", "web"]
+      },
+      {
+        "name": "Ошибка БД в запросе",
+        "severity": "warn",
+        "match": {"cmd_type": "DB_REQUEST"},
+        "keyword": "error",
+        "actions": ["console", "web"]
+      }
+    ]
+  }
+}

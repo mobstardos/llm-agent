@@ -1,0 +1,235 @@
+# ─── Sprint 6: 62 новых MCP-сервера ───────────────────────────────
+  elasticsearch:
+    command: python
+    args: ['-m', 'src.mcp_servers.elasticsearch.server']
+
+  redis:
+    command: python
+    args: ['-m', 'src.mcp_servers.redis.server']
+
+  mongodb:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-mongodb']
+
+  qdrant:
+    command: uvx
+    args: ['qdrant-mcp-server']
+
+  pinecone:
+    command: uvx
+    args: ['pinecone-mcp']
+
+  weaviate:
+    command: uvx
+    args: ['weaviate-mcp']
+
+  chroma:
+    command: uvx
+    args: ['chroma-mcp']
+
+  milvus:
+    command: uvx
+    args: ['milvus-mcp']
+
+  cloudflare:
+    command: npx
+    args: ['-y', '@cloudflare/mcp-server-cloudflare']
+
+  aws_s3:
+    command: uvx
+    args: ['mcp-aws-s3']
+
+  aws_lambda:
+    command: uvx
+    args: ['mcp-aws-lambda']
+
+  aws_cloudwatch:
+    command: uvx
+    args: ['mcp-aws-cloudwatch']
+
+  google_drive:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-google-drive']
+
+  helm:
+    command: uvx
+    args: ['helm-mcp']
+
+  slack:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-slack']
+
+  discord:
+    command: npx
+    args: ['-y', 'discord-mcp']
+
+  telegram:
+    command: uvx
+    args: ['telegram-mcp']
+
+  gmail:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-gmail']
+
+  linear:
+    command: npx
+    args: ['-y', 'linear-mcp']
+
+  notion:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-notion']
+
+  jira:
+    command: uvx
+    args: ['mcp-atlassian']
+
+  trello:
+    command: uvx
+    args: ['trello-mcp']
+
+  figma:
+    command: npx
+    args: ['-y', 'figma-mcp']
+
+  grafana:
+    command: uvx
+    args: ['mcp-grafana']
+
+  sentry:
+    command: uvx
+    args: ['sentry-mcp']
+
+  datadog:
+    command: uvx
+    args: ['datadog-mcp']
+
+  prometheus:
+    command: uvx
+    args: ['prometheus-mcp']
+
+  langsmith:
+    command: uvx
+    args: ['langsmith-mcp']
+
+  google_sheets:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-google-sheets']
+
+  airtable:
+    command: npx
+    args: ['-y', 'airtable-mcp']
+
+  google_calendar:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-google-calendar']
+
+  brave_search:
+    command: python
+    args: ['-m', 'src.mcp_servers.brave_search.server']
+
+  exa_search:
+    command: python
+    args: ['-m', 'src.mcp_servers.exa_search.server']
+
+  tavily_search:
+    command: python
+    args: ['-m', 'src.mcp_servers.tavily_search.server']
+
+  playwright_official:
+    command: npx
+    args: ['-y', '@playwright/mcp']
+
+  puppeteer:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-puppeteer']
+
+  brightdata:
+    command: npx
+    args: ['-y', '@brightdata/mcp']
+
+  onepassword:
+    command: npx
+    args: ['-y', '@1password/mcp-server']
+
+  vault:
+    command: uvx
+    args: ['vault-mcp']
+
+  stripe:
+    command: npx
+    args: ['-y', 'stripe-mcp']
+
+  shopify:
+    command: npx
+    args: ['-y', 'shopify-mcp']
+
+  bioinformatics:
+    command: uvx
+    args: ['biothings-mcp']
+
+  sonarqube:
+    command: uvx
+    args: ['sonarqube-mcp']
+
+  fetch:
+    command: uvx
+    args: ['mcp-server-fetch']
+
+  sequential_thinking:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-sequential-thinking']
+
+  memory_official:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-memory']
+
+  time:
+    command: uvx
+    args: ['mcp-server-time']
+
+  git_official:
+    command: uvx
+    args: ['mcp-server-git']
+
+  github_official:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-github']
+
+  reddit:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-reddit']
+
+  everart:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-everart']
+
+  sqlite_official:
+    command: uvx
+    args: ['mcp-server-sqlite']
+
+
+# --- Sprint 6 extension (Headroom + Design tools) ---
+  headroom:
+    command: python
+    args: ['-m', 'src.mcp_servers.headroom.server']
+
+  taste:
+    command: npx
+    args: ['-y', 'taste-mcp']
+
+  impeccable:
+    command: npx
+    args: ['-y', 'impeccable-mcp']
+
+  playwright_cli:
+    command: npx
+    args: ['-y', '@playwright/mcp-cli']
+
+  awesome_design:
+    command: npx
+    args: ['-y', 'awesome-design-mcp']
+
+  image23js:
+    command: npx
+    args: ['-y', 'image23js-mcp']
+

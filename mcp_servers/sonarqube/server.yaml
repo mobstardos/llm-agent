@@ -1,0 +1,32 @@
+id: sonarqube
+schema_version: "1.5.0"
+title: SonarQube MCP
+description: "Анализ code quality: code smells, security hotspots, bugs."
+
+command: uvx
+args: ['sonarqube-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SONARQUBE_URL, level: hard}
+    - {name: SONARQUBE_TOKEN, level: hard}
+
+mode: read
+
+tools:
+  - {name: sq_get_issues, danger: read}
+  - {name: sq_get_metrics, danger: read}
+  - {name: sq_list_projects, danger: read}
+  - {name: sq_get_hotspots, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: sonarqube-mcp (PyPI)
+# GitHub: https://github.com/sonarsource/sonarqube-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

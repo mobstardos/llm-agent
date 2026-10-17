@@ -1,0 +1,30 @@
+id: langsmith
+schema_version: "1.5.0"
+title: LangSmith MCP
+description: "Трейсинг LLM-вызовов, дебаг prompt'ов, chains, runs."
+
+command: uvx
+args: ['langsmith-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: LANGCHAIN_API_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: langsmith_list_runs, danger: read}
+  - {name: langsmith_get_run, danger: read}
+  - {name: langsmith_search_traces, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: langsmith-mcp (PyPI)
+# GitHub: https://github.com/langchain-ai/langsmith-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

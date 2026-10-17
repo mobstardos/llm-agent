@@ -1,0 +1,33 @@
+id: gmail
+schema_version: "1.5.0"
+title: Gmail агент
+version: "1.0.0"
+description: "Gmail: чтение, отправка, поиск писем, управление метками."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GMAIL_CLIENT_ID, level: hard}
+    - {name: GMAIL_CLIENT_SECRET, level: hard}
+
+mcp_servers: [gmail]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [gmail, почта, письмо, email]
+  negative_keywords: []
+  description_for_router: |
+    Gmail: чтение, отправка, поиск писем, управление метками.
+
+mode: write
+dangerous_tools: [gmail_send, gmail_trash]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📧", color: "#ea4335", category: comms}
+
+# GitHub: https://github.com/anthropics/mcp-server-gmail

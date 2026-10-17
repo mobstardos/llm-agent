@@ -1,0 +1,31 @@
+id: git_official
+schema_version: "1.5.0"
+title: Git агент (official)
+version: "1.0.0"
+description: Git operations через official MCP. Дополнит существующий git MCP.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mcp_servers: [git_official]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [git, commit, branch]
+  negative_keywords: []
+  description_for_router: |
+    Git operations через official MCP. Дополнит существующий git MCP.
+
+mode: destructive
+dangerous_tools: [git_commit]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🌳", color: "#f05033", category: devops}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

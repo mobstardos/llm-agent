@@ -1,0 +1,32 @@
+id: google_drive
+schema_version: "1.5.0"
+title: Google Drive MCP
+description: "Чтение, поиск, загрузка файлов в Google Drive."
+
+command: npx
+args: ['-y', '@piotr-agier/google-drive-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GDRIVE_CLIENT_ID, level: hard}
+    - {name: GDRIVE_CLIENT_SECRET, level: hard}
+
+mode: write
+
+tools:
+  - {name: gdrive_search, danger: read}
+  - {name: gdrive_read_file, danger: read}
+  - {name: gdrive_upload, danger: write}
+  - {name: gdrive_list, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', '@piotr-agier/google-drive-mcp' — VERIFIED
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

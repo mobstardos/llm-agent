@@ -1,0 +1,27 @@
+id: data_csv_read
+title: Data — чтение CSV
+category: dev
+tags: [smoke, dev, data]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "data.csv": |
+        name,age,city
+        Alice,30,NYC
+        Bob,25,LA
+        Charlie,35,Chicago
+
+prompt: "Прочитай data.csv и покажи первые строки"
+
+options:
+  agent_id: data
+  mcp_servers: [data, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

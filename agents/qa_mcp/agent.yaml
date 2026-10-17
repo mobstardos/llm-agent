@@ -1,0 +1,40 @@
+id: qa_mcp
+schema_version: "1.5.0"
+title: qa-mcp-public агент (1C QA)
+version: "1.0.0"
+description: >
+  Агент для QA-автоматизации 1C:Enterprise через native TestClient.
+  Запускает BDD/Gherkin сценарии, читает/верифицирует управляемые формы,
+  делает assertions на UI и БД. 63 stable standalone MCP tools.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: QA_MCP_HOME, level: soft}
+    - {name: QA_MCP_TRANSPORT, level: soft}
+
+mcp_servers: [qa_mcp]
+depends_on: {hard: [onec], soft: [onec_metadata, onec_forms, onec_tests]}
+
+priority: 7
+routing_hints:
+  keywords: [qa-mcp, 1c testclient, gherkin, bdd, тестирование 1с, сценарии 1с, testclient, vanessa, qa автоматизация]
+  negative_keywords: [web, browser]
+  description_for_router: |
+    QA-автоматизация 1C:Enterprise через native TestClient. Запуск BDD/Gherkin
+    сценариев, чтение/верификация управляемых форм, assertions на UI и БД.
+    63 stable tools: lifecycle, scenario, read, write, assertions, navigation.
+
+mode: write
+dangerous_tools: [launch_test_client, stop_test_client, delete_table_row, write_form_value_xtest, send_keys]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 25, max_result_chars: 50000, timeout_seconds: 1800}
+ui: {icon: "🧪", color: "#16a34a", category: 1c_qa}
+
+# GitHub (VERIFIED): https://github.com/vlikhobabin/qa-mcp-public
+# License: Apache-2.0
+# 63 stable tools (see docs/MCP-FAQ.md для полного списка)

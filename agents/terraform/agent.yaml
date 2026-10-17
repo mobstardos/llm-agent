@@ -1,0 +1,32 @@
+id: terraform
+schema_version: "1.5.0"
+title: Terraform агент (HashiCorp official)
+version: "1.0.0"
+description: Управление IaC через Terraform Registry и HCP Terraform APIs. Official HashiCorp.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TFC_TOKEN, level: soft}
+
+mcp_servers: [terraform]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: ["terraform", "tf", "iac", "инфраструктура"]
+  negative_keywords: []
+  description_for_router: |
+    Управление IaC через Terraform Registry и HCP Terraform APIs. Official HashiCorp.
+
+mode: destructive
+dangerous_tools: ['tf_apply', 'tf_destroy']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🏗️", color: "#7b42bc", category: devops}
+
+# GitHub (VERIFIED): https://github.com/hashicorp/terraform-mcp-server

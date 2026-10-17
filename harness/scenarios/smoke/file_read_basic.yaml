@@ -1,0 +1,30 @@
+id: file_read_basic
+title: File Agent — простое чтение файла
+category: smoke
+tags: [smoke, file]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "src/hello.py": |
+        def greet():
+            print("hello")
+
+prompt: "Прочитай src/hello.py и скажи, что там написано"
+
+options:
+  agent_id: file
+  mock_llm: true
+
+assertions:
+  - type: tool_called
+    params: {tool: "filesystem__read_file"}
+  - type: no_errors
+    params: {}
+  - type: steps_less_than
+    params: {value: 10}
+
+metrics: [duration_ms, tokens_input, tokens_output]
+
+loop: agent.reasoning

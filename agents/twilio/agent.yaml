@@ -1,0 +1,33 @@
+id: twilio
+schema_version: "1.5.0"
+title: Twilio агент (Twilio Labs)
+version: "1.0.0"
+description: SMS, Voice, WhatsApp через Twilio API. Official Twilio Labs monorepo.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TWILIO_ACCOUNT_SID, level: hard}
+    - {name: TWILIO_AUTH_TOKEN, level: hard}
+
+mcp_servers: [twilio]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: ["twilio", "sms", "звонок", "whatsapp"]
+  negative_keywords: []
+  description_for_router: |
+    SMS, Voice, WhatsApp через Twilio API. Official Twilio Labs monorepo.
+
+mode: write
+dangerous_tools: ['twilio_send_sms', 'twilio_make_call']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📱", color: "#f22f46", category: comms}
+
+# GitHub (VERIFIED): https://github.com/twilio-labs/mcp

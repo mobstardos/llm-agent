@@ -1,0 +1,23 @@
+id: analytics_api
+title: Analytics — проверка API
+category: dev
+tags: [smoke, dev, analytics]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Проверь доступность /api/analytics/overview"
+
+options:
+  agent_id: file
+  mcp_servers: [filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

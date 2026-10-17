@@ -1,0 +1,28 @@
+id: onec_query
+schema_version: "1.5.0"
+title: 1C Query MCP
+description: Язык запросов 1С — парсинг, валидация, конвертация
+
+command: python
+args: ["-m", "src.mcp_servers.onec_query.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+
+mode: read
+
+tools:
+  - {name: parse_query, danger: read}
+  - {name: validate_query, danger: read}
+  - {name: extract_metadata_refs, danger: read}
+  - {name: extract_parameters, danger: read}
+  - {name: sql_to_1c, danger: read}
+  - {name: onec_to_sql, danger: read}
+  - {name: analyze_query, danger: read}
+  - {name: suggest_optimizations, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,58 @@
+id: __template__
+version: "1.0.0"
+title: Шаблон фичи
+description: >
+  Эталонный скелетон для новой фичи llm-agent. Копируйте этот каталог
+  в features/<your-id>/ и заполните реальные значения. После создания
+  фича автоматически подключится через FeatureLoader — без правок
+  src/main.py или src/web/app.js.
+enabled: false  # ← true для активации
+
+# ─── Зависимости фичи ─────────────────────────────────────────────────
+requires:
+  python_packages:
+    # Список Питон-пакетов, без которых фича не работает.
+    # FeatureLoader проверит и залогирует warning, если пакет отсутствует.
+    # Если пакет hard-зависимый — поставить level: hard (фича не
+    # загрузится без него); soft — фича загрузится в degraded-режиме.
+    # Пустой список = фича работает на stdlib.
+    - {name: fastapi, level: soft}
+  env_vars:
+    # Переменные окружения, которые фича читает. Используются только для
+    # документации и логирования при старте.
+    - {name: PROJECT_ROOT, level: soft}
+  features:
+    # Другие фичи, от которых зависит эта.
+    # Пример: - {id: journal, level: soft}
+    []
+
+# ─── API-роутер ───────────────────────────────────────────────────────
+# FeatureLoader вызывает функцию `create_router()` из этого модуля,
+# получает APIRouter и монтирует через `app.include_router()`.
+api_router: api.py:create_router
+
+# ─── Вкладка UI ───────────────────────────────────────────────────────
+# GET /api/features возвращает список фич с их js_url. app.js
+# подгружает каждый ui.js в settings-модалку.
+ui_tab:
+  file: ui.js
+  title: Шаблон                # ← заменить на реальное название
+  icon: "📦"                   # ← заменить emoji
+  category: dev               # ← для группировки в UI
+
+# ─── WebSocket events ─────────────────────────────────────────────────
+# Если фича стримит события через /ws, перечисляем их здесь.
+# event bus (src/events.py) публикует их в WS-канал.
+ws_events: []
+  # - __template__.status_changed
+  # - __template__.progress
+
+# ─── Опциональные поля ────────────────────────────────────────────────
+# Конфигурация фичи (читается через src.config.get_yaml_config())
+config_schema:
+  enabled_by_default: false
+  settings:
+    # Список настраиваемых параметров и их дефолтов.
+    # Эти значения можно переопределить в config/settings.yaml.
+    max_items: 100
+    refresh_interval_seconds: 60

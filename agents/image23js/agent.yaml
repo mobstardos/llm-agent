@@ -1,0 +1,32 @@
+id: image23js
+schema_version: "1.5.0"
+title: Image23.js агент
+version: "1.0.0"
+description: Превращает изображения в интерактивные 3D-модели с помощью кода.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: IMAGE23_API_KEY, level: soft}
+
+mcp_servers: [image23js]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: ["image23", "3d model", "3d", "изображение в 3d"]
+  negative_keywords: []
+  description_for_router: |
+    Превращает изображения в интерактивные 3D-модели с помощью кода.
+
+mode: write
+dangerous_tools: ['image23_to_3d', 'image23_export']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🌀", color: "#10b981", category: design}
+
+# GitHub: https://github.com/image23/image23js-mcp

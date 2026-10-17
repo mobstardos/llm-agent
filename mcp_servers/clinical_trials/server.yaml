@@ -1,0 +1,30 @@
+id: clinical_trials
+schema_version: "1.5.0"
+title: ClinicalTrials.gov MCP
+description: Доступ к базе клинических исследований ClinicalTrials.gov (600K+ trials).
+
+command: uvx
+args: ['--from', 'git+https://github.com/aafjes/mcp-clinicaltrials.gov', 'mcp-clinicaltrials']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: read
+
+tools:
+  - {name: ct_search, danger: read}
+  - {name: ct_get_study, danger: read}
+  - {name: ct_list_conditions, danger: read}
+  - {name: ct_match_patients, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# GitHub: https://github.com/aafjes/mcp-clinicaltrials.gov
+# Установка через uvx с GitHub (нет в PyPI, но git repo работает):
+# uvx --from git+https://github.com/aafjes/mcp-clinicaltrials.gov mcp-clinicaltrials

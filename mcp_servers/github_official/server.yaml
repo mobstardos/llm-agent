@@ -1,0 +1,32 @@
+id: github_official
+schema_version: "1.5.0"
+title: GitHub MCP (official)
+description: "GitHub: repos, issues, PRs, actions — official version. Дополнит существующий github MCP."
+
+command: npx
+args: ['-y', '@modelcontextprotocol/server-github']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GITHUB_TOKEN, level: hard}
+
+mode: write
+
+tools:
+  - {name: gh_off_create_issue, danger: write}
+  - {name: gh_off_get_issue, danger: read}
+  - {name: gh_off_list_prs, danger: read}
+  - {name: gh_off_create_pr, danger: write}
+  - {name: gh_off_list_actions, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: @modelcontextprotocol/server-github (npm)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

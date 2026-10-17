@@ -1,0 +1,31 @@
+id: git
+schema_version: "1.5.0"
+title: Git MCP
+description: Git-операции в PROJECT_ROOT
+
+command: python
+args: ["-m", "src.mcp_servers.git.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: status, danger: read}
+  - {name: diff, danger: read}
+  - {name: log, danger: read}
+  - {name: branch_list, danger: read}
+  - {name: branch_create, danger: write}
+  - {name: checkout, danger: write}
+  - {name: add, danger: write}
+  - {name: commit, danger: write}
+  - {name: reset, danger: destructive}
+
+process:
+  startup_timeout_seconds: 15
+  restart_policy: on_failure
+  max_restarts: 3

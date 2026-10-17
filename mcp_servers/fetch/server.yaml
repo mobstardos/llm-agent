@@ -1,0 +1,27 @@
+id: fetch
+schema_version: "1.5.0"
+title: Fetch MCP
+description: HTTP fetch с поддержкой markdown-конверсии.
+
+command: uvx
+args: ['mcp-server-fetch']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mode: read
+
+tools:
+  - {name: fetch_url, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-server-fetch (PyPI)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

@@ -1,0 +1,35 @@
+id: media
+schema_version: "1.5.0"
+title: Media MCP
+description: Аудио и видео — транскрипция, кадры, метаданные
+
+command: python
+args: ["-m", "src.mcp_servers.media.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: whisper, ops: [transcribe], level: soft}
+    - {id: media, ops: [metadata], level: soft}
+
+mode: write
+
+tools:
+  - {name: metadata, danger: read}
+  - {name: transcribe, danger: read}
+  - {name: translate, danger: read}
+  - {name: extract_audio, danger: write}
+  - {name: extract_frames, danger: write}
+  - {name: clip, danger: write}
+  - {name: convert, danger: write}
+  - {name: merge_audio_video, danger: write}
+  - {name: media_info, danger: read}
+  - {name: transcription_cache_stats, danger: read}
+
+process:
+  startup_timeout_seconds: 60
+  restart_policy: on_failure
+  max_restarts: 3

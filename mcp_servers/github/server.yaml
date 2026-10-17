@@ -1,0 +1,44 @@
+id: github
+schema_version: "1.5.0"
+title: GitHub MCP
+description: PR, issues, actions через GitHub API
+
+command: python
+args: ["-m", "src.mcp_servers.github.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: httpx, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: external
+
+tools:
+  - {name: gh_status, danger: read}
+  - {name: gh_repo_info, danger: read}
+  - {name: gh_list_prs, danger: read}
+  - {name: gh_get_pr, danger: read}
+  - {name: gh_pr_files, danger: read}
+  - {name: gh_pr_diff, danger: read}
+  - {name: gh_create_pr, danger: external}
+  - {name: gh_comment_pr, danger: external}
+  - {name: gh_review_pr, danger: external}
+  - {name: gh_merge_pr, danger: destructive}
+  - {name: gh_close_pr, danger: external}
+  - {name: gh_list_issues, danger: read}
+  - {name: gh_get_issue, danger: read}
+  - {name: gh_create_issue, danger: external}
+  - {name: gh_comment_issue, danger: external}
+  - {name: gh_close_issue, danger: external}
+  - {name: gh_list_workflows, danger: read}
+  - {name: gh_list_runs, danger: read}
+  - {name: gh_run_logs, danger: read}
+  - {name: gh_rerun, danger: external}
+  - {name: gh_create_release, danger: external}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

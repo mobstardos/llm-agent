@@ -1,0 +1,31 @@
+id: sequential_thinking
+schema_version: "1.5.0"
+title: Sequential Thinking агент
+version: "1.0.0"
+description: Step-by-step reasoning для сложных задач.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mcp_servers: [sequential_thinking]
+depends_on: {hard: [], soft: []}
+
+priority: 12
+routing_hints:
+  keywords: [reasoning, thinking, пошагово]
+  negative_keywords: []
+  description_for_router: |
+    Step-by-step reasoning для сложных задач.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🧠", color: "#9b59b6", category: ai_obs}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

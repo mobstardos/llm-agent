@@ -1,0 +1,32 @@
+id: helm
+schema_version: "1.5.0"
+title: Helm MCP
+description: Управление Helm-чартами в Kubernetes.
+
+command: uvx
+args: ['helm-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: KUBECONFIG, level: soft}
+
+mode: destructive
+
+tools:
+  - {name: helm_list, danger: read}
+  - {name: helm_install, danger: destructive}
+  - {name: helm_uninstall, danger: destructive}
+  - {name: helm_upgrade, danger: destructive}
+  - {name: helm_search, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: helm-mcp (PyPI)
+# GitHub: https://github.com/vic3king/helm-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

@@ -1,0 +1,32 @@
+id: datadog
+schema_version: "1.5.0"
+title: Datadog MCP
+description: "Datadog: metrics, traces, logs, RUM, monitors."
+
+command: uvx
+args: ['datadog-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: DATADOG_API_KEY, level: hard}
+    - {name: DATADOG_APP_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: dd_query_metrics, danger: read}
+  - {name: dd_search_logs, danger: read}
+  - {name: dd_list_monitors, danger: read}
+  - {name: dd_get_trace, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: datadog-mcp (PyPI)
+# GitHub: https://github.com/DataDog/mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

@@ -1,0 +1,31 @@
+id: telegram
+schema_version: "1.5.0"
+title: Telegram MCP
+description: "Telegram Bot API: сообщения, каналы, sticker-паки."
+
+command: uvx
+args: ['telegram-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TELEGRAM_BOT_TOKEN, level: hard}
+
+mode: write
+
+tools:
+  - {name: tg_send_message, danger: write}
+  - {name: tg_get_updates, danger: read}
+  - {name: tg_send_photo, danger: write}
+  - {name: tg_get_chat, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: telegram-mcp (PyPI)
+# GitHub: https://github.com/Chainlit/telegram-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

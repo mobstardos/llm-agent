@@ -1,0 +1,32 @@
+id: security
+schema_version: "1.5.0"
+title: Security MCP
+description: Секреты, SAST, SCA, SBOM, хэши, подписи
+
+command: python
+args: ["-m", "src.mcp_servers.security.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: read
+
+tools:
+  - {name: scan_secrets, danger: read}
+  - {name: scan_sast, danger: read}
+  - {name: scan_dependencies, danger: read}
+  - {name: scan_licenses, danger: read}
+  - {name: generate_sbom, danger: read}
+  - {name: hash_file, danger: read}
+  - {name: hash_string, danger: read}
+  - {name: verify_hash, danger: read}
+  - {name: generate_password, danger: read}
+  - {name: generate_key, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

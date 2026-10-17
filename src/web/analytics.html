@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Analytics — LLM Agent</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, sans-serif;
+      background: #0f1116; color: #e6e6e6; padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 24px;
+      padding-bottom: 16px; border-bottom: 1px solid #23252e;
+    }
+    h1 { font-size: 22px; margin: 0; }
+    h1 span { color: #6b7280; font-size: 14px; font-weight: 400; }
+    h2 {
+      font-size: 12px; text-transform: uppercase; color: #9aa0a6;
+      margin: 28px 0 12px; letter-spacing: 0.6px;
+    }
+    .actions { display: flex; gap: 8px; align-items: center; }
+    .live-dot {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; background: #4ade80;
+      margin-right: 6px; animation: pulse 2s infinite;
+    }
+    .live-dot.offline { background: #6b7280; animation: none; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .btn {
+      background: #2563eb; color: white; border: none;
+      padding: 8px 16px; border-radius: 6px; cursor: pointer;
+      font-size: 12px; font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn.secondary {
+      background: #23252e; color: #d4d4d8;
+    }
+    .btn.secondary:hover { background: #2f323d; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: #1c1f28; border: 1px solid #23252e;
+      border-radius: 8px; padding: 16px;
+      transition: border-color 0.15s;
+    }
+    .card:hover { border-color: #3b82f6; }
+    .card .label {
+      font-size: 10px; color: #9aa0a6;
+      text-transform: uppercase; letter-spacing: 0.6px;
+      font-weight: 600;
+    }
+    .card .value {
+      font-size: 26px; font-weight: 600; margin-top: 6px;
+      color: #a5d6ff; font-variant-numeric: tabular-nums;
+    }
+    .card .sub {
+      font-size: 11px; color: #6b7280; margin-top: 4px;
+    }
+    .card.warn .value { color: #fbbf24; }
+    .card.ok .value { color: #4ade80; }
+    .card.bad .value { color: #f87171; }
+
+    .chart-wrap {
+      background: #1c1f28; border: 1px solid #23252e;
+      border-radius: 8px; padding: 16px;
+      overflow: hidden;
+    }
+    .chart {
+      height: 200px; display: flex; align-items: flex-end;
+      gap: 2px; padding: 10px 0 0;
+    }
+    .chart .col {
+      flex: 1; background: linear-gradient(to top, #1d4ed8, #3b82f6);
+      border-radius: 2px 2px 0 0; min-height: 2px;
+      position: relative; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .chart .col:hover { opacity: 0.8; }
+    .chart .col.empty { background: #23252e; }
+    .chart .col .tooltip {
+      display: none; position: absolute; bottom: calc(100% + 6px);
+      left: 50%; transform: translateX(-50%);
+      background: #1c1f28; border: 1px solid #3b82f6;
+      padding: 6px 10px; border-radius: 6px;
+      white-space: nowrap; font-size: 11px; z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .chart .col:hover .tooltip { display: block; }
+
+    .line-chart {
+      height: 180px; position: relative;
+      background:
+        linear-gradient(to top, rgba(59,130,246,0.05), transparent),
+        #171a22;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .line-chart svg { width: 100%; height: 100%; display: block; }
+    .line-chart .grid-line {
+      stroke: #23252e; stroke-width: 1;
+    }
+
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 8px 10px; text-align: left;
+      border-bottom: 1px solid #23252e;
+    }
+    th {
+      color: #9aa0a6; font-weight: 600;
+      text-transform: uppercase; font-size: 10px;
+      letter-spacing: 0.5px;
+      background: #171a22;
+    }
+    td { color: #d4d4d8; }
+    tr:hover td { background: #171a22; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .bar-mini {
+      display: inline-block; height: 6px;
+      background: #3b82f6; border-radius: 3px;
+      vertical-align: middle; margin-right: 8px;
+      min-width: 2px;
+    }
+    .badge {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 4px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .badge-green { background: #14532d; color: #86efac; }
+    .badge-yellow { background: #78350f; color: #fcd34d; }
+    .badge-red { background: #7f1d1d; color: #fca5a5; }
+    .badge-blue { background: #1e3a8a; color: #93c5fd; }
+
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    .empty {
+      text-align: center; padding: 40px;
+      color: #6b7280; font-size: 13px;
+    }
+    .loading { opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 Analytics <span id="db-status"></span></h1>
+      <div class="actions">
+        <span id="live-status" class="sub">
+          <span class="live-dot offline" id="live-dot"></span>
+          <span id="live-text">WS отключён</span>
+        </span>
+        <button class="btn secondary" onclick="refreshAll()">🔄 Обновить</button>
+      </div>
+    </header>
+
+    <h2>Обзор системы</h2>
+    <div id="overview" class="grid"></div>
+
+    <h2>Активность за 30 дней</h2>
+    <div class="chart-wrap">
+      <div class="chart" id="daily-chart"></div>
+    </div>
+
+    <h2>Почасовая активность (48ч)</h2>
+    <div class="chart-wrap">
+      <div class="line-chart" id="hourly-chart"></div>
+    </div>
+
+    <h2>Статистика обогащения</h2>
+    <div class="chart-wrap">
+      <div class="line-chart" id="enrichment-chart"></div>
+    </div>
+
+    <h2>Агенты — производительность</h2>
+    <div class="chart-wrap">
+      <table id="agents-table">
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th class="num">Runs</th>
+            <th class="num">Success</th>
+            <th class="num">Avg ms</th>
+            <th class="num">P95 ms</th>
+            <th class="num">Avg iter</th>
+            <th class="num">Tokens</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <h2>Топ тем</h2>
+        <div class="chart-wrap">
+          <table id="topics-table">
+            <thead>
+              <tr>
+                <th>Topic</th>
+                <th class="num">Events</th>
+                <th class="num">Avg imp.</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h2>Инструменты</h2>
+        <div class="chart-wrap">
+          <table id="tools-table">
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th class="num">Calls</th>
+                <th class="num">Success</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <h2>Топ файлов</h2>
+    <div class="chart-wrap">
+      <table id="files-table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th class="num">Chunks</th>
+            <th class="num">Importance</th>
+            <th class="num">Updated</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ─── Утилиты ─────────────────────────────────────────
+    function fmtNum(n) {
+      if (n == null) return '—';
+      if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      return String(n);
+    }
+    function fmtMs(ms) {
+      if (ms == null) return '—';
+      if (ms >= 1000) return (ms / 1000).toFixed(1) + 's';
+      return Math.round(ms) + 'ms';
+    }
+    function fmtDate(s) {
+      if (!s) return '—';
+      const d = new Date(s);
+      return d.toLocaleDateString('ru', { day: '2-digit', month: '2-digit' });
+    }
+    function esc(s) {
+      return String(s || '').replace(/[&<>]/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;'
+      }[c]));
+    }
+
+    // ─── Карточка overview ───────────────────────────────
+    function card(label, value, sub = '', cls = '') {
+      return `<div class="card ${cls}">
+        <div class="label">${label}</div>
+        <div class="value">${value}</div>
+        ${sub ? `<div class="sub">${sub}</div>` : ''}
+      </div>`;
+    }
+
+    async function loadOverview() {
+      const r = await fetch('/api/analytics/overview');
+      const d = await r.json();
+      const el = document.getElementById('overview');
+
+      if (!d.enabled) {
+        el.innerHTML = '<div class="empty">Аналитика доступна только с PostgreSQL</div>';
+        return;
+      }
+
+      el.innerHTML = [
+        card('Сессий', fmtNum(d.total_sessions)),
+        card('Сообщений', fmtNum(d.total_messages)),
+        card('Событий', fmtNum(d.total_events),
+             `${fmtNum(d.events_24h)} за 24ч · ${fmtNum(d.events_7d)} за 7д`),
+        card('Обогащено', fmtNum(d.enriched_events),
+             d.total_events
+               ? `${Math.round(100 * d.enriched_events / d.total_events)}% от всех`
+               : '—',
+             'ok'),
+        card('Важных', fmtNum(d.important_events),
+             'importance ≥ 0.7', 'warn'),
+        card('Файлов', fmtNum(d.total_files),
+             `${fmtNum(d.total_chunks)} чанков`),
+        card('Граф', fmtNum(d.total_nodes),
+             `${fmtNum(d.total_edges)} связей`),
+        card('Loop runs', fmtNum(d.total_runs),
+             `${fmtNum(d.active_agents)} активных агентов`),
+        card('Ср. важность',
+             d.avg_importance != null ? d.avg_importance.toFixed(3) : '—'),
+        card('Размер БД', (d.db_size_mb || 0).toFixed(1) + ' MB'),
+      ].join('');
+    }
+
+    // ─── Столбчатая диаграмма ────────────────────────────
+    async function loadDaily() {
+      const r = await fetch('/api/analytics/daily?days=30');
+      const d = await r.json();
+      if (!d.enabled) return;
+
+      const data = d.data || [];
+      const max = Math.max(1, ...data.map(x => x.events_count));
+      const html = data.map(x => {
+        const h = Math.max(2, (x.events_count / max) * 100);
+        const errH = Math.max(0, (x.errors_count / max) * 100);
+        return `<div class="col" style="height:${h}%">
+          <div class="tooltip">
+            <b>${x.day}</b><br>
+            События: ${x.events_count}<br>
+            Сессии: ${x.sessions_count}<br>
+            Ошибок: ${x.errors_count}<br>
+            Решений: ${x.decisions_count}<br>
+            Ср. важность: ${(x.avg_importance || 0).toFixed(2)}
+          </div>
+        </div>`;
+      }).join('');
+      document.getElementById('daily-chart').innerHTML =
+        html || '<div class="empty">Нет данных</div>';
+    }
+
+    // ─── SVG-линия ───────────────────────────────────────
+    function renderLine(containerId, points, { fill = '#3b82f6' } = {}) {
+      const el = document.getElementById(containerId);
+      if (!points || points.length < 2) {
+        el.innerHTML = '<div class="empty">Нет данных</div>';
+        return;
+      }
+
+      const W = 1000, H = 180, P = 10;
+      const values = points.map(p => p.value);
+      const max = Math.max(1, ...values);
+      const step = (W - 2 * P) / (points.length - 1);
+
+      const pathPoints = points.map((p, i) => {
+        const x = P + i * step;
+        const y = H - P - (p.value / max) * (H - 2 * P);
+        return [x, y];
+      });
+
+      const pathD = pathPoints.map((p, i) =>
+        (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)
+      ).join(' ');
+
+      const areaD = pathD +
+        ` L${pathPoints[pathPoints.length-1][0]},${H-P}` +
+        ` L${pathPoints[0][0]},${H-P} Z`;
+
+      // Grid lines
+      const gridLines = [0, 0.25, 0.5, 0.75, 1].map(f => {
+        const y = H - P - f * (H - 2 * P);
+        return `<line class="grid-line" x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" />`;
+      }).join('');
+
+      const dots = pathPoints.map((p, i) => {
+        const pt = points[i];
+        return `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${fill}"
+          opacity="0.001">
+          <title>${pt.label}: ${pt.value}</title>
+        </circle>`;
+      }).join('');
+
+      el.innerHTML = `
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+          ${gridLines}
+          <defs>
+            <linearGradient id="g-${containerId}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="${fill}" stop-opacity="0.3"/>
+              <stop offset="1" stop-color="${fill}" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="${areaD}" fill="url(#g-${containerId})"/>
+          <path d="${pathD}" stroke="${fill}" stroke-width="2" fill="none"/>
+          ${dots}
+        </svg>
+        <div style="position:absolute;top:8px;right:12px;
+                    font-size:11px;color:#6b7280">
+          max: ${max}
+        </div>
+      `;
+    }
+
+    async function loadHourly() {
+      const r = await fetch('/api/analytics/hourly?hours=48');
+      const d = await r.json();
+      if (!d.enabled) return;
+
+      const points = (d.data || []).map(x => ({
+        value: x.events,
+        label: x.hour,
+      }));
+      renderLine('hourly-chart', points, { fill: '#3b82f6' });
+    }
+
+    async function loadEnrichment() {
+      const r = await fetch('/api/analytics/enrichment?days=30');
+      const d = await r.json();
+      if (!d.enabled) return;
+
+      const points = (d.data || []).map(x => ({
+        value: x.enrichment_rate || 0,
+        label: `${x.day} (${x.enriched}/${x.total_events})`,
+      }));
+      renderLine('enrichment-chart', points, { fill: '#10b981' });
+    }
+
+    // ─── Таблицы ─────────────────────────────────────────
+    async function loadAgents() {
+      const r = await fetch('/api/analytics/agents');
+      const d = await r.json();
+      if (!d.enabled) return;
+      const tbody = document.querySelector('#agents-table tbody');
+      const rows = d.data || [];
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">Нет данных</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(a => {
+        const cls = a.success_rate >= 95 ? 'badge-green'
+                  : a.success_rate >= 80 ? 'badge-yellow'
+                  : 'badge-red';
+        return `<tr>
+          <td><b>${esc(a.agent || '—')}</b></td>
+          <td class="num">${fmtNum(a.runs)}</td>
+          <td class="num"><span class="badge ${cls}">${a.success_rate}%</span></td>
+          <td class="num">${fmtMs(a.avg_duration_ms)}</td>
+          <td class="num">${fmtMs(a.p95_duration_ms)}</td>
+          <td class="num">${a.avg_iterations || 0}</td>
+          <td class="num">${fmtNum(a.total_tokens)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function loadTopics() {
+      const r = await fetch('/api/analytics/topics?limit=15');
+      const d = await r.json();
+      if (!d.enabled) return;
+      const tbody = document.querySelector('#topics-table tbody');
+      const rows = d.data || [];
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="3" class="empty">Нет данных</td></tr>';
+        return;
+      }
+      const max = Math.max(1, ...rows.map(x => x.events_count));
+      tbody.innerHTML = rows.map(t => {
+        const w = Math.round((t.events_count / max) * 100);
+        return `<tr>
+          <td>
+            <span class="bar-mini" style="width:${w}%"></span>
+            ${esc(t.topic)}
+          </td>
+          <td class="num">${t.events_count}</td>
+          <td class="num">${(t.avg_importance || 0).toFixed(2)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function loadTools() {
+      const r = await fetch('/api/analytics/tools?limit=15');
+      const d = await r.json();
+      if (!d.enabled) return;
+      const tbody = document.querySelector('#tools-table tbody');
+      const rows = d.data || [];
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="3" class="empty">Нет данных</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(t => {
+        const cls = t.success_rate >= 95 ? 'badge-green'
+                  : t.success_rate >= 80 ? 'badge-yellow'
+                  : 'badge-red';
+        return `<tr>
+          <td><code style="font-size:11px">${esc(t.tool)}</code></td>
+          <td class="num">${fmtNum(t.calls)}</td>
+          <td class="num"><span class="badge ${cls}">${t.success_rate}%</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function loadFiles() {
+      const r = await fetch('/api/analytics/files?limit=20');
+      const d = await r.json();
+      if (!d.enabled) return;
+      const tbody = document.querySelector('#files-table tbody');
+      const rows = d.data || [];
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">Нет данных</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(f => `
+        <tr>
+          <td><code style="font-size:11px">${esc(f.file)}</code></td>
+          <td class="num">${f.chunk_count}</td>
+          <td class="num">${(f.avg_importance || 0).toFixed(2)}</td>
+          <td class="num">${fmtDate(f.last_updated)}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ─── Refresh ─────────────────────────────────────────
+    async function refreshAll() {
+      const btn = event?.target;
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Обновление...'; }
+      try {
+        await fetch('/api/analytics/refresh', { method: 'POST' });
+        await Promise.all([
+          loadOverview(), loadDaily(), loadHourly(),
+          loadEnrichment(), loadAgents(), loadTopics(),
+          loadTools(), loadFiles(),
+        ]);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Обновить'; }
+      }
+    }
+
+    // ─── WebSocket ───────────────────────────────────────
+    let ws;
+    let wsReconnectTimer = null;
+
+    function connectWs() {
+      try {
+        ws = new WebSocket(`ws://${location.host}/ws/analytics`);
+      } catch (e) {
+        setLiveStatus(false);
+        return;
+      }
+
+      ws.onopen = () => {
+        setLiveStatus(true);
+        if (wsReconnectTimer) {
+          clearTimeout(wsReconnectTimer);
+          wsReconnectTimer = null;
+        }
+      };
+
+      ws.onmessage = (e) => {
+        try {
+          const d = JSON.parse(e.data);
+          if (d.type === 'analytics') {
+            if (d.overview) updateOverviewFromWs(d.overview);
+            if (d.daily) updateDailyFromWs(d.daily);
+            if (d.agents) updateAgentsFromWs(d.agents);
+          } else if (d.type === 'heartbeat') {
+            // ignore
+          }
+        } catch (err) {
+          console.warn('WS message parse:', err);
+        }
+      };
+
+      ws.onclose = () => {
+        setLiveStatus(false);
+        wsReconnectTimer = setTimeout(connectWs, 3000);
+      };
+
+      ws.onerror = () => {
+        setLiveStatus(false);
+      };
+    }
+
+    function setLiveStatus(online) {
+      const dot = document.getElementById('live-dot');
+      const text = document.getElementById('live-text');
+      if (online) {
+        dot.classList.remove('offline');
+        text.textContent = 'Live';
+        text.style.color = '#4ade80';
+      } else {
+        dot.classList.add('offline');
+        text.textContent = 'WS отключён';
+        text.style.color = '#6b7280';
+      }
+    }
+
+    function updateOverviewFromWs(ov) {
+      // Полная перерисовка overview, если пришли свежие данные
+      const el = document.getElementById('overview');
+      if (!el) return;
+      el.innerHTML = [
+        card('Сессий', fmtNum(ov.total_sessions)),
+        card('Сообщений', fmtNum(ov.total_messages)),
+        card('Событий', fmtNum(ov.total_events)),
+        card('Обогащено', fmtNum(ov.enriched_events), '', 'ok'),
+        card('Важных', fmtNum(ov.important_events),
+             'importance ≥ 0.7', 'warn'),
+        card('Чанков', fmtNum(ov.total_chunks)),
+        card('Узлов', fmtNum(ov.total_nodes)),
+        card('Loop runs', fmtNum(ov.total_runs)),
+        card('Ср. важность',
+             ov.avg_importance != null ? ov.avg_importance.toFixed(3) : '—'),
+      ].join('');
+    }
+
+    // ─── Init ────────────────────────────────────────────
+    (async () => {
+      // Проверить доступность аналитики
+      try {
+        const r = await fetch('/api/analytics/overview');
+        const d = await r.json();
+        document.getElementById('db-status').textContent =
+          d.enabled ? '· PostgreSQL' : '· нет БД';
+      } catch {}
+
+      // Загрузить всё
+      await Promise.all([
+        loadOverview(),
+        loadDaily(),
+        loadHourly(),
+        loadEnrichment(),
+        loadAgents(),
+        loadTopics(),
+        loadTools(),
+        loadFiles(),
+      ]);
+
+      // WS для realtime
+      connectWs();
+
+      // Периодический fallback (если WS умер)
+      setInterval(() => {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          loadOverview();
+        }
+      }, 60000);
+    })();
+  </script>
+</body>
+</html>

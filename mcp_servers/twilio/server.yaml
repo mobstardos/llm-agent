@@ -1,0 +1,31 @@
+id: twilio
+schema_version: "1.5.0"
+title: Twilio MCP (Twilio Labs)
+description: SMS, Voice, WhatsApp через Twilio API. Official Twilio Labs monorepo.
+
+command: npx
+args: ['-y', 'twilio-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TWILIO_ACCOUNT_SID, level: hard}
+    - {name: TWILIO_AUTH_TOKEN, level: hard}
+
+mode: write
+
+tools:
+  - {name: twilio_send_sms, danger: write}
+  - {name: twilio_make_call, danger: write}
+  - {name: twilio_search_docs, danger: read}
+  - {name: twilio_get_messages, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# npm: https://www.npmjs.com/package/twilio-mcp (VERIFIED)
+# GitHub: https://github.com/twilio-labs/mcp

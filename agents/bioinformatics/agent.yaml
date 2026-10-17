@@ -1,0 +1,32 @@
+id: bioinformatics
+schema_version: "1.5.0"
+title: Bioinformatics агент
+version: "1.0.0"
+description: "NCBI, Ensembl — генетические и биологические данные."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: NCBI_API_KEY, level: soft}
+
+mcp_servers: [bioinformatics]
+depends_on: {hard: [], soft: []}
+
+priority: 13
+routing_hints:
+  keywords: [bioinformatics, ncbi, gene, variant]
+  negative_keywords: []
+  description_for_router: |
+    NCBI, Ensembl — генетические и биологические данные.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🧬", color: "#1f8b4c", category: specialized}
+
+# GitHub: https://github.com/biothings/mcp

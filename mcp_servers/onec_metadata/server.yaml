@@ -1,0 +1,35 @@
+id: onec_metadata
+schema_version: "1.5.0"
+title: 1C Metadata MCP
+description: Работа с XML-выгрузкой конфигурации 1С
+
+command: python
+args: ["-m", "src.mcp_servers.onec_metadata.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: lxml, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: list_objects, danger: read}
+  - {name: count_objects, danger: read}
+  - {name: read_object, danger: read}
+  - {name: read_module, danger: read}
+  - {name: write_module, danger: write}
+  - {name: create_object, danger: write}
+  - {name: add_attribute, danger: write}
+  - {name: add_tabular_section, danger: write}
+  - {name: create_extension, danger: write}
+  - {name: adopt_object, danger: write}
+  - {name: diff_config, danger: read}
+  - {name: find_module, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

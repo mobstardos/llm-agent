@@ -1,0 +1,26 @@
+id: file_apply_patch_basic
+title: File Agent — применить патч
+category: smoke
+tags: [smoke, file, patch]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "src/hello.py": |
+        def greet():
+            print("hello")
+
+prompt: "Добавь docstring к функции greet в src/hello.py"
+
+options:
+  agent_id: file
+  mcp_servers: [filesystem]
+
+assertions:
+  - type: tool_called
+    params: {tool: "filesystem__read_file"}
+  - type: no_errors
+    params: {}
+
+loop: agent.reasoning

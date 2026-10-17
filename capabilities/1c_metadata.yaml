@@ -1,0 +1,23 @@
+id: onec_metadata
+schema_version: "1.5.0"
+title: 1C Metadata
+description: Работа с XML-выгрузкой конфигурации 1С
+
+operations:
+  - id: read
+  - id: write
+  - id: validate
+
+providers:
+  - id: local_xml
+    display_name: "Локальная XML-выгрузка"
+    type: local
+    priority: 10
+    supports: [read, write, validate]
+    cost_hint: free
+    health:
+      method: which
+      binary: python
+
+strategy: fallback
+tie_breaker: [health, alphabetical]

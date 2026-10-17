@@ -1,0 +1,35 @@
+id: cassandra
+schema_version: "1.5.0"
+title: Cassandra агент (community)
+version: "1.0.0"
+description: "Apache Cassandra: wide-column store, CQL queries. Community реализация."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: CASSANDRA_HOST, level: hard}
+    - {name: CASSANDRA_PORT, level: soft}
+    - {name: CASSANDRA_USERNAME, level: soft}
+    - {name: CASSANDRA_PASSWORD, level: soft}
+
+mcp_servers: [cassandra]
+depends_on: {hard: [], soft: []}
+
+priority: 12
+routing_hints:
+  keywords: ["cassandra", "cql", "wide column"]
+  negative_keywords: []
+  description_for_router: |
+    Apache Cassandra: wide-column store, CQL queries. Community реализация.
+
+mode: write
+dangerous_tools: ['cassandra_execute']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔮", color: "#1287b0", category: database}
+
+# GitHub (VERIFIED): https://github.com/sahil1115/mcp-cassandra-server

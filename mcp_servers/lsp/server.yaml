@@ -1,0 +1,35 @@
+id: lsp
+schema_version: "1.5.0"
+title: LSP MCP
+description: Language Server Protocol — навигация, диагностика, рефакторинг
+
+command: python
+args: ["-m", "src.mcp_servers.lsp.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mode: write
+
+tools:
+  - {name: lsp_status, danger: read}
+  - {name: lsp_diagnostics, danger: read}
+  - {name: lsp_hover, danger: read}
+  - {name: lsp_definition, danger: read}
+  - {name: lsp_references, danger: read}
+  - {name: lsp_implementation, danger: read}
+  - {name: lsp_completion, danger: read}
+  - {name: lsp_signature_help, danger: read}
+  - {name: lsp_document_symbols, danger: read}
+  - {name: lsp_workspace_symbols, danger: read}
+  - {name: lsp_rename, danger: write}
+  - {name: lsp_code_action, danger: write}
+  - {name: lsp_format, danger: write}
+
+process:
+  startup_timeout_seconds: 60
+  restart_policy: on_failure
+  max_restarts: 3

@@ -1,0 +1,33 @@
+id: supabase
+schema_version: "1.5.0"
+title: Supabase агент (official)
+version: "1.0.0"
+description: "Supabase: SQL, Auth, Storage, Realtime + PostgREST built-in. Official."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SUPABASE_ACCESS_TOKEN, level: hard}
+    - {name: SUPABASE_PROJECT_REF, level: soft}
+
+mcp_servers: [supabase]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: ["supabase", "supa", "postgrest"]
+  negative_keywords: []
+  description_for_router: |
+    Supabase: SQL, Auth, Storage, Realtime + PostgREST built-in. Official.
+
+mode: write
+dangerous_tools: ['supabase_create_table', 'supabase_storage_upload']
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🟢", color: "#3ecf8e", category: database}
+
+# GitHub (VERIFIED): https://github.com/supabase/mcp

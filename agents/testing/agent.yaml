@@ -1,0 +1,32 @@
+id: testing
+schema_version: "1.5.0"
+title: Testing агент
+version: "1.0.0"
+description: Тесты — discover, run, coverage, flaky
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [testing, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 8
+routing_hints:
+  keywords: [тесты, pytest, jest, запусти тесты, покрытие, coverage]
+  negative_keywords: [1с, база]
+  description_for_router: |
+    Работа с тестами: запуск, покрытие, поиск тестов, flaky.
+
+mode: destructive
+dangerous_tools: [test_run, test_coverage, test_flaky_check]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 1800}
+ui: {icon: "🧪", color: "#16a34a", category: dev}

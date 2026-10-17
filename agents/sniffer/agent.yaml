@@ -1,0 +1,35 @@
+id: sniffer
+schema_version: "1.5.0"
+title: Sniffer агент
+version: "1.0.0"
+description: перехват TCP-трафика, разбор протоколов, тревоги, экспорт
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [sniffer]
+depends_on: {hard: [], soft: [network]}
+
+priority: 17
+routing_hints:
+  keywords: [сниффер, трафик, пакеты, перехват, дамп, tcp, thrift, modbus,
+             hexdump, pcap, прослушать порт, инспекция, АЗС, RemoteServer,
+             тревоги, аномалии, jsonl, wireshark]
+  negative_keywords: [1с]
+  description_for_router: |
+    Перехват TCP-трафика прозрачным прокси: запуск/остановка сниффера,
+    просмотр пакетов и сессий, разбор протоколов (Thrift, RemoteServer,
+    Modbus, HTTP/JSON, hexdump), тревоги и аномалии, экспорт JSONL/SQLite/
+    PCAP/CSV, чтение файлов захвата.
+
+mode: external
+dangerous_tools: [sniffer_start, sniffer_stop, sniffer_restart, sniffer_read_capture]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 14, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "🛰", color: "#10b981", category: dev}

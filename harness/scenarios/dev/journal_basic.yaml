@@ -1,0 +1,25 @@
+id: journal_basic
+title: Journal — базовая проверка
+category: dev
+tags: [smoke, dev, journal]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "src/test.py": |
+        def hello():
+            pass
+
+prompt: "Покажи статистику журнала"
+
+options:
+  agent_id: journal
+  mcp_servers: [journal, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

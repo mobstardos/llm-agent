@@ -1,0 +1,31 @@
+id: clinical_trials
+schema_version: "1.5.0"
+title: ClinicalTrials.gov агент
+version: "1.0.0"
+description: Доступ к базе клинических исследований ClinicalTrials.gov (600K+ trials).
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars: []
+
+mcp_servers: [clinical_trials]
+depends_on: {hard: [], soft: []}
+
+priority: 12
+routing_hints:
+  keywords: ["clinical trial", "клиническое исследование"]
+  negative_keywords: []
+  description_for_router: |
+    Доступ к базе клинических исследований ClinicalTrials.gov (600K+ trials).
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔬", color: "#0066cc", category: specialized}
+
+# GitHub (VERIFIED): https://github.com/aafjes/mcp-clinicaltrials.gov

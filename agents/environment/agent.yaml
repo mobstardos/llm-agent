@@ -1,0 +1,31 @@
+id: environment
+schema_version: "1.5.0"
+title: Environment агент
+version: "1.0.0"
+description: venv, nvm, pyenv, версии
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [environment, filesystem]
+depends_on: {hard: [], soft: []}
+
+priority: 16
+routing_hints:
+  keywords: [venv, pyenv, nvm, версия python, версия node, окружение]
+  negative_keywords: [1с]
+  description_for_router: |
+    Управление окружениями: venv, pyenv, nvm, версии инструментов.
+
+mode: destructive
+dangerous_tools: [python_venv_create, pyenv_install, pyenv_local,
+                  nvm_install, nvm_use]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 20000, timeout_seconds: 600}
+ui: {icon: "🔧", color: "#6b7280", category: dev}

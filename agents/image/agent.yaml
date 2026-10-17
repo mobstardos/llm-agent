@@ -1,0 +1,39 @@
+id: image
+schema_version: "1.5.0"
+title: Image агент
+version: "1.0.0"
+description: Работа с изображениями — описание, OCR, обработка
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: PIL, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+  capabilities:
+    - {id: vision, ops: [describe], level: soft,
+       message: "Vision недоступна — только OCR"}
+    - {id: ocr, ops: [ocr], level: soft,
+       message: "OCR недоступен"}
+
+mcp_servers: [image, filesystem]
+depends_on:
+  hard: [file]
+  soft: []
+
+priority: 15
+routing_hints:
+  keywords: [картинка, изображение, screenshot, скриншот, иконка, favicon, фото]
+  negative_keywords: [база, sql, git]
+  description_for_router: |
+    Работа с изображениями: описание через Vision, OCR текста,
+    изменение размера, конвертация, favicon.
+
+mode: write
+dangerous_tools: [resize, crop, convert, optimize, generate_favicon_set]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 10, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "🖼", color: "#8b5cf6", category: file}

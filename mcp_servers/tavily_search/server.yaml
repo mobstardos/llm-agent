@@ -1,0 +1,30 @@
+id: tavily_search
+schema_version: "1.5.0"
+title: Tavily Search MCP
+description: AI-tuned search для RAG — находит релевантный контент для LLM.
+
+command: python
+args: ['-m', 'src.mcp_servers.tavily_search.server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: TAVILY_API_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: tavily_search, danger: read}
+  - {name: tavily_extract, danger: read}
+  - {name: tavily_crawl, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: httpx (в requirements.txt)
+# GitHub: https://github.com/tavily-ai/tavily-mcp
+# Native Python — реализация в src/mcp_servers/<id>/server.py

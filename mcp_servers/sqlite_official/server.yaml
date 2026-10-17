@@ -1,0 +1,31 @@
+id: sqlite_official
+schema_version: "1.5.0"
+title: SQLite MCP (official)
+description: Управление SQLite-БД через official MCP. Дополнит ваш db_extended.
+
+command: uvx
+args: ['mcp-server-sqlite']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SQLITE_PATH, level: hard}
+
+mode: write
+
+tools:
+  - {name: sqlite_query, danger: read}
+  - {name: sqlite_execute, danger: write}
+  - {name: sqlite_list_tables, danger: read}
+  - {name: sqlite_schema, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: mcp-server-sqlite (PyPI)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

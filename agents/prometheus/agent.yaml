@@ -1,0 +1,32 @@
+id: prometheus
+schema_version: "1.5.0"
+title: Prometheus агент
+version: "1.0.0"
+description: "Prometheus: PromQL запросы, alertmanager, targets."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROMETHEUS_URL, level: hard}
+
+mcp_servers: [prometheus]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [prometheus, prom, promql]
+  negative_keywords: []
+  description_for_router: |
+    Prometheus: PromQL запросы, alertmanager, targets.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔥", color: "#e6522c", category: monitoring}
+
+# GitHub: https://github.com/prometheus/prometheus

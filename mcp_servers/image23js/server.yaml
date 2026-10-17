@@ -1,0 +1,29 @@
+id: image23js
+schema_version: "1.5.0"
+title: Image23.js MCP
+description: Превращает изображения в интерактивные 3D-модели с помощью кода.
+
+command: npx
+args: ['-y', '@meshy-ai/meshy-mcp-server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: IMAGE23_API_KEY, level: soft}
+
+mode: write
+
+tools:
+  - {name: image23_to_3d, danger: write}
+  - {name: image23_get_model, danger: read}
+  - {name: image23_export, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', '@meshy-ai/meshy-mcp-server' — VERIFIED
+# GitHub: https://github.com/image23/image23js-mcp

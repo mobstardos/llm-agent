@@ -1,0 +1,34 @@
+id: journal
+schema_version: "1.5.0"
+title: Journal MCP
+description: >
+  Чёрный ящик системы: журнал всех действий агентов, правок файлов,
+  зависимостей. Поиск, хронология, провенанс файлов, откат (rollback),
+  план воспроизведения (replay). Доступ только к журналу — проект не трогает.
+
+command: python
+args: ["-m", "src.journal.mcp_server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: soft}
+
+mode: write
+
+tools:
+  - {name: journal_query, danger: read}
+  - {name: journal_search, danger: read}
+  - {name: journal_get, danger: read}
+  - {name: journal_timeline, danger: read}
+  - {name: journal_stats, danger: read}
+  - {name: journal_provenance, danger: read}
+  - {name: journal_rollback, danger: destructive}
+  - {name: journal_replay_plan, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]

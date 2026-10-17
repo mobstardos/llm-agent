@@ -1,0 +1,32 @@
+id: onec_designer_tools
+schema_version: "1.5.0"
+title: 1C Designer Tools MCP
+description: Инструменты разработки 1С через Конструктор MCP — код, запросы, валидация, журнал
+
+command: python
+args: ["-m", "src.mcp_servers.onec_designer_tools.server"]
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: ONEC_MCP_URL, level: soft}
+    - {name: ONEC_MCP_TOKEN, level: soft}
+
+env:
+  ONEC_MCP_URL: "${ONEC_MCP_URL}"
+  ONEC_MCP_TOKEN: "${ONEC_MCP_TOKEN}"
+
+mode: external
+
+tools:
+  - {name: vc_tools_list, danger: read}
+  - {name: vcexecutecode, danger: external}
+  - {name: vcexecutequery, danger: external}
+  - {name: vcvalidatequery, danger: read}
+  - {name: vcloggetlasterror, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3

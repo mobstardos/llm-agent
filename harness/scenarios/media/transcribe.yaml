@@ -1,0 +1,25 @@
+id: media_transcribe
+title: Media — транскрипция аудио
+category: media
+tags: [smoke, media]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Транскрибируй audio/sample.mp3"
+
+options:
+  agent_id: media
+  mcp_servers: [media, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

@@ -1,0 +1,31 @@
+id: onepassword
+schema_version: "1.5.0"
+title: 1Password MCP
+description: Доступ к секретам из 1Password vault. Без хранения в .env.
+
+command: npx
+args: ['-y', 'mcp-1password']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: OP_ACCOUNT, level: hard}
+    - {name: OP_TOKEN, level: hard}
+
+mode: read
+
+tools:
+  - {name: op_get_item, danger: read}
+  - {name: op_list_vaults, danger: read}
+  - {name: op_create_item, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', 'mcp-1password' — VERIFIED
+# GitHub: https://github.com/1Password/1password-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

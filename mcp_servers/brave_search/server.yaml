@@ -1,0 +1,30 @@
+id: brave_search
+schema_version: "1.5.0"
+title: Brave Search MCP
+description: "Web search через Brave Search API. Быстрее, чем browser MCP."
+
+command: python
+args: ['-m', 'src.mcp_servers.brave_search.server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: BRAVE_API_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: brave_search, danger: read}
+  - {name: brave_search_news, danger: read}
+  - {name: brave_search_images, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: httpx (в requirements.txt)
+# GitHub: https://github.com/modelcontextprotocol/servers
+# Native Python — реализация в src/mcp_servers/<id>/server.py

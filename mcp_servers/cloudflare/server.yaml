@@ -1,0 +1,35 @@
+id: cloudflare
+schema_version: "1.5.0"
+title: Cloudflare MCP
+description: "Workers, KV, R2, D1, Pages — управление всей инфраструктурой Cloudflare."
+
+command: npx
+args: ['-y', '@cloudflare/mcp-server-cloudflare']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: CLOUDFLARE_API_TOKEN, level: hard}
+    - {name: CLOUDFLARE_ACCOUNT_ID, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: cf_workers_list, danger: read}
+  - {name: cf_worker_deploy, danger: destructive}
+  - {name: cf_kv_get, danger: read}
+  - {name: cf_kv_set, danger: write}
+  - {name: cf_r2_list_buckets, danger: read}
+  - {name: cf_r2_upload, danger: write}
+  - {name: cf_pages_deploy, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: @cloudflare/mcp-server-cloudflare (npm)
+# GitHub: https://github.com/cloudflare/mcp-server-cloudflare
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

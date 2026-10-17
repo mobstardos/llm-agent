@@ -1,0 +1,31 @@
+id: discord
+schema_version: "1.5.0"
+title: Discord MCP
+description: "Discord: сервера, каналы, сообщения, роли."
+
+command: npx
+args: ['-y', 'discord-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: DISCORD_TOKEN, level: hard}
+
+mode: write
+
+tools:
+  - {name: discord_list_guilds, danger: read}
+  - {name: discord_list_channels, danger: read}
+  - {name: discord_send_message, danger: write}
+  - {name: discord_get_messages, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: discord-mcp (npm)
+# GitHub: https://github.com/sergetic/discord-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

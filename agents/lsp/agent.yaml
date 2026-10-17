@@ -1,0 +1,34 @@
+id: lsp
+schema_version: "1.5.0"
+title: LSP агент
+version: "1.0.0"
+description: Language Server — навигация, диагностика, рефакторинг
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [lsp, filesystem]
+depends_on:
+  hard: [file]
+  soft: [code_analysis]
+
+priority: 7
+routing_hints:
+  keywords: [lsp, диагностика, hover, definition, typescript, pyright]
+  negative_keywords: [1с]
+  description_for_router: |
+    LSP-навигация: hover, definition, references, diagnostics,
+    completion, signature, document symbols, workspace symbols,
+    rename, code actions, format.
+
+mode: write
+dangerous_tools: [lsp_rename, lsp_format]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 40000, timeout_seconds: 300}
+ui: {icon: "🧭", color: "#0ea5e9", category: dev}

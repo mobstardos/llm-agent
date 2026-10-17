@@ -1,0 +1,32 @@
+id: brave_search
+schema_version: "1.5.0"
+title: Brave Search агент
+version: "1.0.0"
+description: "Web search через Brave Search API. Быстрее, чем browser MCP."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: BRAVE_API_KEY, level: hard}
+
+mcp_servers: [brave_search]
+depends_on: {hard: [], soft: []}
+
+priority: 7
+routing_hints:
+  keywords: [поиск, web search, brave]
+  negative_keywords: []
+  description_for_router: |
+    Web search через Brave Search API. Быстрее, чем browser MCP.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🦁", color: "#fb542b", category: search}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

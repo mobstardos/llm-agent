@@ -1,0 +1,27 @@
+id: onec_sql_to_1c
+title: 1C Query — конвертация SQL
+category: 1c
+tags: [smoke, 1c, query, convert]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: |
+  Сконвертируй SQL в язык запросов 1С:
+  SELECT name FROM users WHERE active = TRUE LIMIT 10
+
+options:
+  agent_id: onec_query
+  mcp_servers: [onec_query]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+  - type: steps_less_than
+    params: {value: 5}
+
+loop: agent.reasoning

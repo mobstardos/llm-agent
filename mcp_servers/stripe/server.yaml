@@ -1,0 +1,31 @@
+id: stripe
+schema_version: "1.5.0"
+title: Stripe MCP
+description: "Stripe: платежи, refund, subscription, customers."
+
+command: npx
+args: ['-y', 'stripe-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: STRIPE_SECRET_KEY, level: hard}
+
+mode: destructive
+
+tools:
+  - {name: stripe_create_payment, danger: destructive}
+  - {name: stripe_refund, danger: destructive}
+  - {name: stripe_list_customers, danger: read}
+  - {name: stripe_create_subscription, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: stripe-mcp (npm)
+# GitHub: https://github.com/stripe/stripe-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

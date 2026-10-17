@@ -1,0 +1,31 @@
+id: seatunnel
+schema_version: "1.5.0"
+title: Apache SeaTunnel MCP (official)
+description: "Apache SeaTunnel: data integration, ETL pipelines. Official Apache SeaTunnel-tools."
+
+command: uvx
+args: ['--from', 'git+https://github.com/ocean-zhc/seatunnel-mcp', 'seatunnel-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SEATUNNEL_API_URL, level: hard}
+
+mode: write
+
+tools:
+  - {name: seatunnel_list_jobs, danger: read}
+  - {name: seatunnel_run_job, danger: write}
+  - {name: seatunnel_get_job, danger: read}
+  - {name: seatunnel_get_docs, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# GitHub: https://github.com/ocean-zhc/seatunnel-mcp
+# Альтернатива (official Apache): https://github.com/apache/seatunnel-tools
+# Установка: uvx --from git+https://github.com/ocean-zhc/seatunnel-mcp seatunnel-mcp

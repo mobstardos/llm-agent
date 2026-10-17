@@ -1,0 +1,118 @@
+id: qa_mcp
+schema_version: "1.5.0"
+title: qa-mcp-public (1C TestClient QA)
+description: >
+  63 stable standalone MCP tools для native 1C:Enterprise TestClient QA automation.
+  BDD/Gherkin scenarios, managed-form reads/actions, assertions, waits.
+  Capture-free, NO Vanessa Automation runtime required.
+  Спит native /TESTCLIENT protocol directly, replays 7-frame handshake once,
+  synthesizes every other frame from per-element templates.
+
+command: uv
+args: ['run', 'qa-native-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: QA_MCP_HOME, level: soft}
+    - {name: QA_MCP_TRANSPORT, level: soft}
+    - {name: QA_MCP_HTTP_HOST, level: soft}
+    - {name: QA_MCP_HTTP_PORT, level: soft}
+    - {name: QA_MCP_BEARER_TOKEN, level: soft}
+    - {name: QA_MCP_TESTCLIENT_OWNERSHIP_ROOT, level: soft}
+
+mode: write
+
+tools:
+  - {name: qa_mcp_doctor, danger: read}
+  - {name: launch_test_client, danger: destructive}
+  - {name: attach_test_client, danger: write}
+  - {name: test_client_status, danger: read}
+  - {name: stop_test_client, danger: destructive}
+  - {name: transpile, danger: read}
+  - {name: search_for_steps, danger: read}
+  - {name: run_scenario, danger: write}
+  - {name: run_step, danger: write}
+  - {name: run_write_scenario_tool, danger: write}
+  - {name: get_test_results, danger: read}
+  - {name: write_test_report, danger: write}
+  - {name: get_state, danger: read}
+  - {name: infobase_info, danger: read}
+  - {name: read_form_descriptor, danger: read}
+  - {name: read_active_window, danger: read}
+  - {name: read_record, danger: read}
+  - {name: read_table_cell, danger: read}
+  - {name: read_list_column, danger: read}
+  - {name: read_list_row, danger: read}
+  - {name: read_list_grid, danger: read}
+  - {name: read_spreadsheet_cell, danger: read}
+  - {name: read_user_messages, danger: read}
+  - {name: get_window_list, danger: read}
+  - {name: get_window_list_testclient, danger: read}
+  - {name: capture_screenshot, danger: read}
+  - {name: assert_form_value, danger: read}
+  - {name: wait_for_form_value, danger: read}
+  - {name: assert_data, danger: read}
+  - {name: assert_data_count, danger: read}
+  - {name: role_data_matrix, danger: read}
+  - {name: query_com, danger: read}
+  - {name: assert_com_count, danger: read}
+  - {name: com_connector_doctor, danger: read}
+  - {name: write_form_value, danger: write}
+  - {name: write_form_date, danger: write}
+  - {name: write_form_value_xtest, danger: write}
+  - {name: write_form_values, danger: write}
+  - {name: write_form_fields_by_label, danger: write}
+  - {name: send_keys, danger: write}
+  - {name: switch_page, danger: write}
+  - {name: toggle_checkbox, danger: write}
+  - {name: set_choice, danger: write}
+  - {name: set_reference_field, danger: write}
+  - {name: set_table_cell, danger: write}
+  - {name: set_table_date_cell, danger: write}
+  - {name: select_table_row, danger: write}
+  - {name: add_table_row, danger: write}
+  - {name: delete_table_row, danger: destructive}
+  - {name: move_table_row, danger: write}
+  - {name: copy_table_row, danger: write}
+  - {name: select_all_table_rows, danger: write}
+  - {name: open_list, danger: write}
+  - {name: open_card, danger: write}
+  - {name: close_window, danger: write}
+  - {name: activate_window, danger: write}
+  - {name: click_command, danger: write}
+  - {name: search_list, danger: read}
+  - {name: set_list_view, danger: write}
+  - {name: advanced_search, danger: read}
+  - {name: choose_from_list, danger: write}
+  - {name: choose_from_menu, danger: write}
+  - {name: answer_dialog, danger: write}
+  - {name: run_report, danger: read}
+
+process:
+  startup_timeout_seconds: 60
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# GitHub (VERIFIED): https://github.com/vlikhobabin/qa-mcp-public
+# Install:
+#   1. Download qa_mcp-0.1.0-py3-none-any.whl from GitHub releases
+#   2. python3 -m venv .venv
+#   3. .venv/bin/python -m pip install ./qa_mcp-0.1.0-py3-none-any.whl
+#   4. .venv/bin/qa-native-mcp  (starts stdio MCP server)
+# Or via uv (no need для .whl):
+#   uv run qa-native-mcp
+#
+# Authenticated HTTP transport (default loopback):
+#   export QA_MCP_TRANSPORT=http
+#   export QA_MCP_HTTP_HOST=127.0.0.1
+#   export QA_MCP_HTTP_PORT=8000
+#   export QA_MCP_BEARER_TOKEN="$(openssl rand -hex 32)"
+#   uv run qa-native-mcp
+#   # Connect at http://127.0.0.1:8000/mcp with Authorization: Bearer <token>
+#
+# License: Apache-2.0
+# 63 stable tools + 5 research tools (open_external_processor, echo_jsonrpc_arguments,
+# generate_smoke_suite, autofill_required_fields, measure_scenario)

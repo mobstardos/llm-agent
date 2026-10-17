@@ -1,0 +1,33 @@
+id: weaviate
+schema_version: "1.5.0"
+title: Weaviate агент
+version: "1.0.0"
+description: GraphQL-native vector DB для semantic search.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: WEAVIATE_URL, level: hard}
+    - {name: WEAVIATE_API_KEY, level: soft}
+
+mcp_servers: [weaviate]
+depends_on: {hard: [], soft: []}
+
+priority: 11
+routing_hints:
+  keywords: [weaviate, graphql, vector]
+  negative_keywords: []
+  description_for_router: |
+    GraphQL-native vector DB для semantic search.
+
+mode: write
+dangerous_tools: [weaviate_create_schema, weaviate_insert]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔗", color: "#1ac2a6", category: database}
+
+# GitHub: https://github.com/weaviate/mcp

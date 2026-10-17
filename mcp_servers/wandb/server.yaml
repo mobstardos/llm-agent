@@ -1,0 +1,30 @@
+id: wandb
+schema_version: "1.5.0"
+title: W&B MCP (Weights & Biases official)
+description: Query and analyze your Weights & Biases data через MCP. Official W&B. 16 tools.
+
+command: uvx
+args: ['wb-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: WANDB_API_KEY, level: hard}
+
+mode: read
+
+tools:
+  - {name: wandb_list_runs, danger: read}
+  - {name: wandb_get_run, danger: read}
+  - {name: wandb_list_artifacts, danger: read}
+  - {name: wandb_query_traces, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# PyPI: https://pypi.org/project/wb-mcp/ (VERIFIED)
+# Official GitHub: https://github.com/wandb/wandb-mcp-server (git clone + pip install -e .)

@@ -1,0 +1,31 @@
+id: airtable
+schema_version: "1.5.0"
+title: Airtable MCP
+description: "Airtable: bases, tables, records, views."
+
+command: npx
+args: ['-y', 'airtable-mcp']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AIRTABLE_API_KEY, level: hard}
+
+mode: write
+
+tools:
+  - {name: airtable_list_bases, danger: read}
+  - {name: airtable_list_records, danger: read}
+  - {name: airtable_create_record, danger: write}
+  - {name: airtable_update_record, danger: write}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: airtable-mcp (npm)
+# GitHub: https://github.com/airtable/airtable-mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

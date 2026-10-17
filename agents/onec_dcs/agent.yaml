@@ -1,0 +1,34 @@
+id: onec_dcs
+schema_version: "1.5.0"
+title: 1С DCS агент
+version: "1.0.0"
+description: Схемы компоновки данных 1С
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+    - {name: lxml, level: hard}
+  env_vars:
+    - {name: PROJECT_ROOT, level: hard}
+
+mcp_servers: [onec_dcs, onec_metadata, filesystem]
+depends_on:
+  hard: [file]
+  soft: [onec_metadata]
+
+priority: 14
+routing_hints:
+  keywords: [скд, схема компоновки, отчет, набор данных, вычисляемое поле]
+  negative_keywords: [web, sql]
+  description_for_router: |
+    Схемы компоновки данных 1С: чтение, анализ, создание,
+    добавление вычисляемых полей и параметров.
+
+mode: write
+dangerous_tools: [create_dcs, add_calculated_field, add_parameter]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "📊", color: "#dc2626", category: 1c}

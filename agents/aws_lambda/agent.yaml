@@ -1,0 +1,33 @@
+id: aws_lambda
+schema_version: "1.5.0"
+title: AWS Lambda агент
+version: "1.0.0"
+description: "Управление Lambda-функциями: invoke, deploy, list, logs."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: AWS_ACCESS_KEY_ID, level: hard}
+    - {name: AWS_SECRET_ACCESS_KEY, level: hard}
+
+mcp_servers: [aws_lambda]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [lambda, aws lambda, функция]
+  negative_keywords: []
+  description_for_router: |
+    Управление Lambda-функциями: invoke, deploy, list, logs.
+
+mode: destructive
+dangerous_tools: [lambda_invoke, lambda_deploy]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "λ", color: "#ff9900", category: cloud}
+
+# GitHub: https://github.com/aws-samples/mcp-aws-lambda

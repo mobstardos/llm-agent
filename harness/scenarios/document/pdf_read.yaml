@@ -1,0 +1,24 @@
+id: document_pdf_read
+title: Document — чтение PDF
+category: document
+tags: [smoke, document, pdf]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test.txt": "placeholder"
+
+prompt: "Прочитай документ docs/manual.pdf"
+
+options:
+  agent_id: document
+  mcp_servers: [document]
+
+assertions:
+  - type: no_errors
+    params: {}
+  - type: steps_less_than
+    params: {value: 10}
+
+loop: agent.reasoning

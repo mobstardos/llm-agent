@@ -1,0 +1,32 @@
+id: mongodb
+schema_version: "1.5.0"
+title: MongoDB MCP
+description: "Документо-ориентированная БД. CRUD, агрегации, индексы."
+
+command: npx
+args: ['-y', 'mongodb-mcp-server']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: MONGO_URI, level: hard}
+
+mode: write
+
+tools:
+  - {name: mongo_find, danger: read}
+  - {name: mongo_insert, danger: write}
+  - {name: mongo_update, danger: write}
+  - {name: mongo_delete, danger: destructive}
+  - {name: mongo_aggregate, danger: read}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', 'mongodb-mcp-server' — VERIFIED
+# GitHub: https://github.com/mongodb-js/mcp
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

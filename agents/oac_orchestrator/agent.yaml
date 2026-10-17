@@ -1,0 +1,32 @@
+id: oac_orchestrator
+schema_version: "1.5.0"
+title: OAC оркестратор
+version: "1.0.0"
+description: оркестрация задач по методологии OpenAgents Control (анализ → план → подтверждение → выполнение → проверка)
+
+requires:
+  python_packages: []
+  env_vars: []
+
+mcp_servers: []
+depends_on: {hard: [], soft: [file, code_analysis, testing, documentation, cicd, environment]}
+
+priority: 18
+routing_hints:
+  keywords: [оac, план, ревью, декомпозиция, контекст, сабтаск, методология,
+             подтверждение, конвейер, по шагам]
+  negative_keywords: []
+  description_for_router: |
+    Оркестрация сложных задач по методологии OAC: анализ контекста (MVI-бандл),
+    план с пометками [review], подтверждение пользователя, делегирование шагов
+    профильным агентам, верификация результата. Используйте для многошаговых
+    задач, где важен контроль изменений.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 14, max_result_chars: 30000, timeout_seconds: 300}
+ui: {icon: "🎼", color: "#8b5cf6", category: dev}

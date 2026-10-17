@@ -1,0 +1,33 @@
+id: gmail
+schema_version: "1.5.0"
+title: Gmail MCP
+description: "Gmail: чтение, отправка, поиск писем, управление метками."
+
+command: npx
+args: ['-y', 'mcp-server-gmail']
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GMAIL_CLIENT_ID, level: hard}
+    - {name: GMAIL_CLIENT_SECRET, level: hard}
+
+mode: write
+
+tools:
+  - {name: gmail_send, danger: write}
+  - {name: gmail_read, danger: read}
+  - {name: gmail_search, danger: read}
+  - {name: gmail_list_labels, danger: read}
+  - {name: gmail_trash, danger: destructive}
+
+process:
+  startup_timeout_seconds: 30
+  restart_policy: on_failure
+  max_restarts: 3
+  backoff_seconds: [1, 2, 5, 15]
+
+# Package: '-y', 'mcp-server-gmail' — VERIFIED
+# GitHub: https://github.com/anthropics/mcp-server-gmail
+# External — установка через npx/uvx (см. install_mcp_servers.sh)

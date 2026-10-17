@@ -1,0 +1,33 @@
+id: sonarqube
+schema_version: "1.5.0"
+title: SonarQube агент
+version: "1.0.0"
+description: "Анализ code quality: code smells, security hotspots, bugs."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: SONARQUBE_URL, level: hard}
+    - {name: SONARQUBE_TOKEN, level: hard}
+
+mcp_servers: [sonarqube]
+depends_on: {hard: [], soft: []}
+
+priority: 10
+routing_hints:
+  keywords: [sonarqube, code quality, code smell]
+  negative_keywords: []
+  description_for_router: |
+    Анализ code quality: code smells, security hotspots, bugs.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🧐", color: "#4e9e9c", category: code_quality}
+
+# GitHub: https://github.com/sonarsource/sonarqube-mcp

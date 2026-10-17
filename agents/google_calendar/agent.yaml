@@ -1,0 +1,33 @@
+id: google_calendar
+schema_version: "1.5.0"
+title: Google Calendar агент
+version: "1.0.0"
+description: "Google Calendar: события, расписания, напоминания."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GCAL_CLIENT_ID, level: hard}
+    - {name: GCAL_CLIENT_SECRET, level: hard}
+
+mcp_servers: [google_calendar]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [calendar, календарь, событие]
+  negative_keywords: []
+  description_for_router: |
+    Google Calendar: события, расписания, напоминания.
+
+mode: write
+dangerous_tools: [gcal_create_event, gcal_update_event, gcal_delete_event]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📅", color: "#4285f4", category: office}
+
+# GitHub: https://github.com/modelcontextprotocol/servers

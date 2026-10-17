@@ -1,0 +1,33 @@
+id: grafana
+schema_version: "1.5.0"
+title: Grafana агент
+version: "1.0.0"
+description: "Grafana: query метрик, dashboards, alerts, data sources."
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: GRAFANA_URL, level: hard}
+    - {name: GRAFANA_API_KEY, level: hard}
+
+mcp_servers: [grafana]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [grafana, дашборд, график, метрика]
+  negative_keywords: []
+  description_for_router: |
+    Grafana: query метрик, dashboards, alerts, data sources.
+
+mode: read
+dangerous_tools: []
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "📈", color: "#f46800", category: monitoring}
+
+# GitHub: https://github.com/grafana/mcp-server-grafana

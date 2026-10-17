@@ -1,0 +1,26 @@
+id: testing_framework_detect
+title: Testing — определить фреймворк
+category: dev
+tags: [smoke, dev, testing]
+
+fixture:
+  type: temp_project
+  params:
+    files:
+      "test_example.py": |
+        def test_one():
+            assert 1 + 1 == 2
+      "pyproject.toml": "[tool.pytest.ini_options]\n"
+
+prompt: "Определи тестовый фреймворк проекта"
+
+options:
+  agent_id: testing
+  mcp_servers: [testing, filesystem]
+
+assertions:
+  - type: no_errors
+    severity: soft
+    params: {}
+
+loop: agent.reasoning

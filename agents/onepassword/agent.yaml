@@ -1,0 +1,33 @@
+id: onepassword
+schema_version: "1.5.0"
+title: 1Password агент
+version: "1.0.0"
+description: Доступ к секретам из 1Password vault. Без хранения в .env.
+
+requires:
+  python_packages:
+    - {name: mcp, level: hard}
+  env_vars:
+    - {name: OP_ACCOUNT, level: hard}
+    - {name: OP_TOKEN, level: hard}
+
+mcp_servers: [onepassword]
+depends_on: {hard: [], soft: []}
+
+priority: 9
+routing_hints:
+  keywords: [1password, op, секрет, vault]
+  negative_keywords: []
+  description_for_router: |
+    Доступ к секретам из 1Password vault. Без хранения в .env.
+
+mode: read
+dangerous_tools: [op_create_item]
+
+prompt: prompt.md
+user_template: user.md
+
+runtime: {max_steps: 15, max_result_chars: 30000, timeout_seconds: 600}
+ui: {icon: "🔐", color: "#0078d4", category: security}
+
+# GitHub: https://github.com/1Password/1password-mcp

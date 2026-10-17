@@ -1,0 +1,8 @@
+{
+  "mcpServers": { 
+    "MCP-demo": {
+      "url": "http://localhost/mcptest/hs/mcp",
+      "connection_id": "1c_demo_mcp_001"
+    }
+  }
+} 
